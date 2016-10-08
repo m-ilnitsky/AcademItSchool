@@ -121,4 +121,34 @@ public class Range {
 
         return null;
     }
+
+    public Range[] calcUnion(Range range2){
+        if(isInside(range2)){
+            Range[] union = new Range[1];
+            union[0].setEquals(this);
+            return union;
+        }else if(range2.isInside(this)){
+            Range[] union = new Range[1];
+            union[0].setEquals(range2);
+            return union;
+        }else if(isIntersection(range2)){
+            Range[] union = new Range[1];
+            union[0].set(Math.min(range2.getFrom(),from),Math.max(range2.getTo(),to));
+            return union;
+        }else{
+            Range[] union = new Range[2];
+            if(FD.isBigger(range2.from,to)){
+                union[0].setEquals(this);
+                union[1].setEquals(range2);
+            }else{
+                union[0].setEquals(range2);
+                union[1].setEquals(this);
+            }
+            return union;
+        }
+    }
+
+    public Range[] calcDifference(Range range2){
+
+    }
 }
