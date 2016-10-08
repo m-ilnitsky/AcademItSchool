@@ -100,8 +100,8 @@ public class Range {
         return FD.isBiggerOrEqual(range2.to, from) && FD.isBiggerOrEqual(to, range2.from);
     }
 
-    public Range calcIntersection(Range range2){
-        if(isIntersection(range2)){
+    public Range calcIntersection(Range range2) {
+        if (isIntersection(range2)) {
             Range intersection = new Range();
 
             if (range2.isInside(this)) {
@@ -122,25 +122,17 @@ public class Range {
         return null;
     }
 
-    public Range[] calcUnion(Range range2){
-        if(isInside(range2)){
+    public Range[] calcUnion(Range range2) {
+        if (isIntersection(range2)) {
             Range[] union = new Range[1];
-            union[0].setEquals(this);
+            union[0].set(Math.min(range2.getFrom(), from), Math.max(range2.getTo(), to));
             return union;
-        }else if(range2.isInside(this)){
-            Range[] union = new Range[1];
-            union[0].setEquals(range2);
-            return union;
-        }else if(isIntersection(range2)){
-            Range[] union = new Range[1];
-            union[0].set(Math.min(range2.getFrom(),from),Math.max(range2.getTo(),to));
-            return union;
-        }else{
+        } else {
             Range[] union = new Range[2];
-            if(FD.isBigger(range2.from,to)){
+            if (FD.isBigger(range2.from, to)) {
                 union[0].setEquals(this);
                 union[1].setEquals(range2);
-            }else{
+            } else {
                 union[0].setEquals(range2);
                 union[1].setEquals(this);
             }
@@ -148,7 +140,36 @@ public class Range {
         }
     }
 
-    public Range[] calcDifference(Range range2){
-
+    public Range[] calcDifference(Range range2) {
+        if (range2.isInside(this) || isEqual(range2)) {
+            return null;
+        } else if (isInside(range2)) {
+            if (FD.isEqual(to, range2.to)) {
+                Range[] union = new Range[1];
+                union[0].set(from, range2.from);
+                return union;
+            } else if (FD.isEqual(from, range2.from)) {
+                Range[] union = new Range[1];
+                union[0].set(range2.to, to);
+                return union;
+            } else {
+                Range[] union = new Range[2];
+                union[0].set(from, range2.from);
+                union[1].set(range2.to, to);
+                return union;
+            }
+        } else if (isIntersection(range2)) {
+            Range[] union = new Range[1];
+            if (FD.isBigger(range2.to, to)) {
+                union[0].set(from, range2.from);
+            } else {
+                union[0].set(range2.to, to);
+            }
+            return union;
+        } else {
+            Range[] union = new Range[1];
+            union[0].setEquals(this);
+            return union;
+        }
     }
 }
