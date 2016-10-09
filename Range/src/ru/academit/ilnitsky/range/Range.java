@@ -125,16 +125,16 @@ public class Range {
     public Range[] calcUnion(Range range2) {
         if (isIntersection(range2)) {
             Range[] union = new Range[1];
-            union[0].set(Math.min(range2.getFrom(), from), Math.max(range2.getTo(), to));
+            union[0] = new Range(Math.min(range2.from, from), Math.max(range2.to, to));
             return union;
         } else {
             Range[] union = new Range[2];
             if (FD.isBigger(range2.from, to)) {
-                union[0].setEquals(this);
-                union[1].setEquals(range2);
+                union[0] = new Range(this);
+                union[1] = new Range(range2);
             } else {
-                union[0].setEquals(range2);
-                union[1].setEquals(this);
+                union[0] = new Range(range2);
+                union[1] = new Range(this);
             }
             return union;
         }
@@ -146,30 +146,34 @@ public class Range {
         } else if (isInside(range2)) {
             if (FD.isEqual(to, range2.to)) {
                 Range[] union = new Range[1];
-                union[0].set(from, range2.from);
+                union[0] = new Range(from, range2.from);
                 return union;
             } else if (FD.isEqual(from, range2.from)) {
                 Range[] union = new Range[1];
-                union[0].set(range2.to, to);
+                union[0] = new Range(range2.to, to);
                 return union;
             } else {
                 Range[] union = new Range[2];
-                union[0].set(from, range2.from);
-                union[1].set(range2.to, to);
+                union[0] = new Range(from, range2.from);
+                union[1] = new Range(range2.to, to);
                 return union;
             }
         } else if (isIntersection(range2)) {
             Range[] union = new Range[1];
             if (FD.isBigger(range2.to, to)) {
-                union[0].set(from, range2.from);
+                union[0] = new Range(from, range2.from);
             } else {
-                union[0].set(range2.to, to);
+                union[0] = new Range(range2.to, to);
             }
             return union;
         } else {
             Range[] union = new Range[1];
-            union[0].setEquals(this);
+            union[0] = new Range(this);
             return union;
         }
+    }
+
+    public String toString() {
+        return "[ " + from + " ; " + to + " ]";
     }
 }
