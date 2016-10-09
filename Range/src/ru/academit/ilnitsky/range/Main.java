@@ -97,15 +97,22 @@ public class Main {
 
         Range[] range6d7 = range6.calcDifference(range7);
         System.out.print("range6.calcDifference(range7) = ");
-        for (int i = 0; i < range6d7.length; i++) {
-            System.out.print(range6d7[i] + " ");
+        for (Range r: range6d7) {
+            System.out.print(r + " ");
         }
         System.out.println();
 
         Range[] range3d7 = range3.calcDifference(range7);
         System.out.print("range3.calcDifference(range7) = ");
-        for (int i = 0; i < range3d7.length; i++) {
-            System.out.print(range3d7[i] + " ");
+        for (Range r: range3d7) {
+            System.out.print(r + " ");
+        }
+        System.out.println();
+
+        Range[] range3d5 = range3.calcDifference(range5);
+        System.out.print("range3.calcDifference(range5) = ");
+        for (Range r: range3d5) {
+            System.out.print(r + " ");
         }
         System.out.println();
 
@@ -113,15 +120,15 @@ public class Main {
 
         Range[] range6u7 = range6.calcUnion(range7);
         System.out.print("range6.calcUnion(range7) = ");
-        for (int i = 0; i < range6u7.length; i++) {
-            System.out.print(range6u7[i] + " ");
+        for (Range r: range6u7) {
+            System.out.print(r + " ");
         }
         System.out.println();
 
         Range[] range3u7 = range3.calcUnion(range7);
         System.out.print("range3.calcUnion(range7) = ");
-        for (int i = 0; i < range3u7.length; i++) {
-            System.out.print(range3u7[i] + " ");
+        for (Range r: range3u7) {
+            System.out.print(r + " ");
         }
         System.out.println();
     }
