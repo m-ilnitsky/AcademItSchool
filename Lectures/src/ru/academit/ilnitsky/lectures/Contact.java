@@ -50,7 +50,7 @@ public class Contact {
     }
 
     public String toString() {
-        return String.format("И: %s, Ф: %s, Т: %s", name, surname, phone);
+        return String.format("И: %-8s Ф: %-15s Т: %-7s", name, surname, phone);
     }
 
     public static void main(String[] args) {
@@ -61,6 +61,17 @@ public class Contact {
         contact[2]=new Contact("Юля","Василькова","12775");
         contact[3]=new Contact("Оля","Шаландова","12771");
 
+        for (Contact c: contact) {
+            System.out.println(c);
+        }
+
+        contact[0].setName("Дуся");
+        contact[1].setSurname("Попкин");
+        contact[2].setPhone("!666!");
+        contact[3].setName("Воля");
+        contact[3].setSurname(contact[3].getSurname()+"нович");
+
+        System.out.println();
         for (Contact c: contact) {
             System.out.println(c);
         }

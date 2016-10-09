@@ -104,20 +104,7 @@ public class Range {
 
     public Range calcIntersection(Range range) {
         if (isIntersection(range)) {
-            Range intersection = new Range();
-
-            if (range.isInside(this)) {
-                intersection.set(from, to);
-            } else if (this.isInside(range)) {
-                intersection.set(range.from, range.to);
-            } else if (Compare.isBigger(to, range.to) && Compare.isBiggerOrEqual(range.to, from)) {
-                intersection.set(from, range.to);
-            } else if (Compare.isBigger(range.to, to) && Compare.isBiggerOrEqual(to, range.from)) {
-                intersection.set(range.from, to);
-            } else {
-                return null;
-            }
-
+            Range intersection = new Range(Math.max(range.from, from), Math.min(range.to, to));
             return intersection;
         }
 
