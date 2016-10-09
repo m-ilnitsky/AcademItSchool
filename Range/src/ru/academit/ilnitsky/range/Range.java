@@ -2,7 +2,7 @@ package ru.academit.ilnitsky.range;
 
 /**
  * Created by Mike on 09.10.2016.
- * Числовой диапазон
+ * Класс "Числовой диапазон"
  */
 public class Range {
     private double from;

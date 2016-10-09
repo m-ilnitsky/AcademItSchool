@@ -1,9 +1,8 @@
 package ru.academit.ilnitsky.range;
 
-import com.sun.istack.internal.NotNull;
-
 /**
  * Created by Mike on 09.10.2016.
+ * Программа для тестирования класса Range
  */
 public class Main {
     public static void main(String[] args) {
