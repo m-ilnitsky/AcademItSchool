@@ -47,4 +47,13 @@ public class Rectangle implements Shape {
     public void set(Shape shape) {
         set(shape.getWidth(), shape.getHeight());
     }
+
+    public boolean equals(Rectangle rectangle) {
+        return ((height == rectangle.height) && (width == rectangle.width))
+                || ((height == rectangle.width) && (width == rectangle.height));
+    }
+
+    public String toString() {
+        return String.format("[Rectangle: W = %f, H = %f]", width, height);
+    }
 }

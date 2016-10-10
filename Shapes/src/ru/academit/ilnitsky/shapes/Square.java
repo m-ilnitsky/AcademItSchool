@@ -51,4 +51,12 @@ public class Square implements Shape {
     public void setPerimeter(double perimeter) {
         this.edge = perimeter / 4;
     }
+
+    public boolean equals(Square square) {
+        return edge == square.edge;
+    }
+
+    public String toString() {
+        return String.format("[Square: W = H = %f]", edge);
+    }
 }

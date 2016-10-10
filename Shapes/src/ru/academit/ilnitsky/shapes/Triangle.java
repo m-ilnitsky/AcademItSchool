@@ -10,14 +10,21 @@ public class Triangle implements Shape {
     private Point pointC;
 
     public Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
-        set(x1, y1, x2, y2, x3, y3);
+        this.pointA = new Point(x1, y1);
+        this.pointB = new Point(x2, y2);
+        this.pointC = new Point(x3, y3);
     }
 
     public Triangle(Point pointA, Point pointB, Point pointC) {
-        set(pointA, pointB, pointC);
+        this.pointA = new Point(pointA);
+        this.pointB = new Point(pointB);
+        this.pointC = new Point(pointC);
     }
 
     public Triangle() {
+        this.pointA = new Point();
+        this.pointB = new Point();
+        this.pointC = new Point();
     }
 
     public double getWidth() {
@@ -52,5 +59,16 @@ public class Triangle implements Shape {
         this.pointA = pointA;
         this.pointB = pointB;
         this.pointC = pointC;
+    }
+
+    public boolean equals(Triangle triangle) {
+        return (pointA.equals(triangle.pointA) && pointB.equals(triangle.pointB) && pointC.equals(triangle.pointC))
+                || (pointA.equals(triangle.pointB) && pointB.equals(triangle.pointC) && pointC.equals(triangle.pointA))
+                || (pointA.equals(triangle.pointC) && pointB.equals(triangle.pointA) && pointC.equals(triangle.pointB));
+    }
+
+    public String toString() {
+        return String.format("[Triangle: A%s B%s C%s]", pointA, pointB, pointC);
+        //return String.format("[Triangle: A(%f ; %f) B(%f ; %f) C(%f ; %f)]", pointA.getX(), pointA.getY(), pointB.getX(), pointB.getY(), pointC.getX(), pointC.getY());
     }
 }

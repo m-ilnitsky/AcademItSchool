@@ -53,4 +53,12 @@ public class Circle implements Shape {
     public void set(Shape shape) {
         this.radius = Math.min(shape.getHeight(), shape.getWidth()) / 2;
     }
+
+    public boolean equals(Circle circle) {
+        return radius == circle.radius;
+    }
+
+    public String toString() {
+        return String.format("[Circle: R = %f]", radius);
+    }
 }

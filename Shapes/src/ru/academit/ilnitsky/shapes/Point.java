@@ -12,6 +12,10 @@ public class Point {
         set(x, y);
     }
 
+    public Point(Point point) {
+        set(point.x, point.y);
+    }
+
     public Point() {
     }
 
@@ -55,7 +59,12 @@ public class Point {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    public boolean equals(Point point) {
+        return (x == point.x) && (y == point.y);
+    }
+
     public String toString() {
-        return String.format("(%f ; %f)", x, y);
+        return "( " + x + " ; " + y + " )";
+        //return String.format("(%f ; %f)", x, y);
     }
 }
