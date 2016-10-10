@@ -104,8 +104,7 @@ public class Range {
 
     public Range calcIntersection(Range range) {
         if (isIntersection(range)) {
-            Range intersection = new Range(Math.max(range.from, from), Math.min(range.to, to));
-            return intersection;
+            return new Range(Math.max(range.from, from), Math.min(range.to, to));
         }
 
         return null;
@@ -113,8 +112,7 @@ public class Range {
 
     public Range[] calcUnion(Range range) {
         if (isIntersection(range)) {
-            Range[] union = {new Range(Math.min(range.from, from), Math.max(range.to, to))};
-            return union;
+            return new Range[]{new Range(Math.min(range.from, from), Math.max(range.to, to))};
         } else {
             Range[] union = new Range[2];
             if (Compare.isBigger(range.from, to)) {
@@ -133,14 +131,11 @@ public class Range {
             return new Range[0];
         } else if (isInside(range)) {
             if (Compare.isEqual(to, range.to)) {
-                Range[] difference = {new Range(from, range.from)};
-                return difference;
+                return new Range[]{new Range(from, range.from)};
             } else if (Compare.isEqual(from, range.from)) {
-                Range[] difference = {new Range(range.to, to)};
-                return difference;
+                return new Range[]{new Range(range.to, to)};
             } else {
-                Range[] difference = {new Range(from, range.from), new Range(range.to, to)};
-                return difference;
+                return new Range[]{new Range(from, range.from), new Range(range.to, to)};
             }
         } else if (isIntersection(range)) {
             Range[] difference = new Range[1];
@@ -151,8 +146,7 @@ public class Range {
             }
             return difference;
         } else {
-            Range[] difference = {new Range(this)};
-            return difference;
+            return new Range[]{new Range(this)};
         }
     }
 
