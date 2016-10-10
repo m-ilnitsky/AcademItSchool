@@ -48,6 +48,14 @@ public class Rectangle implements Shape {
         set(shape.getWidth(), shape.getHeight());
     }
 
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + HashCode.hashCode(width);
+        result = prime * result + HashCode.hashCode(height);
+        return result;
+    }
+
     public boolean equals(Rectangle rectangle) {
         return ((height == rectangle.height) && (width == rectangle.width))
                 || ((height == rectangle.width) && (width == rectangle.height));

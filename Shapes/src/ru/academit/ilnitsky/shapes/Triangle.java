@@ -61,6 +61,15 @@ public class Triangle implements Shape {
         this.pointC = pointC;
     }
 
+    public int hashCode() {
+        final int prime = 7;
+        int result = 1;
+        result = prime * result + pointA.hashCode();
+        result = prime * result + pointB.hashCode();
+        result = prime * result + pointC.hashCode();
+        return result;
+    }
+
     public boolean equals(Triangle triangle) {
         return (pointA.equals(triangle.pointA) && pointB.equals(triangle.pointB) && pointC.equals(triangle.pointC))
                 || (pointA.equals(triangle.pointB) && pointB.equals(triangle.pointC) && pointC.equals(triangle.pointA))

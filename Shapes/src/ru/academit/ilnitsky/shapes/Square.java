@@ -52,6 +52,13 @@ public class Square implements Shape {
         this.edge = perimeter / 4;
     }
 
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + HashCode.hashCode(edge);
+        return result;
+    }
+
     public boolean equals(Square square) {
         return edge == square.edge;
     }

@@ -54,6 +54,13 @@ public class Circle implements Shape {
         this.radius = Math.min(shape.getHeight(), shape.getWidth()) / 2;
     }
 
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + HashCode.hashCode(radius);
+        return result;
+    }
+
     public boolean equals(Circle circle) {
         return radius == circle.radius;
     }

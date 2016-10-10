@@ -88,7 +88,7 @@ public class Main {
         shape[11] = new Triangle(12, 11, 0, 11, 0, 0);
 
         for (Shape sh : shape) {
-            System.out.printf("%-70s  S = %-12f  P = %-12f  HashCode = %10d%n", sh, sh.getArea(), sh.getPerimeter(), sh.hashCode());
+            System.out.printf("%-70s  S = %-12f  P = %-12f  HashCode = %11d%n", sh, sh.getArea(), sh.getPerimeter(), sh.hashCode());
         }
 
         Shape[] maxArea = new Shape[5];
@@ -106,5 +106,19 @@ public class Main {
             maxPerimeter[i] = findMaxPerimeter(shape, i + 1);
             System.out.printf("№%-2d  P = %-12f  %-80s%n", i + 1, maxPerimeter[i].getPerimeter(), maxPerimeter[i]);
         }
+
+        System.out.println();
+        System.out.println(HashCode.hashCode(100));
+        System.out.println(HashCode.hashCode(1.0001));
+        System.out.println(HashCode.hashCode(1.0000002));
+        System.out.println(HashCode.hashCode(1.345e77));
+        System.out.println(HashCode.hashCode(-1.345e77));
+        System.out.println(HashCode.hashCode(1.345e-77));
+
+        System.out.println();
+        System.out.println(new Point(1, 12).hashCode());
+        System.out.println(new Point(2, 7).hashCode());
+        System.out.println(new Point(7, 2).hashCode());
+        System.out.println(new Point(0, 127).hashCode());
     }
 }

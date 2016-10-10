@@ -59,6 +59,14 @@ public class Point {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + HashCode.hashCode(x);
+        result = prime * result + HashCode.hashCode(y);
+        return result;
+    }
+
     public boolean equals(Point point) {
         return (x == point.x) && (y == point.y);
     }
