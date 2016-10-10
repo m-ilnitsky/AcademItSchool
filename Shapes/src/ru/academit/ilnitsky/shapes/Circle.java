@@ -11,13 +11,6 @@ public class Circle implements Shape {
         this.radius = radius;
     }
 
-    public Circle(Shape shape) {
-        set(shape);
-    }
-
-    public Circle() {
-    }
-
     public double getWidth() {
         return radius * 2;
     }
@@ -50,7 +43,7 @@ public class Circle implements Shape {
         this.radius = perimeter / 2 / Math.PI;
     }
 
-    public void set(Shape shape) {
+    public void clone(Shape shape) {
         this.radius = Math.min(shape.getHeight(), shape.getWidth()) / 2;
     }
 
@@ -61,8 +54,17 @@ public class Circle implements Shape {
         return result;
     }
 
-    public boolean equals(Circle circle) {
-        return radius == circle.radius;
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        } else if (this == object) {
+            return true;
+        } else if (this.getClass() == object.getClass()) {
+            Circle other = (Circle) object;
+            return radius == other.radius;
+        } else {
+            return false;
+        }
     }
 
     public String toString() {

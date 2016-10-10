@@ -21,10 +21,16 @@ public class Triangle implements Shape {
         this.pointC = new Point(pointC);
     }
 
-    public Triangle() {
-        this.pointA = new Point();
-        this.pointB = new Point();
-        this.pointC = new Point();
+    public Point getPointA() {
+        return pointA;
+    }
+
+    public Point getPointB() {
+        return pointB;
+    }
+
+    public Point getPointC() {
+        return pointC;
     }
 
     public double getWidth() {
@@ -49,16 +55,22 @@ public class Triangle implements Shape {
         return pointA.getDistance(pointB) + pointB.getDistance(pointC) + pointC.getDistance(pointA);
     }
 
-    public void set(double x1, double y1, double x2, double y2, double x3, double y3) {
-        this.pointA.set(x1, y1);
-        this.pointB.set(x2, y2);
-        this.pointC.set(x3, y3);
+    public void setPointA(Point pointA) {
+        this.pointA = pointA;
     }
 
-    public void set(Point pointA, Point pointB, Point pointC) {
-        this.pointA = pointA;
+    public void setPointB(Point pointB) {
         this.pointB = pointB;
+    }
+
+    public void setPointC(Point pointC) {
         this.pointC = pointC;
+    }
+
+    public void clone(Triangle triangle) {
+        this.pointA = triangle.pointA;
+        this.pointB = triangle.pointB;
+        this.pointC = triangle.pointC;
     }
 
     public int hashCode() {
@@ -70,14 +82,20 @@ public class Triangle implements Shape {
         return result;
     }
 
-    public boolean equals(Triangle triangle) {
-        return (pointA.equals(triangle.pointA) && pointB.equals(triangle.pointB) && pointC.equals(triangle.pointC))
-                || (pointA.equals(triangle.pointB) && pointB.equals(triangle.pointC) && pointC.equals(triangle.pointA))
-                || (pointA.equals(triangle.pointC) && pointB.equals(triangle.pointA) && pointC.equals(triangle.pointB));
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        } else if (this == object) {
+            return true;
+        } else if (this.getClass() == object.getClass()) {
+            Triangle other = (Triangle) object;
+            return (pointA.equals(other.pointA) && pointB.equals(other.pointB) && pointC.equals(other.pointC));
+        } else {
+            return false;
+        }
     }
 
     public String toString() {
         return String.format("[Triangle: A%s B%s C%s]", pointA, pointB, pointC);
-        //return String.format("[Triangle: A(%f ; %f) B(%f ; %f) C(%f ; %f)]", pointA.getX(), pointA.getY(), pointB.getX(), pointB.getY(), pointC.getX(), pointC.getY());
     }
 }

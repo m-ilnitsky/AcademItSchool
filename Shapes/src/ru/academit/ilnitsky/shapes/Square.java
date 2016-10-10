@@ -8,16 +8,10 @@ import ru.academit.ilnitsky.shapes.Shape;
  */
 public class Square implements Shape {
     private double edge;
+    private final int NUM_EDGES = 4;
 
     public Square(double edge) {
         this.edge = edge;
-    }
-
-    public Square(Shape shape) {
-        set(shape);
-    }
-
-    public Square() {
     }
 
     public double getWidth() {
@@ -33,11 +27,11 @@ public class Square implements Shape {
     }
 
     public double getPerimeter() {
-        return edge * 4;
+        return edge * NUM_EDGES;
     }
 
-    public void set(Shape shape) {
-        this.edge = Math.max(shape.getHeight(), shape.getWidth());
+    public void clone(Square square) {
+        this.edge = Math.max(square.getHeight(), square.getWidth());
     }
 
     public void setEdge(double edge) {
@@ -49,7 +43,7 @@ public class Square implements Shape {
     }
 
     public void setPerimeter(double perimeter) {
-        this.edge = perimeter / 4;
+        this.edge = perimeter / NUM_EDGES;
     }
 
     public int hashCode() {
@@ -59,8 +53,17 @@ public class Square implements Shape {
         return result;
     }
 
-    public boolean equals(Square square) {
-        return edge == square.edge;
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        } else if (this == object) {
+            return true;
+        } else if (this.getClass() == object.getClass()) {
+            Square other = (Square) object;
+            return edge == other.edge;
+        } else {
+            return false;
+        }
     }
 
     public String toString() {

@@ -1,6 +1,9 @@
 package ru.academit.ilnitsky.shapes;
 
+import java.util.Arrays;
+
 public class Main {
+
     private static Shape findMaxArea(Shape[] shapes, int numberBySquare) {
 
         double[] maxAreas = new double[numberBySquare];
@@ -78,9 +81,9 @@ public class Main {
         shape[3] = new Square(25);
 
         shape[4] = new Square(12);
-        shape[5] = new Square(shape[0]);
+        shape[5] = new Square(2);
         shape[6] = new Circle(15);
-        shape[7] = new Circle(shape[0]);
+        shape[7] = new Circle(2);
 
         shape[8] = new Triangle(12, 0, 0, 12, 0, 0);
         shape[9] = new Triangle(7, 0, 0, 3, 0, 0);

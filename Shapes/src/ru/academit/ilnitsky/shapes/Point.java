@@ -1,5 +1,7 @@
 package ru.academit.ilnitsky.shapes;
 
+import org.omg.CORBA.Object;
+
 /**
  * Created by Mike on 10.10.2016.
  * Класс "Точка"
@@ -9,11 +11,13 @@ public class Point {
     private double y;
 
     public Point(double x, double y) {
-        set(x, y);
+        this.x = x;
+        this.y = y;
     }
 
     public Point(Point point) {
-        set(point.x, point.y);
+        this.x = point.x;
+        this.y = point.y;
     }
 
     public Point() {
@@ -35,18 +39,14 @@ public class Point {
         this.y = y;
     }
 
-    public void set(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void shift(double x, double y) {
-        this.x += x;
-        this.y += y;
+    public void clone(Point point) {
+        this.x = point.x;
+        this.y = point.y;
     }
 
     public void shift(Point vector) {
-        shift(vector.x, vector.y);
+        this.x += vector.x;
+        this.y += vector.y;
     }
 
     public double getModule() {
@@ -67,8 +67,17 @@ public class Point {
         return result;
     }
 
-    public boolean equals(Point point) {
-        return (x == point.x) && (y == point.y);
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        } else if (this == object) {
+            return true;
+        } else if (this.getClass() == object.getClass()) {
+            Point other = (Point) object;
+            return (x == other.x) && (y == other.y);
+        } else {
+            return false;
+        }
     }
 
     public String toString() {

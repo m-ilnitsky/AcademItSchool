@@ -9,18 +9,8 @@ public class Rectangle implements Shape {
     private double width;
 
     public Rectangle(double width, double height) {
-        set(width, height);
-    }
-
-    public Rectangle(double edge) {
-        set(edge, edge);
-    }
-
-    public Rectangle(Shape shape) {
-        set(shape);
-    }
-
-    public Rectangle() {
+        this.height = height;
+        this.width = width;
     }
 
     public double getWidth() {
@@ -39,13 +29,9 @@ public class Rectangle implements Shape {
         return (width + height) * 2;
     }
 
-    public void set(double width, double height) {
-        this.height = height;
-        this.width = width;
-    }
-
-    public void set(Shape shape) {
-        set(shape.getWidth(), shape.getHeight());
+    public void clone(Shape shape) {
+        this.height = shape.getHeight();
+        this.width = shape.getWidth();
     }
 
     public int hashCode() {
@@ -56,9 +42,17 @@ public class Rectangle implements Shape {
         return result;
     }
 
-    public boolean equals(Rectangle rectangle) {
-        return ((height == rectangle.height) && (width == rectangle.width))
-                || ((height == rectangle.width) && (width == rectangle.height));
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        } else if (this == object) {
+            return true;
+        } else if (this.getClass() == object.getClass()) {
+            Rectangle other = (Rectangle) object;
+            return (height == other.height) && (width == other.width);
+        } else {
+            return false;
+        }
     }
 
     public String toString() {
