@@ -1,8 +1,31 @@
 package ru.academit.ilnitsky.shapes;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Main {
+
+    private static void viewSortedByArea(Shape[] shapes, int numberTop, int numberBottom) {
+        Shape[] shapes2 = new Shape[shapes.length];
+        System.arraycopy(shapes, 0, shapes2, 0, shapes.length);
+
+        Arrays.sort(shapes2, Collections.reverseOrder(new SortedByArea()));
+
+        for (int i = numberTop - 1; i < numberBottom; i++) {
+            System.out.printf("№%-2d  S = %-12f  %-80s%n", i + 1, shapes2[i].getArea(), shapes2[i]);
+        }
+    }
+
+    private static void viewSortedByPerimeter(Shape[] shapes, int numberTop, int numberBottom) {
+        Shape[] shapes2 = new Shape[shapes.length];
+        System.arraycopy(shapes, 0, shapes2, 0, shapes.length);
+
+        Arrays.sort(shapes2, Collections.reverseOrder(new SortedByPerimeter()));
+
+        for (int i = numberTop - 1; i < numberBottom; i++) {
+            System.out.printf("№%-2d  P = %-12f  %-80s%n", i + 1, shapes2[i].getPerimeter(), shapes2[i]);
+        }
+    }
 
     private static Shape findMaxArea(Shape[] shapes, int numberBySquare) {
 
@@ -97,18 +120,29 @@ public class Main {
         Shape[] maxArea = new Shape[5];
 
         System.out.println();
+        System.out.println("findMaxArea:");
         for (int i = 0; i < maxArea.length; i++) {
             maxArea[i] = findMaxArea(shape, i + 1);
             System.out.printf("№%-2d  S = %-12f  %-80s%n", i + 1, maxArea[i].getArea(), maxArea[i]);
         }
 
+        System.out.println();
+        System.out.println("viewSortedByArea:");
+        viewSortedByArea(shape, 1, 5);
+
+
         Shape[] maxPerimeter = new Shape[5];
 
         System.out.println();
+        System.out.println("findMaxPerimeter:");
         for (int i = 0; i < maxPerimeter.length; i++) {
             maxPerimeter[i] = findMaxPerimeter(shape, i + 1);
             System.out.printf("№%-2d  P = %-12f  %-80s%n", i + 1, maxPerimeter[i].getPerimeter(), maxPerimeter[i]);
         }
+
+        System.out.println();
+        System.out.println("viewSortedByPerimeter:");
+        viewSortedByPerimeter(shape, 1, 5);
 
         System.out.println();
         System.out.println(HashCode.hashCode(100));
