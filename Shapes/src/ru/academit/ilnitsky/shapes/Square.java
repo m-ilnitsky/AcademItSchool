@@ -1,14 +1,12 @@
 package ru.academit.ilnitsky.shapes;
 
-import ru.academit.ilnitsky.shapes.Shape;
-
 /**
  * Created by Mike on 10.10.2016.
  * Класс "Квадрат"
  */
 public class Square implements Shape {
     private double edge;
-    private final int NUM_EDGES = 4;
+    private static final int NUM_EDGES = 4;
 
     public Square(double edge) {
         this.edge = edge;
@@ -46,6 +44,7 @@ public class Square implements Shape {
         this.edge = perimeter / NUM_EDGES;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -53,6 +52,7 @@ public class Square implements Shape {
         return result;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -66,6 +66,7 @@ public class Square implements Shape {
         }
     }
 
+    @Override
     public String toString() {
         return String.format("[Square: W = H = %f]", edge);
     }

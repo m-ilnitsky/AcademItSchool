@@ -1,7 +1,5 @@
 package ru.academit.ilnitsky.shapes;
 
-import org.omg.CORBA.Object;
-
 /**
  * Created by Mike on 10.10.2016.
  * Класс "Точка"
@@ -59,6 +57,7 @@ public class Point {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -67,6 +66,7 @@ public class Point {
         return result;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -80,6 +80,7 @@ public class Point {
         }
     }
 
+    @Override
     public String toString() {
         return "( " + x + " ; " + y + " )";
         //return String.format("(%f ; %f)", x, y);

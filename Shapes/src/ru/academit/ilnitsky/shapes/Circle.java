@@ -47,6 +47,7 @@ public class Circle implements Shape {
         this.radius = Math.min(shape.getHeight(), shape.getWidth()) / 2;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -54,6 +55,7 @@ public class Circle implements Shape {
         return result;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -67,6 +69,7 @@ public class Circle implements Shape {
         }
     }
 
+    @Override
     public String toString() {
         return String.format("[Circle: R = %f]", radius);
     }

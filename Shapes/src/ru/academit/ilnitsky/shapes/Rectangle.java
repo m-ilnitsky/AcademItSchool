@@ -34,6 +34,7 @@ public class Rectangle implements Shape {
         this.width = shape.getWidth();
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -42,6 +43,7 @@ public class Rectangle implements Shape {
         return result;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -55,6 +57,7 @@ public class Rectangle implements Shape {
         }
     }
 
+    @Override
     public String toString() {
         return String.format("[Rectangle: W = %f, H = %f]", width, height);
     }

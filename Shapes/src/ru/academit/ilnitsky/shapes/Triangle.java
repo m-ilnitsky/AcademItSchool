@@ -73,6 +73,7 @@ public class Triangle implements Shape {
         this.pointC = triangle.pointC;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 7;
         int result = 1;
@@ -82,6 +83,7 @@ public class Triangle implements Shape {
         return result;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -95,6 +97,7 @@ public class Triangle implements Shape {
         }
     }
 
+    @Override
     public String toString() {
         return String.format("[Triangle: A%s B%s C%s]", pointA, pointB, pointC);
     }
