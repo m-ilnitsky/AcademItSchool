@@ -1,4 +1,6 @@
-package ru.academit.ilnitsky.shapes;
+package ru.academit.ilnitsky.utils;
+
+import ru.academit.ilnitsky.shapes.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,23 +8,35 @@ import java.util.Collections;
 public class Main {
 
     private static void viewSortedByArea(Shape[] shapes, int numberTop, int numberBottom) {
+        int start = numberTop - 1;
+        int stop = Math.min(numberBottom, shapes.length);
+        if (start >= stop) {
+            return;
+        }
+
         Shape[] shapes2 = new Shape[shapes.length];
         System.arraycopy(shapes, 0, shapes2, 0, shapes.length);
 
         Arrays.sort(shapes2, Collections.reverseOrder(new SortedByArea()));
 
-        for (int i = numberTop - 1; i < numberBottom; i++) {
+        for (int i = start; i < stop; i++) {
             System.out.printf("№%-2d  S = %-12f  %-80s%n", i + 1, shapes2[i].getArea(), shapes2[i]);
         }
     }
 
     private static void viewSortedByPerimeter(Shape[] shapes, int numberTop, int numberBottom) {
+        int start = numberTop - 1;
+        int stop = Math.min(numberBottom, shapes.length);
+        if (start >= stop) {
+            return;
+        }
+
         Shape[] shapes2 = new Shape[shapes.length];
         System.arraycopy(shapes, 0, shapes2, 0, shapes.length);
 
         Arrays.sort(shapes2, Collections.reverseOrder(new SortedByPerimeter()));
 
-        for (int i = numberTop - 1; i < numberBottom; i++) {
+        for (int i = start; i < stop; i++) {
             System.out.printf("№%-2d  P = %-12f  %-80s%n", i + 1, shapes2[i].getPerimeter(), shapes2[i]);
         }
     }
@@ -32,7 +46,6 @@ public class Main {
         double[] maxAreas = new double[numberBySquare];
         int[] maxIndex = new int[numberBySquare];
         for (int i = 0; i < numberBySquare; i++) {
-            maxAreas[i] = 0;
             maxIndex[i] = -1;
         }
 
@@ -66,7 +79,6 @@ public class Main {
         double[] maxPerimeter = new double[numberByPerimeter];
         int[] maxIndex = new int[numberByPerimeter];
         for (int i = 0; i < numberByPerimeter; i++) {
-            maxPerimeter[i] = 0;
             maxIndex[i] = -1;
         }
 
