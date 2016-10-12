@@ -32,6 +32,17 @@ public class Main {
         vector[7] = new Vector(vector[1]);
         vector[8] = new Vector(7, 1.0);
 
+        int v1size = vector[1].getSize();
+        System.out.print("vector[1] = { ");
+        for (int i = 0; i < v1size; i++) {
+            System.out.print(vector[1].getCoordinate(i));
+            if (i + 1 < v1size) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println(" }");
+
+        System.out.println();
         for (int i = 0; i < vector.length; i++) {
             System.out.printf("[%d] %s%n", i, vector[i]);
         }
