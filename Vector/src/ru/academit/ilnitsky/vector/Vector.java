@@ -26,6 +26,9 @@ public class Vector {
     private double[] x;
 
     public Vector(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size<=0");
+        }
         this.SIZE = size;
         this.x = new double[SIZE];
     }
@@ -45,6 +48,10 @@ public class Vector {
     }
 
     public Vector(int size, double[] array) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size<=0");
+        }
+
         this.SIZE = size;
         this.x = new double[SIZE];
 
@@ -101,10 +108,10 @@ public class Vector {
 
     @Override
     public int hashCode() {
-        final int prime = 7;
+        final int prime = 3;
         int result = 1;
         for (double v : x) {
-            result = prime * result + hashCodeForDouble(v);
+            result = prime * result + hashCodeForDouble(v) / SIZE;
         }
         return result;
     }
@@ -137,10 +144,13 @@ public class Vector {
         StringBuilder sb = new StringBuilder();
 
         sb.append("{ ");
-        for (double v : x) {
-            sb.append(v).append(", ");
+        for (int i = 0; i < SIZE; i++) {
+            sb.append(x[i]);
+            if (i + 1 != SIZE) {
+                sb.append(", ");
+            }
         }
-        sb.append("}");
+        sb.append(" }");
 
         return sb.toString();
     }
