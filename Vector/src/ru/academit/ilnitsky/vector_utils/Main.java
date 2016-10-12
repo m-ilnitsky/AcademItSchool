@@ -14,8 +14,8 @@ public class Main {
         Vector[] vector = new Vector[9];
 
         vector[0] = new Vector(4);
-        vector[0].setX(2, 2);
-        vector[0].setX(3, Math.PI);
+        vector[0].setCoordinate(2, 2);
+        vector[0].setCoordinate(3, Math.PI);
 
         double[] array = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7};
 
@@ -24,7 +24,7 @@ public class Main {
         vector[3] = new Vector(4, array);
 
         vector[4] = new Vector(vector[0]);
-        vector[4].setX(0, 1);
+        vector[4].setCoordinate(0, 1);
 
         vector[5] = new Vector(24, 127);
 
@@ -32,8 +32,8 @@ public class Main {
         vector[7] = new Vector(vector[1]);
         vector[8] = new Vector(7, 1.0);
 
-        for (Vector v : vector) {
-            System.out.println(v);
+        for (int i = 0; i < vector.length; i++) {
+            System.out.printf("[%d] %s%n", i, vector[i]);
         }
 
         System.out.println();
@@ -49,6 +49,13 @@ public class Main {
                 }
             }
         }
+
+        System.out.println();
+        System.out.println(vector[2]);
+        System.out.println("+");
+        System.out.println(vector[8]);
+        System.out.println("=");
+        System.out.println(Vector.sum(vector[2], vector[8]));
 
         System.out.println();
         System.out.println(vector[0]);

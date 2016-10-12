@@ -1,5 +1,7 @@
 package ru.academit.ilnitsky.vector;
 
+import ru.academit.ilnitsky.functions.*;
+
 import java.util.Arrays;
 
 /**
@@ -7,56 +9,33 @@ import java.util.Arrays;
  * Класс "Вектор"
  */
 public class Vector {
-    private static final double EPS = 0.0001;
 
-    private static boolean isEqual(double a, double b) {
-        return (Math.abs(a - b) < EPS);
-    }
-
-    private static int hashCodeForDouble(double value) {
-        int shift = 1000;
-        int exponent = Math.getExponent(value);
-        int mantissa = (int) (value / Math.pow(2, exponent) * shift);
-
-        int result = 127;
-        result += (1024 + exponent) * shift;
-        result += 3 * shift + mantissa;
-        return result;
-    }
-
-    private final int SIZE;
     private double[] x;
 
     public Vector(int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("size<=0");
         }
-        this.SIZE = size;
-        this.x = new double[SIZE];
+
+        this.x = new double[size];
     }
 
     public Vector(int size, double value) {
         if (size <= 0) {
             throw new IllegalArgumentException("size<=0");
         }
-        this.SIZE = size;
-        this.x = new double[SIZE];
+
+        this.x = new double[size];
 
         Arrays.fill(x, value);
     }
 
     public Vector(Vector vector) {
-        this.SIZE = vector.SIZE;
-        this.x = new double[SIZE];
-
-        System.arraycopy(vector.x, 0, x, 0, SIZE);
+        this(vector.x);
     }
 
     public Vector(double[] array) {
-        this.SIZE = array.length;
-        this.x = new double[SIZE];
-
-        System.arraycopy(array, 0, x, 0, SIZE);
+        this(array.length, array);
     }
 
     public Vector(int size, double[] array) {
@@ -64,50 +43,69 @@ public class Vector {
             throw new IllegalArgumentException("size<=0");
         }
 
-        this.SIZE = size;
-        this.x = new double[SIZE];
+        this.x = new double[size];
 
-        System.arraycopy(array, 0, x, 0, Math.min(SIZE, array.length));
+        System.arraycopy(array, 0, x, 0, Math.min(size, array.length));
     }
 
     public int getSize() {
-        return SIZE;
+        return x.length;
     }
 
-    public double getX(int i) {
+    public double getCoordinate(int i) {
+        if (i < 0) {
+            throw new ArrayIndexOutOfBoundsException("index < 0");
+        } else if (i >= x.length) {
+            throw new ArrayIndexOutOfBoundsException("index > max");
+        }
+
         return x[i];
     }
 
-    public void setX(int i, double value) {
+    public void setCoordinate(int i, double value) {
+        if (i < 0) {
+            throw new ArrayIndexOutOfBoundsException("index < 0");
+        } else if (i >= x.length) {
+            throw new ArrayIndexOutOfBoundsException("index > max");
+        }
+
         x[i] = value;
     }
 
     public void add(Vector vector) {
-        int size = Math.min(SIZE, vector.SIZE);
+        if (vector.getSize() > this.getSize()) {
+            double[] temp = new double[vector.getSize()];
+            System.arraycopy(this.x, 0, temp, 0, this.getSize());
+            this.x = temp;
+        }
 
+        int size = vector.getSize();
         for (int i = 0; i < size; i++) {
             x[i] += vector.x[i];
         }
     }
 
     public void subtract(Vector vector) {
-        int size = Math.min(SIZE, vector.SIZE);
+        if (vector.getSize() > this.getSize()) {
+            double[] temp = new double[vector.getSize()];
+            System.arraycopy(this.x, 0, temp, 0, this.getSize());
+            this.x = temp;
+        }
 
+        int size = vector.getSize();
         for (int i = 0; i < size; i++) {
             x[i] -= vector.x[i];
         }
     }
 
     public void multiply(double value) {
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < getSize(); i++) {
             x[i] *= value;
         }
     }
 
     public void turn() {
-        for (int i = 0; i < SIZE; i++) {
-            x[i] *= -1;
-        }
+        multiply(-1);
     }
 
     public double getLength() {
@@ -122,8 +120,8 @@ public class Vector {
     public int hashCode() {
         final int prime = 3;
         int result = 1;
-        for (int i = 0; i < SIZE; i++) {
-            result = prime * result / (i + 1) + hashCodeForDouble(x[i]);
+        for (int i = 0; i < getSize(); i++) {
+            result = prime * result / (i + 1) + HashCode.hashCode(x[i]);
         }
         return result;
     }
@@ -137,11 +135,11 @@ public class Vector {
         } else if (this.getClass() == object.getClass()) {
             Vector other = (Vector) object;
 
-            if (SIZE != other.SIZE) {
+            if (getSize() != other.getSize()) {
                 return false;
             } else {
-                for (int i = 0; i < SIZE; i++) {
-                    if (!isEqual(x[i], other.x[i])) {
+                for (int i = 0; i < getSize(); i++) {
+                    if (!Compare.isEqual(x[i], other.x[i])) {
                         return false;
                     }
                 }
@@ -156,9 +154,9 @@ public class Vector {
         StringBuilder sb = new StringBuilder();
 
         sb.append("{ ");
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < getSize(); i++) {
             sb.append(x[i]);
-            if (i + 1 != SIZE) {
+            if (i + 1 != getSize()) {
                 sb.append(", ");
             }
         }
@@ -168,13 +166,10 @@ public class Vector {
     }
 
     public static Vector sum(Vector vector1, Vector vector2) {
-        int min = Math.min(vector1.SIZE, vector2.SIZE);
-        int max = Math.max(vector1.SIZE, vector2.SIZE);
-
         Vector vMin;
         Vector vMax;
 
-        if (min == max || max == vector1.SIZE) {
+        if (vector1.getSize() >= vector2.getSize()) {
             vMax = vector1;
             vMin = vector2;
         } else {
@@ -183,28 +178,22 @@ public class Vector {
         }
 
         Vector vector3 = new Vector(vMax);
-
-        for (int i = 0; i < min; i++) {
-            vector3.x[i] += vMin.x[i];
-        }
+        vector3.add(vMin);
 
         return vector3;
     }
 
     public static Vector difference(Vector vector1, Vector vector2) {
-        int max = Math.max(vector1.SIZE, vector2.SIZE);
+        int max = Math.max(vector1.getSize(), vector2.getSize());
 
         Vector vector3 = new Vector(max, vector1.x);
-
-        for (int i = 0; i < vector2.SIZE; i++) {
-            vector3.x[i] -= vector2.x[i];
-        }
+        vector3.subtract(vector2);
 
         return vector3;
     }
 
     public static double scalarProduct(Vector vector1, Vector vector2) {
-        int min = Math.min(vector1.SIZE, vector2.SIZE);
+        int min = Math.min(vector1.getSize(), vector2.getSize());
 
         double result = 0;
 
