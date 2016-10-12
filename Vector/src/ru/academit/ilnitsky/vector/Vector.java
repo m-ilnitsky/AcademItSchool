@@ -1,5 +1,7 @@
 package ru.academit.ilnitsky.vector;
 
+import java.util.Arrays;
+
 /**
  * Created by Mike on 12.10.2016.
  * Класс "Вектор"
@@ -31,6 +33,16 @@ public class Vector {
         }
         this.SIZE = size;
         this.x = new double[SIZE];
+    }
+
+    public Vector(int size, double value) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size<=0");
+        }
+        this.SIZE = size;
+        this.x = new double[SIZE];
+
+        Arrays.fill(x, value);
     }
 
     public Vector(Vector vector) {
@@ -110,8 +122,8 @@ public class Vector {
     public int hashCode() {
         final int prime = 3;
         int result = 1;
-        for (double v : x) {
-            result = prime * result + hashCodeForDouble(v) / SIZE;
+        for (int i = 0; i < SIZE; i++) {
+            result = prime * result / (i + 1) + hashCodeForDouble(x[i]);
         }
         return result;
     }

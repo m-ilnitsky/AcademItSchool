@@ -1,4 +1,4 @@
-package ru.academit.ilnitsky.utils;
+package ru.academit.ilnitsky.shapes_utils;
 
 import ru.academit.ilnitsky.shapes.*;
 
