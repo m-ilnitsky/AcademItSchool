@@ -14,17 +14,17 @@ public class Main {
         Vector[] vector = new Vector[9];
 
         vector[0] = new Vector(4);
-        vector[0].setCoordinate(2, 2);
-        vector[0].setCoordinate(3, Math.PI);
+        vector[0].setElement(2, 2);
+        vector[0].setElement(3, Math.PI);
 
         double[] array = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7};
 
         vector[1] = new Vector(array);
         vector[2] = new Vector(3, array);
-        vector[3] = new Vector(4, array);
+        vector[3] = new Vector(4, vector[2]);
 
         vector[4] = new Vector(vector[0]);
-        vector[4].setCoordinate(0, 1);
+        vector[4].setElement(0, 1);
 
         vector[5] = new Vector(24, 127);
 
@@ -35,7 +35,7 @@ public class Main {
         int v1size = vector[1].getSize();
         System.out.print("vector[1] = { ");
         for (int i = 0; i < v1size; i++) {
-            System.out.print(vector[1].getCoordinate(i));
+            System.out.print(vector[1].getElement(i));
             if (i + 1 < v1size) {
                 System.out.print(", ");
             }
