@@ -16,8 +16,10 @@ public class Main {
 
         matrix[0] = new Matrix(2, 4);
         matrix[1] = new Matrix(4, 2);
-        matrix[2] = new Matrix(2, 2.0);
-        matrix[3] = new Matrix(3, 3.0);
+        matrix[2] = new Matrix(2, 2);
+        matrix[2].setDiagonal(2);
+        matrix[3] = new Matrix(3, 3);
+        matrix[2].setDiagonal(3);
         matrix[4] = new Matrix(matrix[3]);
         matrix[5] = new Matrix(matrix[2]);
 
@@ -27,7 +29,7 @@ public class Main {
 
         System.out.println();
         for (int i = 0; i < matrix.length; i++) {
-            System.out.printf("[%d] iy = %2d, ix = %2d, hashCode = %11d%n", i, matrix[i].getSizeY(), matrix[i].getSizeX(), matrix[i].hashCode());
+            System.out.printf("[%d] size = %4d, rows = %2d, columns = %2d, hashCode = %11d%n", i, matrix[i].getSize(), matrix[i].getRowsNumber(), matrix[i].getColumnsNumber(), matrix[i].hashCode());
         }
 
         System.out.println();

@@ -9,262 +9,305 @@ import ru.academit.ilnitsky.vector.Vector;
  */
 public class Matrix {
 
-    private Vector[] vectors;
+    private Vector[] rows;
 
-    public Matrix(int iy, int ix) {
-        if (iy <= 0 || ix <= 0) {
-            throw new IllegalArgumentException("size<=0");
+    public Matrix(int numRows, int numColumns) {
+        if (numRows <= 0) {
+            throw new IllegalArgumentException("numRows<=0");
+        }
+        if (numColumns <= 0) {
+            throw new IllegalArgumentException("numColumns<=0");
         }
 
-        vectors = new Vector[iy];
+        rows = new Vector[numRows];
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i] = new Vector(ix);
-        }
-    }
-
-    public Matrix(int iyx, double value) {
-        this(iyx, iyx);
-
-        for (int i = 0; i < iyx; i++) {
-            vectors[i].setCoordinate(i, value);
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new Vector(numColumns);
         }
     }
 
     public Matrix(Matrix matrix) {
-        int iy = matrix.getSizeY();
+        int numRows = matrix.getRowsNumber();
 
-        vectors = new Vector[iy];
+        rows = new Vector[numRows];
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i] = new Vector(matrix.vectors[i]);
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new Vector(matrix.rows[i]);
         }
     }
 
     public Matrix(double[][] array) {
-        int iy = array.length;
+        int numRows = array.length;
+        int numColumns = 0;
+        for (double[] d : array) {
+            if (numColumns < d.length) {
+                numColumns = d.length;
+            }
+        }
 
-        vectors = new Vector[iy];
+        rows = new Vector[numRows];
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i] = new Vector(array[i]);
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new Vector(numColumns, array[i]);
         }
     }
 
     public Matrix(Vector[] vectorArray) {
-        int iy = vectorArray.length;
+        int numRows = vectorArray.length;
+        int numColumns = 0;
+        for (Vector v : vectorArray) {
+            if (numColumns < v.getSize()) {
+                numColumns = v.getSize();
+            }
+        }
 
-        vectors = new Vector[iy];
+        rows = new Vector[numRows];
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i] = new Vector(vectorArray[i]);
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new Vector(numColumns, vectorArray[i]);
         }
     }
 
-    public int getSizeY() {
-        return vectors.length;
+    public int getRowsNumber() {
+        return rows.length;
     }
 
-    public int getSizeX() {
-        return vectors[0].getSize();
+    public int getColumnsNumber() {
+        return rows[0].getSize();
     }
 
-    public void setElement(int iy, int ix, double value) {
-        if (iy < 0 || ix < 0) {
-            throw new ArrayIndexOutOfBoundsException("index < 0");
-        } else if (iy >= getSizeY() || ix >= getSizeX()) {
-            throw new ArrayIndexOutOfBoundsException("index > max");
+    public int getSize() {
+        return rows.length * rows[0].getSize();
+    }
+
+    public void setDiagonal(double value) {
+        int min = Math.min(getColumnsNumber(), getRowsNumber());
+        for (int i = 0; i < min; i++) {
+            rows[i].setElement(i, value);
+        }
+    }
+
+    public Vector getDiagonal() {
+        int min = Math.min(getColumnsNumber(), getRowsNumber());
+
+        Vector diagonal = new Vector(min);
+
+        for (int i = 0; i < min; i++) {
+            diagonal.setElement(i, rows[i].getElement(i));
         }
 
-        vectors[iy].setCoordinate(ix, value);
+        return diagonal;
     }
 
-    public double getElement(int iy, int ix) {
-        if (iy < 0 || ix < 0) {
-            throw new ArrayIndexOutOfBoundsException("index < 0");
-        } else if (iy >= getSizeY() || ix >= getSizeX()) {
-            throw new ArrayIndexOutOfBoundsException("index > max");
+    public void setElement(int numRows, int numColumns, double value) {
+        if (numRows < 0) {
+            throw new ArrayIndexOutOfBoundsException("numRows < 0");
+        } else if (numRows >= getRowsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numRows > max");
+        }
+        if (numColumns < 0) {
+            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
+        } else if (numColumns >= getColumnsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numColumns > max");
         }
 
-        return vectors[iy].getCoordinate(ix);
+        rows[numRows].setElement(numColumns, value);
     }
 
-    public Vector getRow(int iy) {
-        if (iy < 0) {
-            throw new ArrayIndexOutOfBoundsException("index < 0");
-        } else if (iy >= getSizeY()) {
-            throw new ArrayIndexOutOfBoundsException("index > max");
+    public double getElement(int numRows, int numColumns) {
+        if (numRows < 0) {
+            throw new ArrayIndexOutOfBoundsException("numRows < 0");
+        } else if (numRows >= getRowsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numRows > max");
+        }
+        if (numColumns < 0) {
+            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
+        } else if (numColumns >= getColumnsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numColumns > max");
         }
 
-        return new Vector(vectors[iy]);
+        return rows[numRows].getElement(numColumns);
     }
 
-    public Vector getColumn(int ix) {
-        if (ix < 0) {
-            throw new ArrayIndexOutOfBoundsException("index < 0");
-        } else if (ix >= getSizeX()) {
-            throw new ArrayIndexOutOfBoundsException("index > max");
+    public Vector getRow(int numRows) {
+        if (numRows < 0) {
+            throw new ArrayIndexOutOfBoundsException("numRows < 0");
+        } else if (numRows >= getRowsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numRows > max");
         }
 
-        int iy = vectors.length;
-        Vector column = new Vector(iy);
+        return new Vector(rows[numRows]);
+    }
 
-        for (int i = 0; i < iy; i++) {
-            column.setCoordinate(i, vectors[i].getCoordinate(ix));
+    public Vector getColumn(int numColumns) {
+        if (numColumns < 0) {
+            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
+        } else if (numColumns >= getColumnsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numColumns > max");
+        }
+
+        int numRows = rows.length;
+        Vector column = new Vector(numRows);
+
+        for (int i = 0; i < numRows; i++) {
+            column.setElement(i, rows[i].getElement(numColumns));
         }
 
         return column;
     }
 
     public void multiply(double value) {
-        int iy = vectors.length;
+        int numRows = rows.length;
 
-        for (int j = 0; j < iy; j++) {
-            vectors[j].multiply(value);
+        for (Vector v : rows) {
+            v.multiply(value);
         }
     }
 
-    public void resize(int iy, int ix) {
-        int iy1 = vectors.length;
-        int ix1 = vectors[0].getSize();
+    public void resize(int numRows, int numColumns) {
+        int numRows1 = rows.length;
+        int numColumns1 = rows[0].getSize();
 
-        if (ix != ix1 || iy != iy1) {
-            int ixMin = Math.min(ix1, ix);
+        if (numColumns != numColumns1 || numRows != numRows1) {
+            int min = Math.min(numColumns1, numColumns);
 
-            Vector[] temp = new Vector[iy];
+            Vector[] temp = new Vector[numRows];
 
-            for (int i = 0; i < iy; i++) {
-                temp[i] = new Vector(ix);
+            for (int i = 0; i < numRows; i++) {
+                temp[i] = new Vector(numColumns);
 
-                if (i < iy1) {
-                    for (int j = 0; j < ixMin; j++) {
-                        temp[i].setCoordinate(j, vectors[i].getCoordinate(j));
+                if (i < numRows1) {
+                    for (int j = 0; j < min; j++) {
+                        temp[i].setElement(j, rows[i].getElement(j));
                     }
                 }
             }
-            vectors = temp;
+
+            rows = temp;
         }
     }
 
     public void resize(Matrix matrix) {
-        int iy1 = vectors.length;
-        int ix1 = vectors[0].getSize();
+        int numRows1 = rows.length;
+        int numColumns1 = rows[0].getSize();
 
-        int iy2 = matrix.vectors.length;
-        int ix2 = matrix.vectors[0].getSize();
+        int numRows2 = matrix.rows.length;
+        int numColumns2 = matrix.rows[0].getSize();
 
-        if (ix2 > ix1 || iy2 > iy1) {
-            int ixMax = Math.max(ix1, ix2);
-            int iyMax = Math.max(iy1, iy2);
+        if (numColumns2 > numColumns1 || numRows2 > numRows1) {
+            int maxNumColumns = Math.max(numColumns1, numColumns2);
+            int maxNumRows = Math.max(numRows1, numRows2);
 
-            Vector[] temp = new Vector[iyMax];
-
-            for (int i = 0; i < iyMax; i++) {
-                temp[i] = new Vector(ixMax);
-
-                if (i < iy1) {
-                    for (int j = 0; j < ix1; j++) {
-                        temp[i].setCoordinate(j, vectors[i].getCoordinate(j));
-                    }
-                }
-            }
-            vectors = temp;
+            resize(maxNumRows, maxNumColumns);
         }
+    }
+
+    public void transpose() {
+        int numColumns = rows.length;
+        int numRows = rows[0].getSize();
+
+        Vector[] newRows = new Vector[numRows];
+
+        for (int i = 0; i < numRows; i++) {
+            newRows[i] = new Vector(numColumns);
+
+            for (int j = 0; j < numColumns; j++) {
+                newRows[i].setElement(j, rows[j].getElement(i));
+            }
+        }
+
+        rows = newRows;
     }
 
     public void add(Matrix matrix) {
         resize(matrix);
 
-        int iy = matrix.vectors.length;
+        int numRows = matrix.rows.length;
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i].add(matrix.vectors[i]);
+        for (int i = 0; i < numRows; i++) {
+            rows[i].add(matrix.rows[i]);
         }
     }
 
     public void subtract(Matrix matrix) {
         resize(matrix);
 
-        int iy = matrix.vectors.length;
+        int numRows = matrix.rows.length;
 
-        for (int i = 0; i < iy; i++) {
-            vectors[i].subtract(matrix.vectors[i]);
+        for (int i = 0; i < numRows; i++) {
+            rows[i].subtract(matrix.rows[i]);
         }
     }
 
+    public void multiply(Matrix matrix) {
+        int numRows1 = rows.length;
+        int numColumns1 = rows[0].getSize();
+
+        int numRows2 = matrix.rows.length;
+        int numColumns2 = matrix.rows[0].getSize();
+
+        int min = Math.min(numColumns1, numRows2);
+
+        Vector[] newRows = new Vector[numRows1];
+
+        for (int i = 0; i < numRows1; i++) {
+            newRows[i] = new Vector(numColumns2);
+
+            for (int j = 0; j < numColumns2; j++) {
+                double sum = 0;
+
+                for (int k = 0; k < min; k++) {
+                    sum += rows[i].getElement(k) * matrix.rows[k].getElement(j);
+                }
+
+                newRows[i].setElement(j, sum);
+            }
+        }
+
+        rows = newRows;
+    }
+
     public static Matrix sum(Matrix matrix1, Matrix matrix2) {
-        int iy1 = matrix1.vectors.length;
-        int iy2 = matrix2.vectors.length;
-        int iyMax = Math.max(iy1, iy2);
-        int ixMax = Math.max(matrix2.vectors[0].getSize(), matrix2.vectors[0].getSize());
+        Matrix matrix3 = new Matrix(matrix1);
 
-        Matrix matrix3 = new Matrix(iyMax, ixMax);
-
-        for (int i = 0; i < iy1; i++) {
-            matrix3.vectors[i].add(matrix1.vectors[i]);
-        }
-
-        for (int i = 0; i < iy2; i++) {
-            matrix3.vectors[i].add(matrix2.vectors[i]);
-        }
+        matrix3.add(matrix2);
 
         return matrix3;
     }
 
     public static Matrix difference(Matrix matrix1, Matrix matrix2) {
-        int iy1 = matrix1.vectors.length;
-        int iy2 = matrix2.vectors.length;
-        int iyMax = Math.max(iy1, iy2);
-        int ixMax = Math.max(matrix2.vectors[0].getSize(), matrix2.vectors[0].getSize());
+        Matrix matrix3 = new Matrix(matrix1);
 
-        Matrix matrix3 = new Matrix(iyMax, ixMax);
-
-        for (int i = 0; i < iy1; i++) {
-            matrix3.vectors[i].add(matrix1.vectors[i]);
-        }
-
-        for (int i = 0; i < iy2; i++) {
-            matrix3.vectors[i].subtract(matrix2.vectors[i]);
-        }
+        matrix3.subtract(matrix2);
 
         return matrix3;
     }
 
     public static Matrix multiply(Matrix matrix1, Matrix matrix2) {
-        int iy1 = matrix1.vectors.length;
-        int ix1 = matrix1.vectors[0].getSize();
+        Matrix matrix3 = new Matrix(matrix1);
 
-        int iy2 = matrix2.vectors.length;
-        int ix2 = matrix2.vectors[0].getSize();
-
-        Matrix matrix3 = new Matrix(iy1, ix2);
-
-        int min = Math.min(ix1, iy2);
-
-        for (int i = 0; i < iy1; i++) {
-            for (int j = 0; j < ix2; j++) {
-                double sum = 0;
-
-                for (int k = 0; k < min; k++) {
-                    sum += matrix1.vectors[i].getCoordinate(k) * matrix1.vectors[k].getCoordinate(j);
-                }
-
-                matrix3.vectors[i].setCoordinate(j, sum);
-            }
-        }
+        matrix3.multiply(matrix2);
 
         return matrix3;
     }
 
+    public static Matrix multiply(Matrix matrix1, double value) {
+        Matrix matrix2 = new Matrix(matrix1);
+
+        matrix2.multiply(value);
+
+        return matrix2;
+    }
+
     public static Matrix multiply(Vector vector1, Vector vector2) {
-        int iy = vector1.getSize();
-        int ix = vector2.getSize();
+        int numRows = vector1.getSize();
+        int numColumns = vector2.getSize();
 
-        Matrix matrix = new Matrix(iy, ix);
+        Matrix matrix = new Matrix(numRows, numColumns);
 
-        for (int i = 0; i < iy; i++) {
-            for (int j = 0; j < ix; j++) {
-                matrix.vectors[i].setCoordinate(j, vector1.getCoordinate(i) * vector2.getCoordinate(j));
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                matrix.rows[i].setElement(j, vector1.getElement(i) * vector2.getElement(j));
             }
         }
 
@@ -272,22 +315,22 @@ public class Matrix {
     }
 
     public static Vector multiply(Matrix matrix, Vector vector1) {
-        int iy = matrix.vectors.length;
-        int ix = matrix.vectors[0].getSize();
-        int iv = vector1.getSize();
+        int numRows = matrix.rows.length;
+        int numColumns = matrix.rows[0].getSize();
+        int numElements = vector1.getSize();
 
-        int min = Math.min(ix, iv);
+        int min = Math.min(numColumns, numElements);
 
-        Vector vector2 = new Vector(iy);
+        Vector vector2 = new Vector(numRows);
 
-        for (int i = 0; i < iy; i++) {
+        for (int i = 0; i < numRows; i++) {
             double sum = 0;
 
             for (int j = 0; j < min; j++) {
-                sum += matrix.vectors[i].getCoordinate(j) * vector1.getCoordinate(j);
+                sum += matrix.rows[i].getElement(j) * vector1.getElement(j);
             }
 
-            vector2.setCoordinate(i, sum);
+            vector2.setElement(i, sum);
         }
 
         return vector2;
@@ -298,9 +341,12 @@ public class Matrix {
         final int prime = 3;
         int result = 1;
 
-        int iy = getSizeY();
-        for (int i = 0; i < iy; i++) {
-            result = prime * result / (i + 1) + vectors[i].hashCode();
+        int numRows = getRowsNumber();
+        for (int i = 0; i < numRows; i++) {
+            result = prime * result + rows[i].hashCode();
+            if (i % 2 == 1) {
+                result /= i;
+            }
         }
         return result;
     }
@@ -314,13 +360,13 @@ public class Matrix {
         } else if (this.getClass() == object.getClass()) {
             Matrix other = (Matrix) object;
 
-            if ((this.getSizeX() != other.getSizeX())
-                    || (this.getSizeY() != other.getSizeY())) {
+            if ((this.getColumnsNumber() != other.getColumnsNumber())
+                    || (this.getRowsNumber() != other.getRowsNumber())) {
                 return false;
             } else {
-                int iy = this.getSizeY();
-                for (int i = 0; i < iy; i++) {
-                    if (!this.vectors[i].equals(other.vectors[i])) {
+                int numRows = this.getRowsNumber();
+                for (int i = 0; i < numRows; i++) {
+                    if (!this.rows[i].equals(other.rows[i])) {
                         return false;
                     }
                 }
@@ -333,12 +379,12 @@ public class Matrix {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        int iy = this.getSizeY();
+        int numRows = this.getRowsNumber();
 
         sb.append("{ ");
-        for (int i = 0; i < iy; i++) {
-            sb.append(vectors[i]);
-            if (i + 1 != iy) {
+        for (int i = 0; i < numRows; i++) {
+            sb.append(rows[i]);
+            if (i + 1 != numRows) {
                 sb.append(", ");
             }
         }
