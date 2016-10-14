@@ -339,14 +339,18 @@ public class Matrix {
     @Override
     public int hashCode() {
         final int prime = 3;
-        int result = 1;
+        int result = 127;
 
         int numRows = getRowsNumber();
         for (int i = 0; i < numRows; i++) {
-            result = prime * result + rows[i].hashCode();
+            result = prime * result;
             if (i % 2 == 1) {
                 result /= i;
             }
+            if (result > 3e8) {
+                result /= 10;
+            }
+            result += rows[i].hashCode();
         }
         return result;
     }
