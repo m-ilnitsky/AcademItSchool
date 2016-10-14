@@ -25,11 +25,19 @@ public class Number {
         return (lowestDigit(value) == 0);
     }
 
+    public static int length(int value){
+        return Integer.toString(value).length();
+    }
+
+    public static int length(double value){
+        return Double.toString(value).length();
+    }
+
     public static int lowestDigit(double value) {
         double absValue = Math.abs(value);
         int result = 0;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             if ((long) (absValue * Math.pow(10, i + 1)) != ((long) (absValue * Math.pow(10, i)) * 10)) {
                 result = i + 1;
             }
