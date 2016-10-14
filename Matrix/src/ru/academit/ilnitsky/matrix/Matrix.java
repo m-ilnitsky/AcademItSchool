@@ -1,6 +1,7 @@
 package ru.academit.ilnitsky.matrix;
 
 import ru.academit.ilnitsky.functions.*;
+import ru.academit.ilnitsky.functions.Number;
 import ru.academit.ilnitsky.vector.Vector;
 
 /**
@@ -154,6 +155,30 @@ public class Matrix {
         }
 
         return column;
+    }
+
+    public void setRandom() {
+        for (Vector row : rows) {
+            row.setRandom();
+        }
+    }
+
+    public void setRandom(int exponent) {
+        for (Vector row : rows) {
+            row.setRandom(exponent);
+        }
+    }
+
+    public void setRandomInt() {
+        for (Vector row : rows) {
+            row.setRandomInt();
+        }
+    }
+
+    public void setRandomInt(int min, int max) {
+        for (Vector row : rows) {
+            row.setRandomInt(min, max);
+        }
     }
 
     public void multiply(double value) {
@@ -398,49 +423,58 @@ public class Matrix {
     }
 
     public void print() {
-        int min = 1;
-        int max = 16;
+        int numColumns = getColumnsNumber();
+        int numRows = rows.length;
 
-        int iYSize = Integer.toString(max).length();           // Длина чисел в левой колонке
-        int xYSize = Integer.toString(max * max).length();     // Длина чисел в верхней строке и в таблице
+        boolean[] isInteger = new boolean[numColumns];
+        int[] numSymbols = new int[numColumns];
+        String[] columnFormat = new String[numColumns];
 
-        String iYFormat = " %" + iYSize + "d |";  // Формат чисел в левой колонке
-        String xYFormat = " %" + xYSize + "d";    // Формат чисел в верхней строке и таблице
+        for (int i = 0; i < numColumns; i++) {
+            boolean isInt = true;
+            int numSym = 0;
 
-        String leftLine1 = "";
-        String leftLine2 = "";
-        for (int i = 1; i <= iYSize + 2; ++i) {
-            leftLine1 += " ";
-            leftLine2 += "-";
-        }
-        leftLine1 += "|";
-        leftLine2 += "|";
-
-        String topLine = "";
-        for (int i = 1; i <= xYSize + 1; ++i) {
-            topLine += "-";
-        }
-
-        for (int iY = min; iY <= max; ++iY) {
-            if (iY == min) {
-                System.out.print(leftLine1);
-                for (int iX = min; iX <= max; ++iX) {
-                    System.out.printf(xYFormat, iX);
+            for (Vector r : rows) {
+                if (!Number.isInteger(r.getElement(i))) {
+                    isInt = false;
+                    break;
                 }
-                System.out.println();
 
-                System.out.print(leftLine2);
-                for (int iX = min; iX <= max; ++iX) {
-                    System.out.print(topLine);
+                int length = Number.length((int) r.getElement(i));
+
+                if (length > numSym) {
+                    numSym = length;
                 }
-                System.out.println();
             }
 
-            System.out.printf(iYFormat, iY);
-            for (int iX = min; iX <= max; ++iX) {
-                System.out.printf(xYFormat, iX * iY);
+            if (isInt && numSym < 10) {
+                numSymbols[i] = numSym;
+                isInteger[i] = true;
+                columnFormat[i] = "%" + numSym + "d";
+            } else {
+                numSymbols[i] = 10;
+                isInteger[i] = false;
             }
-            System.out.println();
+        }
+
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                if (j == 0) {
+                    System.out.print("|  ");
+                }
+
+                if (isInteger[j]) {
+                    System.out.printf(columnFormat[j], (int) rows[i].getElement(j));
+                } else {
+                    System.out.print(Number.formatExp(rows[i].getElement(j), 3, 10));
+                }
+
+                if (j + 1 < numColumns) {
+                    System.out.print("  ");
+                } else {
+                    System.out.print("  |\n");
+                }
+            }
         }
     }
 }
