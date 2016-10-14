@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.vector;
 import ru.academit.ilnitsky.functions.*;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Created by Mike on 12.10.2016.
@@ -80,6 +81,50 @@ public class Vector {
         }
 
         elements[i] = value;
+    }
+
+    public void setRandom(){
+        final Random random = new Random();
+
+        int size = elements.length;
+        for (int i = 0; i < size; i++) {
+            elements[i] += random.nextDouble()*Math.pow(10,random.nextInt(10));
+        }
+    }
+
+    public void set(Vector vector, boolean fillZero) {
+        int min = Math.min(elements.length, vector.elements.length);
+
+        System.arraycopy(vector.elements, 0, elements, 0, min);
+
+        if (fillZero && min < elements.length) {
+            for (int i = min; i < elements.length; i++) {
+                elements[i] = 0;
+            }
+        }
+    }
+
+    public void resize(int newSize) {
+        double[] newElements = new double[newSize];
+        int min = Math.min(elements.length, newSize);
+
+        System.arraycopy(elements, 0, newElements, 0, min);
+
+        elements = newElements;
+    }
+
+    public void resize(Vector vector) {
+        resize(vector.elements.length);
+    }
+
+    public void clone(Vector vector) {
+        int newSize = vector.elements.length;
+
+        if (elements.length != newSize) {
+            elements = new double[newSize];
+        }
+
+        System.arraycopy(vector.elements, 0, elements, 0, newSize);
     }
 
     public void add(Vector vector) {

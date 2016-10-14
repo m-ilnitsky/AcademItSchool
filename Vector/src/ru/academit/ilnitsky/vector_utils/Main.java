@@ -120,5 +120,23 @@ public class Main {
         System.out.print(".turn() = ");
         vector[7].turn();
         System.out.println(vector[7]);
+        
+        // Тест setRandom
+        System.out.println();
+        Vector[] vector2 = new Vector[10];
+        for(int i=0;i<vector2.length;i++){
+            vector2[i] = new Vector(i+1);
+            vector2[i].setRandom();
+            System.out.printf("[%d] %s%n", i, vector2[i]);
+        }
+
+        //тест hashCode
+        Vector[] vec = new Vector[100];
+        for (int i = 0; i < vec.length; i++) {
+            vec[i] = new Vector((i + 1));
+            vec[i].setRandom();
+
+            System.out.printf("HC[%3d] = %11d%n", i + 1, vec[i].hashCode());
+        }
     }
 }
