@@ -243,6 +243,27 @@ public class Vector {
         return sb.toString();
     }
 
+    public void print() {
+        StringBuilder sb = new StringBuilder();
+        int size = this.getSize();
+
+        sb.append("{ ");
+        for (int i = 0; i < size; i++) {
+            sb.append(Number.format(elements[i]));
+            if (i + 1 != size) {
+                sb.append("  ");
+            }
+        }
+        sb.append(" }");
+
+        System.out.print(sb.toString());
+    }
+
+    public void println() {
+        print();
+        System.out.println();
+    }
+
     public static Vector sum(Vector vector1, Vector vector2) {
         Vector vMin;
         Vector vMax;
