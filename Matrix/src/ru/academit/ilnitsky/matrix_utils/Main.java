@@ -139,18 +139,17 @@ public class Main {
         v1.setRandomInt(0, 5);
         mat4[3].print();
         System.out.println(" *");
-        System.out.println(v1);
+        v1.println();
         System.out.println(" =");
         Vector v2 = Matrix.multiply(mat4[3], v1);
-        System.out.println(v2);
-        System.out.println();
+        v2.println();
 
         // multiply(Vector, Vector)
         System.out.println();
         System.out.println("multiply(Vector, Vector):");
-        System.out.println(v1);
+        v1.println();
         System.out.println(" *");
-        System.out.println(v2);
+        v2.println();
         System.out.println(" =");
         Matrix m4 = Matrix.multiply(v2, v1);
         m4.print();

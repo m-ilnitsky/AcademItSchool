@@ -100,58 +100,50 @@ public class Matrix {
         return diagonal;
     }
 
-    public void setElement(int numRows, int numColumns, double value) {
-        if (numRows < 0) {
-            throw new ArrayIndexOutOfBoundsException("numRows < 0");
-        } else if (numRows >= getRowsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numRows > max");
+    private void testNumRow(int numRow) {
+        if (numRow < 0) {
+            throw new ArrayIndexOutOfBoundsException("numRow < 0");
+        } else if (numRow >= getRowsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numRow > max");
         }
-        if (numColumns < 0) {
-            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
-        } else if (numColumns >= getColumnsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numColumns > max");
-        }
-
-        rows[numRows].setElement(numColumns, value);
     }
 
-    public double getElement(int numRows, int numColumns) {
-        if (numRows < 0) {
-            throw new ArrayIndexOutOfBoundsException("numRows < 0");
-        } else if (numRows >= getRowsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numRows > max");
+    private void testNumColumn(int numColumn) {
+        if (numColumn < 0) {
+            throw new ArrayIndexOutOfBoundsException("numColumn < 0");
+        } else if (numColumn >= getColumnsNumber()) {
+            throw new ArrayIndexOutOfBoundsException("numColumn > max");
         }
-        if (numColumns < 0) {
-            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
-        } else if (numColumns >= getColumnsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numColumns > max");
-        }
-
-        return rows[numRows].getElement(numColumns);
     }
 
-    public Vector getRow(int numRows) {
-        if (numRows < 0) {
-            throw new ArrayIndexOutOfBoundsException("numRows < 0");
-        } else if (numRows >= getRowsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numRows > max");
-        }
+    public void setElement(int numRow, int numColumn, double value) {
+        testNumRow(numRow);
+        testNumColumn(numColumn);
 
-        return new Vector(rows[numRows]);
+        rows[numRow].setElement(numColumn, value);
     }
 
-    public Vector getColumn(int numColumns) {
-        if (numColumns < 0) {
-            throw new ArrayIndexOutOfBoundsException("numColumns < 0");
-        } else if (numColumns >= getColumnsNumber()) {
-            throw new ArrayIndexOutOfBoundsException("numColumns > max");
-        }
+    public double getElement(int numRow, int numColumn) {
+        testNumRow(numRow);
+        testNumColumn(numColumn);
+
+        return rows[numRow].getElement(numColumn);
+    }
+
+    public Vector getRow(int numRow) {
+        testNumRow(numRow);
+
+        return new Vector(rows[numRow]);
+    }
+
+    public Vector getColumn(int numColumn) {
+        testNumColumn(numColumn);
 
         int numRows = rows.length;
         Vector column = new Vector(numRows);
 
         for (int i = 0; i < numRows; i++) {
-            column.setElement(i, rows[i].getElement(numColumns));
+            column.setElement(i, rows[i].getElement(numColumn));
         }
 
         return column;
@@ -182,8 +174,6 @@ public class Matrix {
     }
 
     public void multiply(double value) {
-        int numRows = rows.length;
-
         for (Vector v : rows) {
             v.multiply(value);
         }
@@ -212,7 +202,7 @@ public class Matrix {
         }
     }
 
-    public void resize(Matrix matrix) {
+    private void maximize(Matrix matrix) {
         int numRows1 = rows.length;
         int numColumns1 = rows[0].getSize();
 
@@ -245,7 +235,7 @@ public class Matrix {
     }
 
     public void add(Matrix matrix) {
-        resize(matrix);
+        maximize(matrix);
 
         int numRows = matrix.rows.length;
 
@@ -255,7 +245,7 @@ public class Matrix {
     }
 
     public void subtract(Matrix matrix) {
-        resize(matrix);
+        maximize(matrix);
 
         int numRows = matrix.rows.length;
 
@@ -316,8 +306,8 @@ public class Matrix {
         return matrix3;
     }
 
-    public static Matrix multiply(Matrix matrix1, double value) {
-        Matrix matrix2 = new Matrix(matrix1);
+    public static Matrix multiply(Matrix matrix, double value) {
+        Matrix matrix2 = new Matrix(matrix);
 
         matrix2.multiply(value);
 
@@ -339,10 +329,10 @@ public class Matrix {
         return matrix;
     }
 
-    public static Vector multiply(Matrix matrix, Vector vector1) {
+    public static Vector multiply(Matrix matrix, Vector vector) {
         int numRows = matrix.rows.length;
         int numColumns = matrix.rows[0].getSize();
-        int numElements = vector1.getSize();
+        int numElements = vector.getSize();
 
         int min = Math.min(numColumns, numElements);
 
@@ -352,7 +342,7 @@ public class Matrix {
             double sum = 0;
 
             for (int j = 0; j < min; j++) {
-                sum += matrix.rows[i].getElement(j) * vector1.getElement(j);
+                sum += matrix.rows[i].getElement(j) * vector.getElement(j);
             }
 
             vector2.setElement(i, sum);
@@ -427,7 +417,6 @@ public class Matrix {
         int numRows = rows.length;
 
         boolean[] isInteger = new boolean[numColumns];
-        int[] numSymbols = new int[numColumns];
         String[] columnFormat = new String[numColumns];
 
         for (int i = 0; i < numColumns; i++) {
@@ -448,11 +437,9 @@ public class Matrix {
             }
 
             if (isInt && numSym < 10) {
-                numSymbols[i] = numSym;
                 isInteger[i] = true;
                 columnFormat[i] = "%" + numSym + "d";
             } else {
-                numSymbols[i] = 10;
                 isInteger[i] = false;
             }
         }
@@ -460,7 +447,17 @@ public class Matrix {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
                 if (j == 0) {
-                    System.out.print("|  ");
+                    if (numRows > 1) {
+                        if (i == 0) {
+                            System.out.print("/  ");
+                        } else if (i + 1 == numRows) {
+                            System.out.print("\\  ");
+                        } else {
+                            System.out.print("|  ");
+                        }
+                    } else {
+                        System.out.print("{  ");
+                    }
                 }
 
                 if (isInteger[j]) {
@@ -472,7 +469,17 @@ public class Matrix {
                 if (j + 1 < numColumns) {
                     System.out.print("  ");
                 } else {
-                    System.out.print("  |\n");
+                    if (numRows > 1) {
+                        if (i == 0) {
+                            System.out.println("  \\");
+                        } else if (i + 1 == numRows) {
+                            System.out.println("  /");
+                        } else {
+                            System.out.println("  |");
+                        }
+                    } else {
+                        System.out.println("  }");
+                    }
                 }
             }
         }
