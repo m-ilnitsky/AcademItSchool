@@ -141,7 +141,7 @@ public class Main {
         System.out.println(" *");
         System.out.println(v1);
         System.out.println(" =");
-        Vector v2 = Matrix.multiply(mat4[3],v1);
+        Vector v2 = Matrix.multiply(mat4[3], v1);
         System.out.println(v2);
         System.out.println();
 
