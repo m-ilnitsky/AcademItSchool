@@ -25,11 +25,11 @@ public class Number {
         return (lowestDigit(value) == 0);
     }
 
-    public static int length(int value){
+    public static int length(int value) {
         return Integer.toString(value).length();
     }
 
-    public static int length(double value){
+    public static int length(double value) {
         return Double.toString(value).length();
     }
 
