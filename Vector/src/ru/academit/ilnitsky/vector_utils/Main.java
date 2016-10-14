@@ -120,12 +120,12 @@ public class Main {
         System.out.print(".turn() = ");
         vector[7].turn();
         System.out.println(vector[7]);
-        
+
         // Тест setRandom
         System.out.println();
         Vector[] vector2 = new Vector[10];
-        for(int i=0;i<vector2.length;i++){
-            vector2[i] = new Vector(i+1);
+        for (int i = 0; i < vector2.length; i++) {
+            vector2[i] = new Vector(i + 1);
             vector2[i].setRandom();
             System.out.printf("[%d] %s%n", i, vector2[i]);
         }
@@ -133,8 +133,8 @@ public class Main {
         // Тест setRandomInt
         System.out.println();
         Vector[] vector3 = new Vector[10];
-        for(int i=0;i<vector3.length;i++){
-            vector3[i] = new Vector(i+1);
+        for (int i = 0; i < vector3.length; i++) {
+            vector3[i] = new Vector(i + 1);
             vector3[i].setRandomInt();
             System.out.printf("[%d] %s%n", i, vector3[i]);
         }
