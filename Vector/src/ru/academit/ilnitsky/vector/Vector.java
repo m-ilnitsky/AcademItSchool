@@ -1,6 +1,7 @@
 package ru.academit.ilnitsky.vector;
 
 import ru.academit.ilnitsky.functions.*;
+import ru.academit.ilnitsky.functions.Number;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -83,13 +84,30 @@ public class Vector {
         elements[i] = value;
     }
 
-    public void setRandom(){
+    public void setRandom(int exponent) {
         final Random random = new Random();
 
         int size = elements.length;
         for (int i = 0; i < size; i++) {
-            elements[i] += random.nextDouble()*Math.pow(10,random.nextInt(10));
+            elements[i] += (random.nextDouble() - 0.5) * Math.pow(10, random.nextInt(exponent));
         }
+    }
+
+    public void setRandom() {
+        setRandom(10);
+    }
+
+    public void setRandomInt(int min, int max) {
+        final Random random = new Random();
+
+        int size = elements.length;
+        for (int i = 0; i < size; i++) {
+            elements[i] += min + random.nextInt(max - min + 1);
+        }
+    }
+
+    public void setRandomInt() {
+        setRandomInt(-1000, 1000);
     }
 
     public void set(Vector vector, boolean fillZero) {
@@ -215,7 +233,7 @@ public class Vector {
 
         sb.append("{ ");
         for (int i = 0; i < size; i++) {
-            sb.append(elements[i]);
+            sb.append(Number.format(elements[i]));
             if (i + 1 != size) {
                 sb.append(", ");
             }

@@ -130,7 +130,17 @@ public class Main {
             System.out.printf("[%d] %s%n", i, vector2[i]);
         }
 
+        // Тест setRandomInt
+        System.out.println();
+        Vector[] vector3 = new Vector[10];
+        for(int i=0;i<vector3.length;i++){
+            vector3[i] = new Vector(i+1);
+            vector3[i].setRandomInt();
+            System.out.printf("[%d] %s%n", i, vector3[i]);
+        }
+
         //тест hashCode
+        System.out.println();
         Vector[] vec = new Vector[100];
         for (int i = 0; i < vec.length; i++) {
             vec[i] = new Vector((i + 1));
