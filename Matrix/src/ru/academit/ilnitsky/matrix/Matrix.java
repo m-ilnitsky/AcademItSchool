@@ -396,4 +396,51 @@ public class Matrix {
 
         return sb.toString();
     }
+
+    public void print() {
+        int min = 1;
+        int max = 16;
+
+        int iYSize = Integer.toString(max).length();           // Длина чисел в левой колонке
+        int xYSize = Integer.toString(max * max).length();     // Длина чисел в верхней строке и в таблице
+
+        String iYFormat = " %" + iYSize + "d |";  // Формат чисел в левой колонке
+        String xYFormat = " %" + xYSize + "d";    // Формат чисел в верхней строке и таблице
+
+        String leftLine1 = "";
+        String leftLine2 = "";
+        for (int i = 1; i <= iYSize + 2; ++i) {
+            leftLine1 += " ";
+            leftLine2 += "-";
+        }
+        leftLine1 += "|";
+        leftLine2 += "|";
+
+        String topLine = "";
+        for (int i = 1; i <= xYSize + 1; ++i) {
+            topLine += "-";
+        }
+
+        for (int iY = min; iY <= max; ++iY) {
+            if (iY == min) {
+                System.out.print(leftLine1);
+                for (int iX = min; iX <= max; ++iX) {
+                    System.out.printf(xYFormat, iX);
+                }
+                System.out.println();
+
+                System.out.print(leftLine2);
+                for (int iX = min; iX <= max; ++iX) {
+                    System.out.print(topLine);
+                }
+                System.out.println();
+            }
+
+            System.out.printf(iYFormat, iY);
+            for (int iX = min; iX <= max; ++iX) {
+                System.out.printf(xYFormat, iX * iY);
+            }
+            System.out.println();
+        }
+    }
 }
