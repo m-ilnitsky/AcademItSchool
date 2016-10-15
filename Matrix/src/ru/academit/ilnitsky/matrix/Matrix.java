@@ -4,6 +4,8 @@ import ru.academit.ilnitsky.functions.*;
 import ru.academit.ilnitsky.functions.Number;
 import ru.academit.ilnitsky.vector.Vector;
 
+import static ru.academit.ilnitsky.functions.Compare.isEqual;
+
 /**
  * Created by UserLabView on 12.10.16.
  * Класс "Матрица"
@@ -85,6 +87,13 @@ public class Matrix {
         int min = Math.min(getColumnsNumber(), getRowsNumber());
         for (int i = 0; i < min; i++) {
             rows[i].setElement(i, value);
+        }
+    }
+
+    public void setDiagonal(Vector vector) {
+        int min = Math.min(Math.min(getColumnsNumber(), getRowsNumber()), vector.getSize());
+        for (int i = 0; i < min; i++) {
+            rows[i].setElement(i, vector.getElement(i));
         }
     }
 
@@ -173,12 +182,6 @@ public class Matrix {
         }
     }
 
-    public void multiply(double value) {
-        for (Vector v : rows) {
-            v.multiply(value);
-        }
-    }
-
     public void resize(int numRows, int numColumns) {
         int numRows1 = rows.length;
         int numColumns1 = rows[0].getSize();
@@ -217,6 +220,114 @@ public class Matrix {
         }
     }
 
+    public boolean isSquare() {
+        return (rows.length == rows[0].getSize());
+    }
+
+    public boolean isDiagonal() {
+        if (!isSquare()) {
+            return false;
+        }
+
+        int size = rows.length;
+        if (size == 1) {
+            return true;
+        }
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (i != j && rows[i].getElement(j) != 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isScalarDiagonal() {
+        int size = rows.length;
+        if (size == 1) {
+            return true;
+        }
+
+        double a00 = rows[0].getElement(0);
+        for (int i = 1; i < size; i++) {
+            if (a00 != rows[i].getElement(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isScalar() {
+        if (!isDiagonal()) {
+            return false;
+        }
+
+        return isScalarDiagonal();
+    }
+
+    public Matrix minorMatrix(int numColumn) {
+        int oldNumColumns = rows[0].getSize();
+        int oldNumRows = rows.length;
+        int newNumRows = oldNumRows - 1;
+
+        Matrix matrix = new Matrix(newNumRows, oldNumColumns - 1);
+
+        for (int i = 0; i < newNumRows; i++) {
+            int iOld = i + 1;
+            for (int j = 0; j < oldNumColumns; j++) {
+                if (j < numColumn) {
+                    matrix.rows[i].setElement(j, rows[iOld].getElement(j));
+                } else if (j > numColumn) {
+                    matrix.rows[i].setElement(j - 1, rows[iOld].getElement(j));
+                }
+            }
+        }
+
+        return matrix;
+    }
+
+    public double det() {
+        int size = rows.length;
+
+        if (!isSquare()) {
+            throw new UnsupportedOperationException("Using det() for non-square  matrix!");
+        } else if (size == 1) {
+            return rows[0].getElement(0);
+        } else if (size == 2) {
+            return rows[0].getElement(0) * rows[1].getElement(1) - rows[0].getElement(1) * rows[1].getElement(0);
+        } else if (size == 3) {
+            return rows[0].getElement(0) * rows[1].getElement(1) * rows[2].getElement(2)
+                    - rows[0].getElement(0) * rows[1].getElement(2) * rows[2].getElement(1)
+                    - rows[0].getElement(1) * rows[1].getElement(0) * rows[2].getElement(2)
+                    + rows[0].getElement(1) * rows[1].getElement(2) * rows[2].getElement(0)
+                    + rows[0].getElement(2) * rows[1].getElement(0) * rows[2].getElement(1)
+                    - rows[0].getElement(2) * rows[1].getElement(1) * rows[2].getElement(0);
+        } else if (isDiagonal()) {
+            double result = 1;
+            for (int i = 0; i < size; i++) {
+                double aii = rows[i].getElement(i);
+                if (isEqual(aii, 0)) {
+                    return 0;
+                } else {
+                    result *= aii;
+                }
+            }
+            return result;
+        } else {
+            double sum = 0;
+
+            for (int i = 0; i < size; i++) {
+                sum += ((i % 2 == 0) ? 1 : -1) * rows[0].getElement(i) * minorMatrix(i).det();
+            }
+
+            return sum;
+        }
+    }
+
     public void transpose() {
         int numColumns = rows.length;
         int numRows = rows[0].getSize();
@@ -251,6 +362,12 @@ public class Matrix {
 
         for (int i = 0; i < numRows; i++) {
             rows[i].subtract(matrix.rows[i]);
+        }
+    }
+
+    public void multiply(double value) {
+        for (Vector v : rows) {
+            v.multiply(value);
         }
     }
 
@@ -412,7 +529,7 @@ public class Matrix {
         return sb.toString();
     }
 
-    public void print() {
+    public void println() {
         int numColumns = getColumnsNumber();
         int numRows = rows.length;
 

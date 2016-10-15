@@ -63,18 +63,18 @@ public class Main {
         System.out.println();
         for (int i = 0; i < matrix.length; i++) {
             System.out.printf("[%d]:%n", i);
-            matrix[i].print();
+            matrix[i].println();
             System.out.println();
         }
 
         System.out.println();
-        mat[0][0].print();
+        mat[0][0].println();
 
         System.out.println();
-        mat[2][1].print();
+        mat[2][1].println();
 
         System.out.println();
-        mat[9][2].print();
+        mat[9][2].println();
 
         System.out.println();
         Matrix[] mat2 = new Matrix[10];
@@ -82,7 +82,7 @@ public class Main {
             System.out.println("[" + i + "] " + (i + 1) + "x" + (i + 1));
             mat2[i] = new Matrix(i + 1, i + 1);
             mat2[i].setRandomInt();
-            mat2[i].print();
+            mat2[i].println();
             System.out.println();
         }
 
@@ -92,7 +92,7 @@ public class Main {
             System.out.println("[" + i + "] " + (i + 1) + "x" + (i + 1));
             mat3[i] = new Matrix(i + 1, i + 1);
             mat3[i].setRandomInt(0, 10 * (int) Math.pow(4, i));
-            mat3[i].print();
+            mat3[i].println();
             System.out.println();
         }
 
@@ -110,34 +110,34 @@ public class Main {
 
         // sum & difference
         System.out.println();
-        mat4[0].print();
+        mat4[0].println();
         System.out.println(" +");
-        mat4[1].print();
+        mat4[1].println();
         System.out.println(" =");
         Matrix m1 = Matrix.sum(mat4[0], mat4[1]);
-        m1.print();
+        m1.println();
         System.out.println(" -");
-        mat4[0].print();
+        mat4[0].println();
         System.out.println(" =");
         Matrix m2 = Matrix.difference(m1, mat4[0]);
-        m2.print();
+        m2.println();
 
         // multiply(Matrix, Matrix)
         System.out.println();
         System.out.println("multiply(Matrix, Matrix):");
-        mat4[2].print();
+        mat4[2].println();
         System.out.println(" *");
-        mat4[3].print();
+        mat4[3].println();
         System.out.println(" =");
         Matrix m3 = Matrix.multiply(mat4[2], mat4[3]);
-        m3.print();
+        m3.println();
 
         // multiply(Matrix, Vector)
         System.out.println();
         System.out.println("multiply(Matrix, Vector):");
         Vector v1 = new Vector(4);
         v1.setRandomInt(0, 5);
-        mat4[3].print();
+        mat4[3].println();
         System.out.println(" *");
         v1.println();
         System.out.println(" =");
@@ -152,22 +152,53 @@ public class Main {
         v2.println();
         System.out.println(" =");
         Matrix m4 = Matrix.multiply(v2, v1);
-        m4.print();
+        m4.println();
 
         // multiply(Matrix, double)
         System.out.println();
         System.out.println("multiply(Matrix, double):");
-        mat4[0].print();
+        mat4[0].println();
         System.out.println(" * 2");
         mat4[0].multiply(2);
-        mat4[0].print();
+        mat4[0].println();
 
         // transpose()
         System.out.println();
         System.out.println();
-        mat4[3].print();
+        mat4[3].println();
         System.out.println(" transpose:");
         mat4[3].transpose();
-        mat4[3].print();
+        mat4[3].println();
+
+        // det()
+        Vector vector = new Vector(4);
+        vector.setElement(0, 2);
+        vector.setElement(1, 3);
+        vector.setElement(2, 5);
+        vector.setElement(3, 7);
+
+        Matrix[] matrix2 = new Matrix[6];
+
+        matrix2[0] = new Matrix(1, 1);
+        matrix2[1] = new Matrix(2, 2);
+        matrix2[2] = new Matrix(3, 3);
+        matrix2[3] = new Matrix(4, 4);
+        matrix2[4] = new Matrix(4, 4);
+        matrix2[5] = new Matrix(4, 4);
+
+        matrix2[0].setDiagonal(37);
+        matrix2[1].setDiagonal(2);
+        matrix2[2].setDiagonal(2);
+        matrix2[3].setDiagonal(2);
+        matrix2[4].setDiagonal(vector);
+        matrix2[5].setRandomInt(0, 5);
+
+        for (int i = 0; i < matrix2.length; i++) {
+            System.out.println("[" + i + "]:");
+            matrix2[i].println();
+            System.out.println("det = " + matrix2[i].det());
+            System.out.println();
+        }
+
     }
 }
