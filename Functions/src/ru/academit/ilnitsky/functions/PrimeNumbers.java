@@ -256,6 +256,47 @@ public class PrimeNumbers {
         }
     }
 
+    public void load(String fileName) throws IOException {
+        int numLines = 0;
+
+        try (
+                Scanner fileScanner = new Scanner(new FileInputStream(fileName), "ASCII")
+        ) {
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                numLines++;
+            }
+        }
+
+        try (
+                Scanner fileScanner = new Scanner(new FileInputStream(fileName), "ASCII")
+        ) {
+            int[] primeNumber = new int[numLines];
+            int count = 0;
+
+            while (fileScanner.hasNextLine()) {
+                String[] line = fileScanner.nextLine().trim().split(" ");
+
+                if (!line[0].isEmpty()) {
+                    primeNumber[count] = Integer.parseInt(line[0]);
+                    count++;
+                }
+            }
+
+            numbers = primeNumber;
+
+            System.out.println("Result Size=" + count);
+
+            if (count < numbers.length) {
+                int[] resultArray = new int[count];
+
+                System.arraycopy(numbers, 0, resultArray, 0, count);
+
+                numbers = resultArray;
+            }
+        }
+    }
+
     public void print(int numFirstPrimeNumbers) {
         int min = Math.min(numFirstPrimeNumbers, numbers.length);
         for (int i = 0; i < min; i++) {
@@ -275,11 +316,10 @@ public class PrimeNumbers {
     }
 
     public static void main(String[] args) throws IOException {
-        PrimeNumbers prime = new PrimeNumbers(100);
-        prime.expandTo(50);
+        PrimeNumbers prime = new PrimeNumbers(2000);
+        prime.load("prime_numbers_1e3_expand_from_100.txt");
         prime.expandTo(100);
-        prime.expandTo(1000);
-        prime.expandTo(100);
-        prime.saveToFile("prime_numbers_1e3_expand_from_100.txt");
+        prime.expandTo(2000);
+        prime.saveToFile("prime_numbers_2e3_expand_from 1e3.txt");
     }
 }
