@@ -16,9 +16,7 @@ public class Container {
     }
 
     public Container(RubleBanknote nominal, int maxNumBanknotes) {
-        this.nominal = nominal;
-        this.maxNumBanknotes = maxNumBanknotes;
-        this.numBanknotes = 0;
+        this(nominal, maxNumBanknotes, 0);
     }
 
     public RubleBanknote getNominal() {

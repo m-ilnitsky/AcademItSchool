@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AcademItSchool.iml" filepath="$PROJECT_DIR$/AcademItSchool.iml" />
       <module fileurl="file://$PROJECT_DIR$/CashMachine/CashMachine.iml" filepath="$PROJECT_DIR$/CashMachine/CashMachine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CashMachine2/CashMachine2.iml" filepath="$PROJECT_DIR$/CashMachine2/CashMachine2.iml" />
       <module fileurl="file://$PROJECT_DIR$/Functions/Functions.iml" filepath="$PROJECT_DIR$/Functions/Functions.iml" />
       <module fileurl="file://$PROJECT_DIR$/Lectures/Lectures.iml" filepath="$PROJECT_DIR$/Lectures/Lectures.iml" />
       <module fileurl="file://$PROJECT_DIR$/Matrix/Matrix.iml" filepath="$PROJECT_DIR$/Matrix/Matrix.iml" />
