@@ -10,6 +10,7 @@ public class ATM {
     private final static int NUM_CONTAINERS = 5;
     private Account account;
     private Container[] containers = new Container[NUM_CONTAINERS];
+    private int[] setOfBanknotesForRemove = new int[NUM_CONTAINERS];
 
     public ATM() {
         containers[0] = new Container(R5000, 100, 50);
@@ -100,6 +101,8 @@ public class ATM {
             }
         }
 
+        setOfBanknotesForRemove = numBanknotes;
+
         return numBanknotes;
     }
 
@@ -129,7 +132,21 @@ public class ATM {
             }
         }
 
+        setOfBanknotesForRemove = numBanknotes;
+
         return numBanknotes;
+    }
+
+    public int[] getSetOfBanknotesForRemove() {
+        return setOfBanknotesForRemove;
+    }
+
+    public RubleBanknote[] getSetOfNominal() {
+        RubleBanknote[] set = new RubleBanknote[NUM_CONTAINERS];
+        for (int i = 0; i < NUM_CONTAINERS; i++) {
+            set[i] = containers[i].getNominal();
+        }
+        return set;
     }
 
     public int valueOfSet(int[] numBanknotes) {
@@ -147,8 +164,13 @@ public class ATM {
             return 0;
         }
 
-        int removeValue = valueOfSet(setOfBanknotes(value));
+        int[] setForRemove = setOfBanknotes(value);
+        int removeValue = valueOfSet(setForRemove);
         account.removeFromBalance(removeValue);
+
+        for (int i = 0; i < NUM_CONTAINERS; i++) {
+            containers[i].removeBanknotes(setForRemove[i]);
+        }
 
         return removeValue;
     }
@@ -158,8 +180,13 @@ public class ATM {
             return 0;
         }
 
-        int removeValue = valueOfSet(setOfBanknotesWithPriority(value, priorityBanknote));
+        int[] setForRemove = setOfBanknotesWithPriority(value, priorityBanknote);
+        int removeValue = valueOfSet(setForRemove);
         account.removeFromBalance(removeValue);
+
+        for (int i = 0; i < NUM_CONTAINERS; i++) {
+            containers[i].removeBanknotes(setForRemove[i]);
+        }
 
         return removeValue;
     }

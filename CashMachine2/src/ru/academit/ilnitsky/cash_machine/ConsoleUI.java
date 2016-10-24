@@ -41,8 +41,8 @@ public class ConsoleUI {
             }
         } else if (line.isEmpty()) {
             refresh = true;
-        } else if (Character.isDigit(line.charAt(0))) {
-            choice = Integer.parseInt(line.substring(0, 1));
+        } else if (line.length() == 1 && Character.isDigit(line.charAt(0))) {
+            choice = Integer.parseInt(line);
         } else {
             refresh = true;
         }
@@ -218,6 +218,7 @@ public class ConsoleUI {
                 menuLevel = M3_0;
             }
         } else {
+            menuLevel = M3_1;
             refresh = true;
         }
     }
@@ -403,8 +404,19 @@ public class ConsoleUI {
     private void printMenu3_3() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
-        System.out.printf("Возьмите %d рублей и нажмите [Enter]%n", value);
+        System.out.printf("К выдаче подготовлено %d рублей и нажмите [Enter]%n", value);
 
+        RubleBanknote[] set = atm.getSetOfNominal();
+        int[] setForRemove = atm.getSetOfBanknotesForRemove();
+
+
+        for (int i = 0; i < set.length; i++) {
+            if (setForRemove[i] > 0) {
+                System.out.printf("Возьмите %d банкнот по %3d рублей [Enter]%n", setForRemove[i], set[i].getValue());
+            }
+        }
+
+        System.out.println("Заберите деньги и нажмите [Enter]");
         readChoice();
     }
 
