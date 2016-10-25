@@ -38,10 +38,10 @@ public class ConsoleUI {
 
     private void readChoice() {
         String line = scanner.nextLine();
-        if (menuLevel == M1 || menuLevel == M3_2) {
+        if (menuLevel == M0_1 || menuLevel == M0_3_2_2) {
             menuLevel = M0;
             refresh = true;
-        } else if (menuLevel == M39) {
+        } else if (menuLevel == M0_3_1) {
             try {
                 value = Integer.parseInt(line);
             } catch (NumberFormatException e) {
@@ -80,16 +80,14 @@ public class ConsoleUI {
                     exit = true;
                     break;
                 case 1:
-                    menuLevel = M1;
+                    menuLevel = M0_1;
                     break;
                 case 2:
-                    menuLevel = M2;
+                    menuLevel = M0_2;
                     break;
                 case 3:
-                    menuLevel = M3;
+                    menuLevel = M0_3;
                     break;
-                default:
-                    refresh = true;
             }
         }
     }
@@ -120,7 +118,7 @@ public class ConsoleUI {
         }
     }
 
-    private void printMenu1() {
+    private void printMenu0_1() {
         clear();
         System.out.println("БАЛАНС");
         System.out.println("Имеется:");
@@ -137,7 +135,7 @@ public class ConsoleUI {
         readChoice();
     }
 
-    private void printMenu2() {
+    private void printMenu0_2() {
         clear();
         System.out.println("ПРИЁМ НАЛИЧНЫХ");
 
@@ -161,17 +159,15 @@ public class ConsoleUI {
                 if (moneyBox.hasUnoccupiedSpace(nominals[i])) {
                     value = nominals[i].getValue();
                     moneyBox.addMoney(nominals[i]);
-                    menuLevel = M21;
+                    menuLevel = M0_2_1;
                 } else {
-                    menuLevel = M22;
+                    menuLevel = M0_2_2;
                 }
-            } else {
-                refresh = true;
             }
         }
     }
 
-    private void printMenu21() {
+    private void printMenu0_2_1() {
         clear();
         System.out.println("ПРИЁМ НАЛИЧНЫХ");
         System.out.printf("Счёт пополнен на %d рублей%n", value);
@@ -186,15 +182,13 @@ public class ConsoleUI {
                     menuLevel = M0;
                     break;
                 case 1:
-                    menuLevel = M2;
+                    menuLevel = M0_2;
                     break;
-                default:
-                    refresh = true;
             }
         }
     }
 
-    private void printMenu22() {
+    private void printMenu0_2_2() {
         clear();
         System.out.println("ПРИЁМ НАЛИЧНЫХ");
         System.out.println("Извините, счёт не был пополнен");
@@ -210,95 +204,50 @@ public class ConsoleUI {
                     menuLevel = M0;
                     break;
                 case 1:
-                    menuLevel = M2;
+                    menuLevel = M0_2;
                     break;
-                default:
-                    refresh = true;
             }
         }
     }
 
-    private void caseMenu3(int value) {
+    private void caseMenu0_3(int value) {
         if (moneyBox.isAvailable(value)) {
             this.value = value;
-            menuLevel = M3_0;
+            menuLevel = M0_3_2;
         } else {
-            menuLevel = M3_1;
-            refresh = true;
+            menuLevel = M0_3_2_1;
         }
     }
 
-    private void printMenu3() {
+    private void printMenu0_3() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
-        if (moneyBox.isAvailable(50)) {
-            System.out.println("1: Снять   50 рублей");
+
+        int[] remove = {50, 100, 200, 500, 1000, 2000, 3000, 5000};
+
+        for (int i = 0; i < remove.length; i++) {
+            if (moneyBox.isAvailable(remove[i])) {
+                System.out.printf("%d: Снять %4d рублей%n", i + 1, remove[i]);
+            }
         }
-        if (moneyBox.isAvailable(100)) {
-            System.out.println("2: Снять  100 рублей");
-        }
-        if (moneyBox.isAvailable(200)) {
-            System.out.println("3: Снять  200 рублей");
-        }
-        if (moneyBox.isAvailable(500)) {
-            System.out.println("4: Снять  500 рублей");
-        }
-        if (moneyBox.isAvailable(1000)) {
-            System.out.println("5: Снять 1000 рублей");
-        }
-        if (moneyBox.isAvailable(2000)) {
-            System.out.println("6: Снять 2000 рублей");
-        }
-        if (moneyBox.isAvailable(3000)) {
-            System.out.println("7: Снять 3000 рублей");
-        }
-        if (moneyBox.isAvailable(5000)) {
-            System.out.println("8: Снять 5000 рублей");
-        }
+
         System.out.println("9: Выбрать другую сумму");
         System.out.println("0: ВЫХОД В ОСНОВНОЕ МЕНЮ");
         System.out.println("Введите номер меню и нажмите [Enter]");
 
         readChoice();
         if (!refresh) {
-            switch (choice) {
-                case 0:
-                    menuLevel = M0;
-                    break;
-                case 1:
-                    caseMenu3(50);
-                    break;
-                case 2:
-                    caseMenu3(100);
-                    break;
-                case 3:
-                    caseMenu3(200);
-                    break;
-                case 4:
-                    caseMenu3(500);
-                    break;
-                case 5:
-                    caseMenu3(1000);
-                    break;
-                case 6:
-                    caseMenu3(2000);
-                    break;
-                case 7:
-                    caseMenu3(3000);
-                    break;
-                case 8:
-                    caseMenu3(5000);
-                    break;
-                case 9:
-                    menuLevel = M39;
-                    break;
-                default:
-                    refresh = true;
+            if (choice == 0) {
+                menuLevel = M0;
+            } else if (choice > 0 && choice < 9) {
+                caseMenu0_3(remove[choice - 1]);
+            } else if (choice == 9) {
+                menuLevel = M0_3_1;
             }
         }
     }
 
-    private void printMenu39() {
+    private void printMenu0_3_1() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
         System.out.println("Введите сумму и нажмите [Enter]");
@@ -306,11 +255,11 @@ public class ConsoleUI {
 
         readChoice();
         if (!refresh) {
-            caseMenu3(value);
+            caseMenu0_3(value);
         }
     }
 
-    private void printMenu3_0() {
+    private void printMenu0_3_2() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
         System.out.println("Выберете приоритетные купюры");
@@ -333,17 +282,15 @@ public class ConsoleUI {
                 RubleBanknote priorityBanknote = nominals[nominals.length - choice];
                 if (moneyBox.isAvailable(value, priorityBanknote)) {
                     moneyBox.removeMoney(value, priorityBanknote);
-                    menuLevel = M3_2;
+                    menuLevel = M0_3_2_2;
                 } else {
-                    menuLevel = M3_1;
+                    menuLevel = M0_3_2_1;
                 }
-            } else {
-                refresh = true;
             }
         }
     }
 
-    private void printMenu3_1() {
+    private void printMenu0_3_2_1() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
         System.out.println("Выбранная сумма не может быть выдана имеющимися купюрами");
@@ -356,14 +303,12 @@ public class ConsoleUI {
             if (choice == 0) {
                 menuLevel = M0;
             } else if (choice == 1) {
-                menuLevel = M3;
-            } else {
-                refresh = true;
+                menuLevel = M0_3;
             }
         }
     }
 
-    private void printMenu3_2() {
+    private void printMenu0_3_2_2() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
         System.out.printf("К выдаче подготовлено %d рублей%n", value);
@@ -372,7 +317,7 @@ public class ConsoleUI {
 
         for (int i = 0; i < nominals.length; i++) {
             if (setForRemove[i] > 0) {
-                System.out.printf("Возьмите %d %s по %3d рублей%n", setForRemove[i], printBanknotes2(setForRemove[i]), nominals[i].getValue());
+                System.out.printf("Возьмите %d %s номиналом %3d рублей%n", setForRemove[i], printBanknotes2(setForRemove[i]), nominals[i].getValue());
             }
         }
 
@@ -386,32 +331,32 @@ public class ConsoleUI {
                 case M0:
                     printMenu0();
                     break;
-                case M1:
-                    printMenu1();
+                case M0_1:
+                    printMenu0_1();
                     break;
-                case M2:
-                    printMenu2();
+                case M0_2:
+                    printMenu0_2();
                     break;
-                case M21:
-                    printMenu21();
+                case M0_2_1:
+                    printMenu0_2_1();
                     break;
-                case M22:
-                    printMenu22();
+                case M0_2_2:
+                    printMenu0_2_2();
                     break;
-                case M3:
-                    printMenu3();
+                case M0_3:
+                    printMenu0_3();
                     break;
-                case M3_0:
-                    printMenu3_0();
+                case M0_3_1:
+                    printMenu0_3_1();
                     break;
-                case M39:
-                    printMenu39();
+                case M0_3_2:
+                    printMenu0_3_2();
                     break;
-                case M3_1:
-                    printMenu3_1();
+                case M0_3_2_1:
+                    printMenu0_3_2_1();
                     break;
-                case M3_2:
-                    printMenu3_2();
+                case M0_3_2_2:
+                    printMenu0_3_2_2();
                     break;
             }
         }

@@ -6,7 +6,7 @@ package ru.academit.ilnitsky.console_ui;
  */
 enum MenuLevel {
     M0,
-    M1,
-    M2, M21, M22,
-    M3, M39, M3_0, M3_1, M3_2
+    M0_1,
+    M0_2, M0_2_1, M0_2_2,
+    M0_3, M0_3_1, M0_3_2, M0_3_2_1, M0_3_2_2
 }
