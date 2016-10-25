@@ -24,8 +24,8 @@ public class ConsoleUI {
     private boolean exit = false;
     private boolean refresh = false;
 
-    public ConsoleUI(int numBanknotes) {
-        moneyBox = new MoneyBox(numBanknotes);
+    public ConsoleUI(int containerSize, int numBanknotes) {
+        moneyBox = new MoneyBox(containerSize, numBanknotes);
 
         nominals = moneyBox.getNominals();
 
@@ -124,10 +124,11 @@ public class ConsoleUI {
     private void printMenu1() {
         clear();
         System.out.println("БАЛАНС");
+        System.out.println("Имеется:");
 
         for (RubleBanknote nominal : nominals) {
             if (moneyBox.isAvailable(nominal)) {
-                System.out.printf("Имеется: %d %s номиналом %d рублей.%n", moneyBox.getAvailableBanknote(nominal), printBanknotes(moneyBox.getAvailableBanknote(nominal)), nominal.getValue());
+                System.out.printf("%4d %-6s номиналом %4d рублей.%n", moneyBox.getAvailableBanknote(nominal), printBanknotes(moneyBox.getAvailableBanknote(nominal)), nominal.getValue());
             }
         }
 

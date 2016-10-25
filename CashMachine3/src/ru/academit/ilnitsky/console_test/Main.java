@@ -8,7 +8,7 @@ import ru.academit.ilnitsky.console_ui.ConsoleUI;
  */
 public class Main {
     public static void main(String[] args) {
-        ConsoleUI consoleMoneyBox = new ConsoleUI(10);
+        ConsoleUI consoleMoneyBox = new ConsoleUI(50, 10);
 
         consoleMoneyBox.menu();
     }

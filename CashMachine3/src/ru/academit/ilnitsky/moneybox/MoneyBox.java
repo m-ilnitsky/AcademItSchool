@@ -1,30 +1,37 @@
 package ru.academit.ilnitsky.moneybox;
 
-import static ru.academit.ilnitsky.moneybox.RubleBanknote.*;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Класс "Копилка"
  * Created by UserLabView on 21.10.16.
  */
 public class MoneyBox {
-    private final static int NUM_CONTAINERS = 5;
-    private final static int CONTAINER_SIZE = 100;
+    private final int numContainers;
 
-    private final RubleBanknote[] nominals = new RubleBanknote[NUM_CONTAINERS];
-    private final int[] setOfBanknotesForRemove = new int[NUM_CONTAINERS];
-    private final Container[] containers = new Container[NUM_CONTAINERS];
+    private final RubleBanknote[] nominals;
+    private final int[] setOfBanknotesForRemove;
+    private final Container[] containers;
 
-    public MoneyBox(int numBanknotes) {
+    public MoneyBox(int containerSize, int numBanknotes) {
         RubleBanknote[] banknotes = RubleBanknote.values();
+        Arrays.sort(banknotes, Collections.reverseOrder(new SortedByValue()));
 
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        numContainers = Math.min(banknotes.length, 9); //9 - максимальное число в меню
+
+        nominals = new RubleBanknote[numContainers];
+        setOfBanknotesForRemove = new int[numContainers];
+        containers = new Container[numContainers];
+
+        for (int i = 0; i < numContainers; i++) {
             nominals[i] = banknotes[i];
-            containers[i] = new Container(banknotes[i], CONTAINER_SIZE, numBanknotes);
+            containers[i] = new Container(banknotes[i], containerSize, numBanknotes);
         }
     }
 
     private int getIndexOfContainer(RubleBanknote banknote) {
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             if (containers[i].getNominal() == banknote) {
                 return i;
             }
@@ -53,7 +60,7 @@ public class MoneyBox {
 
     public int getAvailableMoney() {
         int result = 0;
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             result += containers[i].getNumBanknotes() * containers[i].getNominal().getValue();
         }
         return result;
@@ -65,7 +72,7 @@ public class MoneyBox {
 
     public boolean isAvailable(int value) {
         int sum = 0;
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             if (containers[i].getNominal().getValue() <= value) {
                 sum += containers[i].getNominal().getValue() * containers[i].getNumBanknotes();
             }
@@ -88,9 +95,9 @@ public class MoneyBox {
 
     private int[] setOfBanknotesWithoutPriority(int value) {
         int removeValue = value;
-        int[] numBanknotes = new int[NUM_CONTAINERS];
+        int[] numBanknotes = new int[numContainers];
 
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             numBanknotes[i] = removeValue / containers[i].getNominal().getValue();
 
             if (numBanknotes[i] > containers[i].getNumBanknotes()) {
@@ -106,7 +113,7 @@ public class MoneyBox {
 
     private int[] setOfBanknotesWithPriority(int value, RubleBanknote priorityBanknote) {
         int priorityIndex = getIndexOfContainer(priorityBanknote);
-        int[] numBanknotes = new int[NUM_CONTAINERS];
+        int[] numBanknotes = new int[numContainers];
 
         int numBanknotesPriority = value / containers[priorityIndex].getNominal().getValue();
         if (numBanknotesPriority > containers[priorityIndex].getNumBanknotes()) {
@@ -118,7 +125,7 @@ public class MoneyBox {
             numBanknotes[priorityIndex] = numPriority;
             removeValue -= numBanknotes[priorityIndex] * containers[priorityIndex].getNominal().getValue();
 
-            for (int i = 0; i < NUM_CONTAINERS; i++) {
+            for (int i = 0; i < numContainers; i++) {
                 if (i != priorityIndex) {
                     numBanknotes[i] = removeValue / containers[i].getNominal().getValue();
 
@@ -147,26 +154,26 @@ public class MoneyBox {
             numBanknotes = setOfBanknotesWithoutPriority(value);
         }
 
-        System.arraycopy(numBanknotes, 0, setOfBanknotesForRemove, 0, NUM_CONTAINERS);
+        System.arraycopy(numBanknotes, 0, setOfBanknotesForRemove, 0, numContainers);
         return numBanknotes;
     }
 
     public int[] getSetOfBanknotes() {
-        int[] numBanknotes = new int[NUM_CONTAINERS];
-        System.arraycopy(setOfBanknotesForRemove, 0, numBanknotes, 0, NUM_CONTAINERS);
+        int[] numBanknotes = new int[numContainers];
+        System.arraycopy(setOfBanknotesForRemove, 0, numBanknotes, 0, numContainers);
         return numBanknotes;
     }
 
     public RubleBanknote[] getNominals() {
-        RubleBanknote[] banknotes = new RubleBanknote[NUM_CONTAINERS];
-        System.arraycopy(nominals, 0, banknotes, 0, NUM_CONTAINERS);
+        RubleBanknote[] banknotes = new RubleBanknote[numContainers];
+        System.arraycopy(nominals, 0, banknotes, 0, numContainers);
         return banknotes;
     }
 
     private int valueOfSet(int[] numBanknotes) {
         int value = 0;
 
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             value += numBanknotes[i] * containers[i].getNominal().getValue();
         }
 
@@ -178,7 +185,7 @@ public class MoneyBox {
         int[] setForRemove = setOfBanknotes(value, priorityBanknote);
         int removeValue = valueOfSet(setForRemove);
 
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
+        for (int i = 0; i < numContainers; i++) {
             containers[i].removeBanknotes(setForRemove[i]);
         }
 
