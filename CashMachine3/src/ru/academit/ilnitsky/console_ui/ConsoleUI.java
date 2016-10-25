@@ -15,6 +15,8 @@ import static ru.academit.ilnitsky.moneybox.RubleBanknote.*;
 public class ConsoleUI {
     private final MoneyBox moneyBox;
 
+    private final RubleBanknote[] nominals;
+
     private MenuLevel menuLevel;
     private Scanner scanner;
     private int value = 0;
@@ -22,21 +24,16 @@ public class ConsoleUI {
     private boolean exit = false;
     private boolean refresh = false;
 
-    public ConsoleUI() {
-        moneyBox = new MoneyBox();
-        menuLevel = M0;
-        exit = false;
-        value = 0;
-        choice = 0;
-        scanner = new Scanner(System.in);
-    }
-
     public ConsoleUI(int numBanknotes) {
         moneyBox = new MoneyBox(numBanknotes);
+
+        nominals = moneyBox.getNominals();
+
         menuLevel = M0;
         exit = false;
         value = 0;
         choice = 0;
+
         scanner = new Scanner(System.in);
     }
 
@@ -111,11 +108,23 @@ public class ConsoleUI {
         }
     }
 
+    private String printBanknotes2(int numBanknotes) {
+        int num = numBanknotes % 10;
+        if (numBanknotes > 4 && numBanknotes < 21) {
+            return "купюр";
+        } else if (num == 1) {
+            return "купюру";
+        } else if (num > 1 && num < 5) {
+            return "купюры";
+        } else {
+            return "купюр";
+        }
+    }
+
     private void printMenu1() {
         clear();
         System.out.println("БАЛАНС");
 
-        RubleBanknote[] nominals = moneyBox.getNominals();
         for (RubleBanknote nominal : nominals) {
             if (moneyBox.isAvailable(nominal)) {
                 System.out.printf("Имеется: %d %s номиналом %d рублей.%n", moneyBox.getAvailableBanknote(nominal), printBanknotes(moneyBox.getAvailableBanknote(nominal)), nominal.getValue());
@@ -131,67 +140,33 @@ public class ConsoleUI {
     private void printMenu2() {
         clear();
         System.out.println("ПРИЁМ НАЛИЧНЫХ");
-        System.out.println("1: Пополнить счёт на   50 рублей");
-        System.out.println("2: Пополнить счёт на  100 рублей");
-        System.out.println("3: Пополнить счёт на  500 рублей");
-        System.out.println("4: Пополнить счёт на 1000 рублей");
-        System.out.println("5: Пополнить счёт на 5000 рублей");
+
+        for (int i = nominals.length - 1; i >= 0; i--) {
+            if (moneyBox.hasUnoccupiedSpace(nominals[i])) {
+                int j = nominals.length - i;
+                System.out.printf("%d: Пополнить счёт на %4d рублей%n", j, nominals[i].getValue());
+            }
+        }
+
         System.out.println("0: ВЫХОД В ОСНОВНОЕ МЕНЮ");
         System.out.println("Введите номер меню и нажмите [Enter]");
 
         readChoice();
         if (!refresh) {
-            switch (choice) {
-                case 0:
-                    menuLevel = M0;
-                    break;
-                case 1:
-                    if (moneyBox.isUnoccupiedSpace(R50)) {
-                        value = 50;
-                        menuLevel = M21;
-                        moneyBox.addMoney(R50);
-                    } else {
-                        menuLevel = M22;
-                    }
-                    break;
-                case 2:
-                    if (moneyBox.isUnoccupiedSpace(R100)) {
-                        value = 100;
-                        menuLevel = M21;
-                        moneyBox.addMoney(R100);
-                    } else {
-                        menuLevel = M22;
-                    }
-                    break;
-                case 3:
-                    if (moneyBox.isUnoccupiedSpace(R500)) {
-                        value = 500;
-                        menuLevel = M21;
-                        moneyBox.addMoney(R500);
-                    } else {
-                        menuLevel = M22;
-                    }
-                    break;
-                case 4:
-                    if (moneyBox.isUnoccupiedSpace(R1000)) {
-                        value = 1000;
-                        menuLevel = M21;
-                        moneyBox.addMoney(R1000);
-                    } else {
-                        menuLevel = M22;
-                    }
-                    break;
-                case 5:
-                    if (moneyBox.isUnoccupiedSpace(R5000)) {
-                        value = 5000;
-                        menuLevel = M21;
-                        moneyBox.addMoney(R5000);
-                    } else {
-                        menuLevel = M22;
-                    }
-                    break;
-                default:
-                    refresh = true;
+
+            if (choice == 0) {
+                menuLevel = M0;
+            } else if (choice > 0 && choice <= nominals.length) {
+                int i = nominals.length - choice;
+                if (moneyBox.hasUnoccupiedSpace(nominals[i])) {
+                    value = nominals[i].getValue();
+                    moneyBox.addMoney(nominals[i]);
+                    menuLevel = M21;
+                } else {
+                    menuLevel = M22;
+                }
+            } else {
+                refresh = true;
             }
         }
     }
@@ -339,58 +314,31 @@ public class ConsoleUI {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
         System.out.println("Выберете приоритетные купюры");
-        if (value >= 50 && moneyBox.isAvailable(R50)) {
-            System.out.println("1: Снять по возможности купюрами по   50 рублей");
+
+        for (int i = nominals.length - 1; i >= 0; i--) {
+            if (value >= nominals[i].getValue() && moneyBox.isAvailable(nominals[i])) {
+                int j = nominals.length - i;
+                System.out.printf("%d: Снять по возможности купюрами по %4d рублей%n", j, nominals[i].getValue());
+            }
         }
-        if (value >= 100 && moneyBox.isAvailable(R100)) {
-            System.out.println("2: Снять по возможности купюрами по  100 рублей");
-        }
-        if (value >= 500 && moneyBox.isAvailable(R500)) {
-            System.out.println("3: Снять по возможности купюрами по  500 рублей");
-        }
-        if (value >= 1000 && moneyBox.isAvailable(R1000)) {
-            System.out.println("4: Снять по возможности купюрами по 1000 рублей");
-        }
-        if (value >= 5000 && moneyBox.isAvailable(R5000)) {
-            System.out.println("5: Снять по возможности купюрами по 5000 рублей");
-        }
+
         System.out.println("0: ОТМЕНА И ВЫХОД В ОСНОВНОЕ МЕНЮ");
         System.out.println("Введите номер меню и нажмите [Enter]");
 
         readChoice();
         if (!refresh) {
-            RubleBanknote priorityBanknote;
-            switch (choice) {
-                case 0:
-                    priorityBanknote = R5000;
-                    menuLevel = M0;
-                    break;
-                case 1:
-                    priorityBanknote = R50;
-                    break;
-                case 2:
-                    priorityBanknote = R100;
-                    break;
-                case 3:
-                    priorityBanknote = R500;
-                    break;
-                case 4:
-                    priorityBanknote = R1000;
-                    break;
-                case 5:
-                    priorityBanknote = R5000;
-                    break;
-                default:
-                    priorityBanknote = R5000;
-                    refresh = true;
-            }
-            if (choice > 0 && choice < 6) {
+            if (choice == 0) {
+                menuLevel = M0;
+            } else if (choice > 0 && choice <= nominals.length) {
+                RubleBanknote priorityBanknote = nominals[nominals.length - choice];
                 if (moneyBox.isAvailable(value, priorityBanknote)) {
                     moneyBox.removeMoney(value, priorityBanknote);
                     menuLevel = M3_2;
                 } else {
                     menuLevel = M3_1;
                 }
+            } else {
+                refresh = true;
             }
         }
     }
@@ -418,15 +366,13 @@ public class ConsoleUI {
     private void printMenu3_2() {
         clear();
         System.out.println("СНЯТИЕ НАЛИЧНЫХ");
-        System.out.printf("К выдаче подготовлено %d рублей и нажмите [Enter]%n", value);
+        System.out.printf("К выдаче подготовлено %d рублей%n", value);
 
-        RubleBanknote[] nominals = moneyBox.getNominals();
         int[] setForRemove = moneyBox.getSetOfBanknotes();
-
 
         for (int i = 0; i < nominals.length; i++) {
             if (setForRemove[i] > 0) {
-                System.out.printf("Возьмите %d %s по %3d рублей [Enter]%n", setForRemove[i], printBanknotes(setForRemove[i]), nominals[i].getValue());
+                System.out.printf("Возьмите %d %s по %3d рублей%n", setForRemove[i], printBanknotes2(setForRemove[i]), nominals[i].getValue());
             }
         }
 

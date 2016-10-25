@@ -11,31 +11,15 @@ public class MoneyBox {
     private final static int CONTAINER_SIZE = 100;
 
     private final RubleBanknote[] nominals = new RubleBanknote[NUM_CONTAINERS];
-
-    private int[] setOfBanknotesForRemove = new int[NUM_CONTAINERS];
-    private Container[] containers = new Container[NUM_CONTAINERS];
-
-    public MoneyBox() {
-        containers[0] = new Container(R5000, CONTAINER_SIZE, 10);
-        containers[1] = new Container(R1000, CONTAINER_SIZE, 20);
-        containers[2] = new Container(R500, CONTAINER_SIZE, 30);
-        containers[3] = new Container(R100, CONTAINER_SIZE, 40);
-        containers[4] = new Container(R50, CONTAINER_SIZE, 50);
-
-        for (int i = 0; i < NUM_CONTAINERS; i++) {
-            nominals[i] = containers[i].getNominal();
-        }
-    }
+    private final int[] setOfBanknotesForRemove = new int[NUM_CONTAINERS];
+    private final Container[] containers = new Container[NUM_CONTAINERS];
 
     public MoneyBox(int numBanknotes) {
-        containers[0] = new Container(R5000, CONTAINER_SIZE, numBanknotes);
-        containers[1] = new Container(R1000, CONTAINER_SIZE, numBanknotes);
-        containers[2] = new Container(R500, CONTAINER_SIZE, numBanknotes);
-        containers[3] = new Container(R100, CONTAINER_SIZE, numBanknotes);
-        containers[4] = new Container(R50, CONTAINER_SIZE, numBanknotes);
+        RubleBanknote[] banknotes = RubleBanknote.values();
 
         for (int i = 0; i < NUM_CONTAINERS; i++) {
-            nominals[i] = containers[i].getNominal();
+            nominals[i] = banknotes[i];
+            containers[i] = new Container(banknotes[i], CONTAINER_SIZE, numBanknotes);
         }
     }
 
@@ -53,7 +37,7 @@ public class MoneyBox {
         return containers[index].unoccupiedSpace();
     }
 
-    public boolean isUnoccupiedSpace(RubleBanknote banknote) {
+    public boolean hasUnoccupiedSpace(RubleBanknote banknote) {
         return getUnoccupiedSpace(banknote) > 0;
     }
 
@@ -103,43 +87,81 @@ public class MoneyBox {
         return false;
     }
 
-    private int[] setOfBanknotes(int value, RubleBanknote priorityBanknote) {
-        int priorityIndex = getIndexOfContainer(priorityBanknote);
+    private int[] setOfBanknotesWithoutPriority(int value) {
         int removeValue = value;
         int[] numBanknotes = new int[NUM_CONTAINERS];
 
-        numBanknotes[priorityIndex] = removeValue / containers[priorityIndex].getNominal().getValue();
-        if (numBanknotes[priorityIndex] > containers[priorityIndex].getNumBanknotes()) {
-            numBanknotes[priorityIndex] = containers[priorityIndex].getNumBanknotes();
-            removeValue = removeValue - numBanknotes[priorityIndex] * containers[priorityIndex].getNominal().getValue();
-        } else {
-            removeValue %= containers[priorityIndex].getNominal().getValue();
-        }
-
         for (int i = 0; i < NUM_CONTAINERS; i++) {
-            if (i != priorityIndex) {
-                numBanknotes[i] = removeValue / containers[i].getNominal().getValue();
+            numBanknotes[i] = removeValue / containers[i].getNominal().getValue();
 
-                if (numBanknotes[i] > containers[i].getNumBanknotes()) {
-                    numBanknotes[i] = containers[i].getNumBanknotes();
-                    removeValue = removeValue - numBanknotes[i] * containers[i].getNominal().getValue();
-                } else {
-                    removeValue %= containers[i].getNominal().getValue();
-                }
+            if (numBanknotes[i] > containers[i].getNumBanknotes()) {
+                numBanknotes[i] = containers[i].getNumBanknotes();
+                removeValue = removeValue - numBanknotes[i] * containers[i].getNominal().getValue();
+            } else {
+                removeValue %= containers[i].getNominal().getValue();
             }
         }
 
-        setOfBanknotesForRemove = numBanknotes;
+        return numBanknotes;
+    }
 
-        return setOfBanknotesForRemove;
+    private int[] setOfBanknotesWithPriority(int value, RubleBanknote priorityBanknote) {
+        int priorityIndex = getIndexOfContainer(priorityBanknote);
+        int[] numBanknotes = new int[NUM_CONTAINERS];
+
+        int numBanknotesPriority = value / containers[priorityIndex].getNominal().getValue();
+        if (numBanknotesPriority > containers[priorityIndex].getNumBanknotes()) {
+            numBanknotesPriority = containers[priorityIndex].getNumBanknotes();
+        }
+
+        for (int numPriority = numBanknotesPriority; numPriority > 0; numPriority--) {
+            int removeValue = value;
+            numBanknotes[priorityIndex] = numPriority;
+            removeValue -= numBanknotes[priorityIndex] * containers[priorityIndex].getNominal().getValue();
+
+            for (int i = 0; i < NUM_CONTAINERS; i++) {
+                if (i != priorityIndex) {
+                    numBanknotes[i] = removeValue / containers[i].getNominal().getValue();
+
+                    if (numBanknotes[i] > containers[i].getNumBanknotes()) {
+                        numBanknotes[i] = containers[i].getNumBanknotes();
+                        removeValue = removeValue - numBanknotes[i] * containers[i].getNominal().getValue();
+                    } else {
+                        removeValue %= containers[i].getNominal().getValue();
+                    }
+                }
+            }
+
+            if (valueOfSet(numBanknotes) == value) {
+                return numBanknotes;
+            }
+        }
+
+        return numBanknotes;
+    }
+
+    private int[] setOfBanknotes(int value, RubleBanknote priorityBanknote) {
+
+        int[] numBanknotes = setOfBanknotesWithPriority(value, priorityBanknote);
+
+        if (valueOfSet(numBanknotes) != value) {
+            numBanknotes = setOfBanknotesWithoutPriority(value);
+        }
+
+        System.arraycopy(numBanknotes, 0, setOfBanknotesForRemove, 0, NUM_CONTAINERS);
+        return numBanknotes;
     }
 
     public int[] getSetOfBanknotes() {
-        return setOfBanknotesForRemove;
+        int[] numBanknotes = new int[NUM_CONTAINERS];
+        System.arraycopy(setOfBanknotesForRemove, 0, numBanknotes, 0, NUM_CONTAINERS);
+        return numBanknotes;
     }
 
     public RubleBanknote[] getNominals() {
-        return nominals;
+        RubleBanknote[] banknotes = new RubleBanknote[NUM_CONTAINERS];
+        System.arraycopy(nominals, 0, banknotes, 0, NUM_CONTAINERS);
+        return banknotes;
     }
 
     private int valueOfSet(int[] numBanknotes) {
