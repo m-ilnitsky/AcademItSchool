@@ -219,7 +219,7 @@ public class ConsoleUI {
     }
 
     private void caseMenu3(int value) {
-        if (moneyBox.isAvailable(value, R5000)) {
+        if (moneyBox.isAvailable(value)) {
             this.value = value;
             menuLevel = M3_0;
         } else {

@@ -74,8 +74,7 @@ public class MoneyBox {
     }
 
     public boolean isAvailable(int value, RubleBanknote priorityBanknote) {
-        setOfBanknotes(value, priorityBanknote);
-        return value == valueOfSet(setOfBanknotesForRemove);
+        return value == valueOfSet(setOfBanknotes(value, priorityBanknote));
     }
 
     public boolean addMoney(RubleBanknote banknote) {
