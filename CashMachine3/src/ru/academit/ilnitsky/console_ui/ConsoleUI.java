@@ -6,7 +6,6 @@ import ru.academit.ilnitsky.moneybox.RubleBanknote;
 import java.util.Scanner;
 
 import static ru.academit.ilnitsky.console_ui.MenuLevel.*;
-import static ru.academit.ilnitsky.moneybox.RubleBanknote.*;
 
 /**
  * Класс "Консольный интерфейс копилки"

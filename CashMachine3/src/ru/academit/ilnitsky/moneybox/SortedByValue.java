@@ -3,9 +3,10 @@ package ru.academit.ilnitsky.moneybox;
 import java.util.Comparator;
 
 /**
+ * Компаратор для сортировки массива значений перечисления RubleBanknote
  * Created by UserLabView on 25.10.16.
  */
-public class SortedByValue implements Comparator<RubleBanknote> {
+class SortedByValue implements Comparator<RubleBanknote> {
     public int compare(RubleBanknote banknote1, RubleBanknote banknote2) {
 
         double value1 = banknote1.getValue();
