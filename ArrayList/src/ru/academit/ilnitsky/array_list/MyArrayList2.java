@@ -4,22 +4,22 @@ import java.util.*;
 
 /**
  * Моя реализация класса ArrayList
- * Created by UserLabView on 26.10.16.
+ * Created by Mike on 27.10.2016.
  */
-public class MyArrayList<T> implements List<T> {
+public class MyArrayList2<T> implements List<T> {
     private int numElements;
     private int arrayLength;
 
-    private Object[] elements;
+    private T[] elements;
 
-    public MyArrayList(int length) {
+    public MyArrayList2(int length) {
         numElements = 0;
         arrayLength = length;
 
-        elements = new Object[length];
+        elements = (T[]) new Object[length];
     }
 
-    public MyArrayList() {
+    public MyArrayList2() {
         this(64);
     }
 
@@ -28,7 +28,7 @@ public class MyArrayList<T> implements List<T> {
             return false;
         }
 
-        Object[] newElements = new Object[newLength];
+        T[] newElements = (T[]) new Object[newLength];
         System.arraycopy(elements, 0, newElements, 0, numElements);
 
         elements = newElements;
@@ -83,10 +83,10 @@ public class MyArrayList<T> implements List<T> {
     public <T> T[] toArray(T[] a) {
         if (a.length < numElements) {
             T[] a2 = (T[]) new Objects[numElements];
-            System.arraycopy((T[])elements, 0, a2, 0, numElements);
+            System.arraycopy(elements, 0, a2, 0, numElements);
             return a2;
         } else {
-            System.arraycopy((T[])elements, 0, a, 0, numElements);
+            System.arraycopy(elements, 0, a, 0, numElements);
             return a;
         }
     }
@@ -104,7 +104,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean remove(Object o) {
         int index = indexOf(o);
-        if(index<0){
+        if (index < 0) {
             return false;
         }
 
@@ -140,7 +140,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public void clear() {
-        elements = new Object[arrayLength];
+        elements = (T[]) new Object[arrayLength];
         numElements = 0;
     }
 
@@ -165,7 +165,7 @@ public class MyArrayList<T> implements List<T> {
 
         elements[index] = element;
 
-        return (T) elements[index];
+        return elements[index];
     }
 
     @Override
@@ -193,12 +193,12 @@ public class MyArrayList<T> implements List<T> {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
-        T element = (T)elements[index];
+        T element = elements[index];
 
         // TODO Проверить на некорректное копирование с затиранием нескопированных элементов
-        System.arraycopy(elements, index+1, elements, index, numElements - index-1);
+        System.arraycopy(elements, index + 1, elements, index, numElements - index - 1);
 
-        elements[numElements-1] = null;
+        elements[numElements - 1] = null;
         numElements--;
 
         return element;
@@ -248,7 +248,7 @@ public class MyArrayList<T> implements List<T> {
             return false;
         }
 
-        MyArrayList<?> that = (MyArrayList<?>) o;
+        MyArrayList2<?> that = (MyArrayList2<?>) o;
 
         if (numElements != that.numElements) {
             return false;
@@ -271,3 +271,4 @@ public class MyArrayList<T> implements List<T> {
         return result;
     }
 }
+
