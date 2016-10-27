@@ -6,39 +6,39 @@ import java.util.*;
  * Моя реализация класса ArrayList
  * Created by UserLabView on 26.10.16.
  */
-public class MyArrayList<T> implements List<T> {
-    private int numElements;
-    private int arrayLength;
+public class MyArrayList<E> implements List<E> {
+    private final static int INITIAL_LENGTH = 64;
 
-    private Object[] elements;
+    private int numElements;
+    private E[] elements;
 
     public MyArrayList(int length) {
         numElements = 0;
-        arrayLength = length;
 
-        elements = new Object[length];
+        //noinspection unchecked
+        elements = (E[]) new Object[length];
     }
 
     public MyArrayList() {
-        this(64);
+        this(INITIAL_LENGTH);
     }
 
     private boolean resize(int newLength) {
-        if (newLength < numElements || arrayLength == newLength) {
+        if (newLength < numElements || elements.length == newLength) {
             return false;
         }
 
-        Object[] newElements = new Object[newLength];
+        @SuppressWarnings("unchecked")
+        E[] newElements = (E[]) new Object[newLength];
         System.arraycopy(elements, 0, newElements, 0, numElements);
 
         elements = newElements;
-        arrayLength = newLength;
         return true;
     }
 
     private boolean resizeIfNeedForAdd(int numAdd) {
-        if (numElements + numAdd > arrayLength) {
-            return resize(arrayLength + Math.max(numElements, numAdd * 2));
+        if (numElements + numAdd > elements.length) {
+            return resize(elements.length + Math.max(numElements, numAdd * 2));
         }
         return false;
     }
@@ -55,8 +55,8 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean contains(Object o) {
-        if (elements[0].getClass() != o.getClass()) {
-            return false;
+        if (o == null) {
+            throw new NullPointerException("Object == null");
         } else {
             for (Object e : elements) {
                 if (e.equals(o)) {
@@ -68,8 +68,8 @@ public class MyArrayList<T> implements List<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return null;
+    public Iterator<E> iterator() {
+        return new MyArrayListIterator<E>(this);
     }
 
     @Override
@@ -81,18 +81,23 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public <T> T[] toArray(T[] a) {
-        if (a.length < numElements) {
+        if (a == null) {
+            throw new NullPointerException("Object == null");
+        } else if (a.length < numElements) {
+
+            @SuppressWarnings("unchecked")
             T[] a2 = (T[]) new Objects[numElements];
-            System.arraycopy((T[])elements, 0, a2, 0, numElements);
+
+            System.arraycopy(elements, 0, a2, 0, numElements);
             return a2;
         } else {
-            System.arraycopy((T[])elements, 0, a, 0, numElements);
+            System.arraycopy(elements, 0, a, 0, numElements);
             return a;
         }
     }
 
     @Override
-    public boolean add(T e) {
+    public boolean add(E e) {
         resizeIfNeedForAdd(1);
 
         elements[numElements] = e;
@@ -104,7 +109,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean remove(Object o) {
         int index = indexOf(o);
-        if(index<0){
+        if (index < 0) {
             return false;
         }
 
@@ -119,12 +124,12 @@ public class MyArrayList<T> implements List<T> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends T> c) {
+    public boolean addAll(Collection<? extends E> c) {
         return false;
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         return false;
     }
 
@@ -140,23 +145,24 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public void clear() {
-        elements = new Object[arrayLength];
+        //noinspection unchecked
+        elements = (E[]) new Object[elements.length];
         numElements = 0;
     }
 
     @Override
-    public T get(int index) {
+    public E get(int index) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
-        return (T) elements[index];
+        return (E) elements[index];
     }
 
     @Override
-    public T set(int index, T element) {
+    public E set(int index, E element) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
@@ -165,11 +171,11 @@ public class MyArrayList<T> implements List<T> {
 
         elements[index] = element;
 
-        return (T) elements[index];
+        return elements[index];
     }
 
     @Override
-    public void add(int index, T element) {
+    public void add(int index, E element) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
@@ -186,19 +192,19 @@ public class MyArrayList<T> implements List<T> {
     }
 
     @Override
-    public T remove(int index) {
+    public E remove(int index) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
-        T element = (T)elements[index];
+        E element = elements[index];
 
         // TODO Проверить на некорректное копирование с затиранием нескопированных элементов
-        System.arraycopy(elements, index+1, elements, index, numElements - index-1);
+        System.arraycopy(elements, index + 1, elements, index, numElements - index - 1);
 
-        elements[numElements-1] = null;
+        elements[numElements - 1] = null;
         numElements--;
 
         return element;
@@ -225,17 +231,17 @@ public class MyArrayList<T> implements List<T> {
     }
 
     @Override
-    public ListIterator<T> listIterator() {
+    public ListIterator<E> listIterator() {
         return null;
     }
 
     @Override
-    public ListIterator<T> listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         return null;
     }
 
     @Override
-    public List<T> subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         return null;
     }
 
