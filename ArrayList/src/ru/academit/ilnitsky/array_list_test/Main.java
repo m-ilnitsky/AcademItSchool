@@ -41,5 +41,12 @@ public class Main {
         for (int i = 0; i < length; i++) {
             System.out.printf("[%2d]: %s %n", i, iterator.next());
         }
+
+        System.out.println();
+
+        Iterator listIterator = myArrayList.listIterator();
+        for (int i = 0; i < length; i++) {
+            System.out.printf("[%2d]: %s %n", i, listIterator.next());
+        }
     }
 }

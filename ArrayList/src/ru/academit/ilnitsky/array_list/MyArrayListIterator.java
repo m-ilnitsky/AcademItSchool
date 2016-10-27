@@ -8,8 +8,8 @@ import java.util.NoSuchElementException;
  * Created by UserLabView on 27.10.16.
  */
 public class MyArrayListIterator<E> implements Iterator<E> {
-    private int index = -1;
-    private MyArrayList<E> arrayList;
+    protected int index = -1;
+    protected MyArrayList<E> arrayList;
 
     public MyArrayListIterator(MyArrayList<E> arrayList) {
         this.arrayList = arrayList;
@@ -27,6 +27,14 @@ public class MyArrayListIterator<E> implements Iterator<E> {
             return arrayList.get(index);
         } else {
             throw new NoSuchElementException("NextIndex > MaxIndex");
+        }
+    }
+
+    @Override
+    public void remove() {
+        arrayList.remove(index);
+        if (index >= arrayList.size()) {
+            index = arrayList.size();
         }
     }
 }

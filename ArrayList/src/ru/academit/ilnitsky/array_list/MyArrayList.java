@@ -232,12 +232,16 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public ListIterator<E> listIterator() {
-        return null;
+        return new MyArrayListIteratorForList<E>(this);
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return null;
+        ListIterator<E> iterator = new MyArrayListIteratorForList<E>(this);
+        for (int i = 0; i < index; i++) {
+            iterator.next();
+        }
+        return iterator;
     }
 
     @Override
