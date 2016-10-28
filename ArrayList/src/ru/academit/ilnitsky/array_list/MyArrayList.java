@@ -7,13 +7,107 @@ import java.util.*;
  * Created by UserLabView on 26.10.16.
  */
 public class MyArrayList<E> implements List<E> {
+    private class MyIterator implements Iterator<E> {
+        int index = -1;
+
+        void setIndex(int index) {
+            if (index > MyArrayList.this.numElements) {
+                this.index = MyArrayList.this.numElements;
+            } else if (index < 0) {
+                this.index = -1;
+            } else {
+                this.index = index;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return index + 1 < MyArrayList.this.size();
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+                index++;
+                return MyArrayList.this.get(index);
+            } else {
+                throw new NoSuchElementException("NextIndex > MaxIndex");
+            }
+        }
+
+        @Override
+        public void remove() {
+            MyArrayList.this.remove(index);
+            if (index >= MyArrayList.this.size()) {
+                index = MyArrayList.this.size();
+            }
+        }
+    }
+
+    private class MyListIterator extends MyIterator implements ListIterator<E> {
+
+        @Override
+        public boolean hasPrevious() {
+            return index - 1 >= 0;
+        }
+
+        @Override
+        public E previous() {
+            if (hasPrevious()) {
+                index--;
+                return MyArrayList.this.get(index);
+            } else {
+                throw new NoSuchElementException("PreviousIndex < 0");
+            }
+        }
+
+        @Override
+        public int nextIndex() {
+            return index + 1;
+        }
+
+        @Override
+        public int previousIndex() {
+            return index - 1;
+        }
+
+        @Override
+        public void remove() {
+            if (!MyArrayList.this.isChangeNumElements) {
+                MyArrayList.this.remove(index);
+                if (index >= MyArrayList.this.size()) {
+                    index = MyArrayList.this.size();
+                }
+            }
+        }
+
+        @Override
+        public void set(E e) {
+            if (!MyArrayList.this.isChangeNumElements) {
+                MyArrayList.this.set(index, e);
+            }
+        }
+
+        @Override
+        public void add(E e) {
+            if (!MyArrayList.this.isChangeNumElements) {
+                MyArrayList.this.add(index, e);
+            } else if (MyArrayList.this.size() == 0) {
+                MyArrayList.this.add(e);
+            }
+        }
+    }
+
     private final static int INITIAL_LENGTH = 64;
+
+    private boolean isChangeNumElements;
 
     private int numElements;
     private E[] elements;
 
     public MyArrayList(int length) {
         numElements = 0;
+        isChangeNumElements = false;
 
         //noinspection unchecked
         elements = (E[]) new Object[length];
@@ -37,10 +131,7 @@ public class MyArrayList<E> implements List<E> {
     }
 
     private boolean resizeIfNeedForAdd(int numAdd) {
-        if (numElements + numAdd > elements.length) {
-            return resize(elements.length + Math.max(numElements, numAdd * 2));
-        }
-        return false;
+        return (numElements + numAdd > elements.length) && resize(elements.length + Math.max(numElements, numAdd * 2));
     }
 
     @Override
@@ -55,13 +146,9 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
-        if (o == null) {
-            throw new NullPointerException("Object == null");
-        } else {
-            for (Object e : elements) {
-                if (e.equals(o)) {
-                    return true;
-                }
+        for (Object e : elements) {
+            if (e.equals(o)) {
+                return true;
             }
         }
         return false;
@@ -69,12 +156,12 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new MyArrayListIterator<E>(this);
+        return new MyIterator();
     }
 
     @Override
     public Object[] toArray() {
-        Objects[] result = new Objects[numElements];
+        Object[] result = new Object[numElements];
         System.arraycopy(elements, 0, result, 0, numElements);
         return result;
     }
@@ -86,7 +173,7 @@ public class MyArrayList<E> implements List<E> {
         } else if (a.length < numElements) {
 
             @SuppressWarnings("unchecked")
-            T[] a2 = (T[]) new Objects[numElements];
+            T[] a2 = (T[]) new Object[numElements];
 
             System.arraycopy(elements, 0, a2, 0, numElements);
             return a2;
@@ -102,6 +189,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[numElements] = e;
         numElements++;
+        isChangeNumElements = true;
 
         return true;
     }
@@ -114,6 +202,7 @@ public class MyArrayList<E> implements List<E> {
         }
 
         remove(index);
+        isChangeNumElements = true;
 
         return true;
     }
@@ -148,6 +237,7 @@ public class MyArrayList<E> implements List<E> {
         //noinspection unchecked
         elements = (E[]) new Object[elements.length];
         numElements = 0;
+        isChangeNumElements = true;
     }
 
     @Override
@@ -158,7 +248,8 @@ public class MyArrayList<E> implements List<E> {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
-        return (E) elements[index];
+        isChangeNumElements = false;
+        return elements[index];
     }
 
     @Override
@@ -169,9 +260,12 @@ public class MyArrayList<E> implements List<E> {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
-        elements[index] = element;
+        E oldElement = elements[index];
 
-        return elements[index];
+        elements[index] = element;
+        isChangeNumElements = false;
+
+        return oldElement;
     }
 
     @Override
@@ -189,6 +283,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[index] = element;
         numElements++;
+        isChangeNumElements = true;
     }
 
     @Override
@@ -206,6 +301,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[numElements - 1] = null;
         numElements--;
+        isChangeNumElements = true;
 
         return element;
     }
@@ -214,6 +310,7 @@ public class MyArrayList<E> implements List<E> {
     public int indexOf(Object o) {
         for (int i = 0; i < numElements; i++) {
             if (o.equals(elements[i])) {
+                isChangeNumElements = false;
                 return i;
             }
         }
@@ -224,6 +321,7 @@ public class MyArrayList<E> implements List<E> {
     public int lastIndexOf(Object o) {
         for (int i = numElements - 1; i >= 0; i--) {
             if (o.equals(elements[i])) {
+                isChangeNumElements = false;
                 return i;
             }
         }
@@ -232,21 +330,39 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public ListIterator<E> listIterator() {
-        return new MyArrayListIteratorForList<E>(this);
+        return new MyListIterator();
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        ListIterator<E> iterator = new MyArrayListIteratorForList<E>(this);
-        for (int i = 0; i < index; i++) {
-            iterator.next();
-        }
+        MyListIterator iterator = new MyListIterator();
+
+        iterator.setIndex(index);
+
         return iterator;
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return null;
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException("fromIndex < 0");
+        }
+        if (toIndex >= numElements) {
+            throw new IndexOutOfBoundsException("toIndex > size()");
+        }
+        if (fromIndex > toIndex) {
+            throw new IndexOutOfBoundsException("fromIndex > toIndex");
+        }
+
+        MyArrayList<E> list = new MyArrayList<>(toIndex - fromIndex);
+
+        int count = 0;
+        for (int i = fromIndex; i < toIndex; i++) {
+            list.elements[count] = elements[i];
+            count++;
+        }
+
+        return list;
     }
 
     @Override
@@ -254,18 +370,19 @@ public class MyArrayList<E> implements List<E> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
 
-        MyArrayList<?> that = (MyArrayList<?>) o;
+        @SuppressWarnings("unchecked")
+        MyArrayList<E> that = (MyArrayList<E>) o;
 
-        if (numElements != that.numElements) {
+        if (this.numElements != that.numElements) {
             return false;
         }
 
-        for (int i = 0; i < numElements; i++) {
-            if (elements[i].equals(that.elements[i])) {
+        for (int i = 0; i < this.numElements; i++) {
+            if (this.elements[i].equals(that.elements[i])) {
                 return false;
             }
         }
@@ -279,5 +396,27 @@ public class MyArrayList<E> implements List<E> {
             result = 31 * result + elements[i].hashCode();
         }
         return result;
+    }
+
+    public void ensureCapacity(int minCapacity) {
+        if (elements.length < minCapacity) {
+
+            @SuppressWarnings("unchecked")
+            E[] newElements = (E[]) new Object[minCapacity];
+
+            System.arraycopy(elements, 0, newElements, 0, numElements);
+
+            elements = newElements;
+        }
+    }
+
+    public void trimToSize() {
+
+        @SuppressWarnings("unchecked")
+        E[] newElements = (E[]) new Object[numElements];
+
+        System.arraycopy(elements, 0, newElements, 0, numElements);
+
+        elements = newElements;
     }
 }
