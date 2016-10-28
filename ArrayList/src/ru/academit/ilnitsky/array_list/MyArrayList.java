@@ -209,17 +209,64 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        int size = c.size();
+        if (size == 0 || numElements == 0) {
+            return false;
+        }
+
+        Iterator iterator = c.iterator();
+
+        for (int i = 0; i < size; i++) {
+            Object o = iterator.next();
+            for (int j = 0; j < numElements; j++) {
+                if (!o.equals(elements[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        int size = c.size();
+        Iterator iterator = c.iterator();
+
+        resizeIfNeedForAdd(size);
+
+        for (int i = 0; i < size; i++) {
+            elements[numElements] = (E) iterator.next();
+            numElements++;
+        }
+
+        isChangeNumElements = true;
+        return true;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
+        if (index < 0) {
+            throw new IndexOutOfBoundsException("index < 0");
+        } else if (index >= numElements) {
+            throw new IndexOutOfBoundsException("index > size()");
+        }
+
+        int size = c.size();
+        Iterator iterator = c.iterator();
+
+        resizeIfNeedForAdd(size);
+        int end = index + size;
+
+        // TODO Проверить на некорректное копирование с затиранием нескопированных элементов
+        System.arraycopy(elements, index, elements, end, numElements - index);
+
+        for (int i = index; i < end; i++) {
+            elements[i] = (E) iterator.next();
+            numElements++;
+        }
+
+        isChangeNumElements = true;
+        return true;
     }
 
     @Override
