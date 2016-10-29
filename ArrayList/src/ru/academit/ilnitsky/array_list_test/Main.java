@@ -68,12 +68,12 @@ public class Main {
         }
         */
 
-        Iterator listIterator2 = myArrayList.listIterator();
+        listIterator = myArrayList.listIterator();
         length = myArrayList.size();
         System.out.println();
         System.out.println("myArrayList.removeAll(myArrayList2)");
         for (int i = 0; i < length; i++) {
-            System.out.printf("[%2d]: %s %n", i, listIterator2.next());
+            System.out.printf("[%2d]: %s %n", i, listIterator.next());
         }
 
         // Тест myArrayList.retainAll(myArrayList3)
@@ -89,12 +89,12 @@ public class Main {
 
         myArrayList.retainAll(myArrayList3);
 
-        Iterator listIterator3 = myArrayList.listIterator();
+        listIterator = myArrayList.listIterator();
         length = myArrayList.size();
         System.out.println();
         System.out.println("myArrayList.retainAll(myArrayList3)");
         for (int i = 0; i < length; i++) {
-            System.out.printf("[%2d]: %s %n", i, listIterator3.next());
+            System.out.printf("[%2d]: %s %n", i, listIterator.next());
         }
     }
 }
