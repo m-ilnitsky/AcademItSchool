@@ -10,13 +10,12 @@ import java.util.Iterator;
  */
 public class Main {
     public static void main(String[] args) {
-        MyArrayList<String> myArrayList = new MyArrayList<String>(10);
+        MyArrayList<String> myArrayList = new MyArrayList<>(2);
 
         myArrayList.add("A1");
         myArrayList.add("A2");
         myArrayList.add("A3");
         myArrayList.add("A4");
-        myArrayList.add(2, "A2-2");
         myArrayList.add("A5");
         myArrayList.add("A6");
         myArrayList.add("A7");
@@ -27,8 +26,12 @@ public class Main {
         myArrayList.add("A12");
         myArrayList.add("A13");
         myArrayList.add("A14");
+
+        myArrayList.set(3, null);
+        myArrayList.set(6, null);
         myArrayList.remove(10);
         myArrayList.remove("A6");
+        myArrayList.add(2, "A2-2");
 
         int length = myArrayList.size();
         for (int i = 0; i < length; i++) {
@@ -47,6 +50,51 @@ public class Main {
         Iterator listIterator = myArrayList.listIterator();
         for (int i = 0; i < length; i++) {
             System.out.printf("[%2d]: %s %n", i, listIterator.next());
+        }
+
+        // Тест myArrayList.removeAll(myArrayList2)
+        MyArrayList<String> myArrayList2 = new MyArrayList<>(2);
+
+        myArrayList2.add("A8");
+        myArrayList2.add("A9");
+        myArrayList2.add("A10");
+
+        myArrayList.removeAll(myArrayList2);
+
+        /*
+        // Тест исключения при изменении списка
+        for (int i = 0; i < length; i++) {
+            System.out.printf("[%2d]: %s %n", i, iterator.next());
+        }
+        */
+
+        Iterator listIterator2 = myArrayList.listIterator();
+        length = myArrayList.size();
+        System.out.println();
+        System.out.println("myArrayList.removeAll(myArrayList2)");
+        for (int i = 0; i < length; i++) {
+            System.out.printf("[%2d]: %s %n", i, listIterator2.next());
+        }
+
+        // Тест myArrayList.retainAll(myArrayList3)
+        MyArrayList<String> myArrayList3 = new MyArrayList<>(2);
+
+        myArrayList3.add("A1");
+        myArrayList3.add("A2");
+        myArrayList3.add("A3");
+        myArrayList3.add("A4");
+        myArrayList3.add("A5");
+        myArrayList3.add("A6");
+        myArrayList3.add("A7");
+
+        myArrayList.retainAll(myArrayList3);
+
+        Iterator listIterator3 = myArrayList.listIterator();
+        length = myArrayList.size();
+        System.out.println();
+        System.out.println("myArrayList.retainAll(myArrayList3)");
+        for (int i = 0; i < length; i++) {
+            System.out.printf("[%2d]: %s %n", i, listIterator3.next());
         }
     }
 }

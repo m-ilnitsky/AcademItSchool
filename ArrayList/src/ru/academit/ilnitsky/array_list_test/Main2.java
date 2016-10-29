@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Main2 {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<String>(10);
+        ArrayList<String> list = new ArrayList<>(10);
 
         list.add("A1");
         list.add("A2");
