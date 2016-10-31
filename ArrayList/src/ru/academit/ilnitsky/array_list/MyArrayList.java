@@ -8,27 +8,27 @@ import java.util.*;
  */
 public class MyArrayList<E> implements List<E> {
     private class MyIterator implements Iterator<E> {
-        int index = -1;
+        protected int index = -1;
 
-        private final int initNumElements;
+        private final long initNumChanges;
         private boolean isChanged;
 
-        MyIterator() {
-            initNumElements = MyArrayList.this.numElements;
+        protected MyIterator() {
+            initNumChanges = MyArrayList.this.numChanges;
             isChanged = false;
         }
 
-        void check() {
+        protected void check() {
             if (isChanged) {
                 throw new ConcurrentModificationException("MyArrayList has changed");
             }
-            if (initNumElements != MyArrayList.this.numElements) {
+            if (initNumChanges != MyArrayList.this.numChanges) {
                 isChanged = true;
                 throw new ConcurrentModificationException("MyArrayList has changed");
             }
         }
 
-        void setIndex(int index) {
+        protected void setIndex(int index) {
             if (index > MyArrayList.this.numElements) {
                 this.index = MyArrayList.this.numElements;
             } else if (index < 0) {
@@ -118,11 +118,14 @@ public class MyArrayList<E> implements List<E> {
 
     private final static int INITIAL_LENGTH = 64;
 
+    private long numChanges;
+
     private int numElements;
     private E[] elements;
 
     public MyArrayList(int length) {
         numElements = 0;
+        numChanges = 0;
 
         //noinspection unchecked
         elements = (E[]) new Object[length];
@@ -199,9 +202,15 @@ public class MyArrayList<E> implements List<E> {
             T[] a2 = (T[]) new Object[numElements];
 
             System.arraycopy(elements, 0, a2, 0, numElements);
+
             return a2;
         } else {
             System.arraycopy(elements, 0, a, 0, numElements);
+
+            for (int i = numElements; i < a.length; i++) {
+                a[i] = null;
+            }
+
             return a;
         }
     }
@@ -212,6 +221,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[numElements] = e;
         numElements++;
+        numChanges++;
 
         return true;
     }
@@ -235,11 +245,8 @@ public class MyArrayList<E> implements List<E> {
             return false;
         }
 
-        Iterator iterator = c.iterator();
-
-        for (int i = 0; i < size; i++) {
-            Object o = iterator.next();
-            for (int j = 0; j < numElements; j++) {
+        for (Object o : c) {
+            for (int i = 0; i < numElements; i++) {
                 if (!o.equals(elements[i])) {
                     return false;
                 }
@@ -251,15 +258,16 @@ public class MyArrayList<E> implements List<E> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         int size = c.size();
-        Iterator iterator = c.iterator();
 
         resizeIfNeedForAdd(size);
 
-        for (int i = 0; i < size; i++) {
+        for (Object o : c) {
             //noinspection unchecked
-            elements[numElements] = (E) iterator.next();
+            elements[numElements] = (E) o;
             numElements++;
         }
+
+        numChanges++;
 
         return true;
     }
@@ -286,6 +294,8 @@ public class MyArrayList<E> implements List<E> {
             numElements++;
         }
 
+        numChanges++;
+
         return true;
     }
 
@@ -309,6 +319,7 @@ public class MyArrayList<E> implements List<E> {
         if (isChange) {
             elements = newElements;
             numElements = count;
+            numChanges++;
             return true;
         } else {
             return false;
@@ -334,6 +345,7 @@ public class MyArrayList<E> implements List<E> {
         if (isChange) {
             elements = newElements;
             numElements = count;
+            numChanges++;
             return true;
         } else {
             return false;
@@ -345,6 +357,7 @@ public class MyArrayList<E> implements List<E> {
         //noinspection unchecked
         elements = (E[]) new Object[elements.length];
         numElements = 0;
+        numChanges++;
     }
 
     @Override
@@ -369,6 +382,7 @@ public class MyArrayList<E> implements List<E> {
         E oldElement = elements[index];
 
         elements[index] = element;
+        numChanges++;
 
         return oldElement;
     }
@@ -387,6 +401,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[index] = element;
         numElements++;
+        numChanges++;
     }
 
     @Override
@@ -403,6 +418,7 @@ public class MyArrayList<E> implements List<E> {
 
         elements[numElements - 1] = null;
         numElements--;
+        numChanges++;
 
         return element;
     }
@@ -499,8 +515,14 @@ public class MyArrayList<E> implements List<E> {
         }
 
         for (int i = 0; i < this.numElements; i++) {
-            if (this.elements[i].equals(that.elements[i])) {
-                return false;
+            if (this.elements[i] != null) {
+                if (!this.elements[i].equals(that.elements[i])) {
+                    return false;
+                }
+            } else {
+                if (that.elements[i] != null) {
+                    return false;
+                }
             }
         }
         return true;
@@ -510,7 +532,9 @@ public class MyArrayList<E> implements List<E> {
     public int hashCode() {
         int result = numElements;
         for (int i = 0; i < numElements; i++) {
-            result = 31 * result + elements[i].hashCode();
+            int hash = (elements[i] != null) ? elements[i].hashCode() : 37;
+            result = 31 * result + hash;
+
         }
         return result;
     }
@@ -528,12 +552,14 @@ public class MyArrayList<E> implements List<E> {
     }
 
     public void trimToSize() {
+        if (numElements < elements.length) {
 
-        @SuppressWarnings("unchecked")
-        E[] newElements = (E[]) new Object[numElements];
+            @SuppressWarnings("unchecked")
+            E[] newElements = (E[]) new Object[numElements];
 
-        System.arraycopy(elements, 0, newElements, 0, numElements);
+            System.arraycopy(elements, 0, newElements, 0, numElements);
 
-        elements = newElements;
+            elements = newElements;
+        }
     }
 }
