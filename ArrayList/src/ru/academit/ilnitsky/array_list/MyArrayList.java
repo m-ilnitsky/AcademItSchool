@@ -281,19 +281,18 @@ public class MyArrayList<E> implements List<E> {
         }
 
         int size = c.size();
-        Iterator iterator = c.iterator();
-
         resizeIfNeedForAdd(size);
-        int end = index + size;
 
-        System.arraycopy(elements, index, elements, end, numElements - index);
+        System.arraycopy(elements, index, elements, index + size, numElements - index);
 
-        for (int i = index; i < end; i++) {
+        int i = index;
+        for (Object o : c) {
             //noinspection unchecked
-            elements[i] = (E) iterator.next();
-            numElements++;
+            elements[i] = (E) o;
+            i++;
         }
 
+        numElements += size;
         numChanges++;
 
         return true;
