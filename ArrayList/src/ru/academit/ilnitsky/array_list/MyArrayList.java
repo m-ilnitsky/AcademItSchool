@@ -11,19 +11,13 @@ public class MyArrayList<E> implements List<E> {
         protected int index = -1;
 
         private final long initNumChanges;
-        private boolean isChanged;
 
         protected MyIterator() {
             initNumChanges = MyArrayList.this.numChanges;
-            isChanged = false;
         }
 
         protected void check() {
-            if (isChanged) {
-                throw new ConcurrentModificationException("MyArrayList has changed");
-            }
             if (initNumChanges != MyArrayList.this.numChanges) {
-                isChanged = true;
                 throw new ConcurrentModificationException("MyArrayList has changed");
             }
         }
@@ -92,15 +86,6 @@ public class MyArrayList<E> implements List<E> {
         public int previousIndex() {
             check();
             return index - 1;
-        }
-
-        @Override
-        public void remove() {
-            check();
-            MyArrayList.this.remove(index);
-            if (index >= MyArrayList.this.size()) {
-                index = MyArrayList.this.size();
-            }
         }
 
         @Override
@@ -206,9 +191,8 @@ public class MyArrayList<E> implements List<E> {
             return a2;
         } else {
             System.arraycopy(elements, 0, a, 0, numElements);
-
-            for (int i = numElements; i < a.length; i++) {
-                a[i] = null;
+            if (a.length > numElements) {
+                a[numElements] = null;
             }
 
             return a;
@@ -246,10 +230,26 @@ public class MyArrayList<E> implements List<E> {
         }
 
         for (Object o : c) {
-            for (int i = 0; i < numElements; i++) {
-                if (!o.equals(elements[i])) {
-                    return false;
+            boolean hasInThis = false;
+
+            if (o != null) {
+                for (int i = 0; i < numElements; i++) {
+                    if (o.equals(elements[i])) {
+                        hasInThis = true;
+                        break;
+                    }
                 }
+            } else {
+                for (int i = 0; i < numElements; i++) {
+                    if (elements[i] == null) {
+                        hasInThis = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasInThis) {
+                return false;
             }
         }
         return true;
@@ -327,7 +327,6 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        boolean isChange = false;
         int count = 0;
 
         @SuppressWarnings("unchecked")
@@ -337,11 +336,10 @@ public class MyArrayList<E> implements List<E> {
             if (c.contains(elements[i])) {
                 newElements[count] = elements[i];
                 count++;
-                isChange = true;
             }
         }
 
-        if (isChange) {
+        if (count != numElements) {
             elements = newElements;
             numElements = count;
             numChanges++;
