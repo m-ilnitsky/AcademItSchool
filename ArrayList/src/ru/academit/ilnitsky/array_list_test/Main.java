@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.array_list_test;
 import ru.academit.ilnitsky.array_list.*;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * Класс для тетирования класса MyArrayList
@@ -95,6 +96,15 @@ public class Main {
         System.out.println("myArrayList.retainAll(myArrayList3)");
         for (int i = 0; i < length; i++) {
             System.out.printf("[%2d]: %s %n", i, listIterator.next());
+        }
+
+        System.out.println();
+
+        ListIterator listIterator2 = myArrayList.listIterator();
+        listIterator2.next();
+        listIterator2.remove();
+        while (listIterator2.hasNext()) {
+            System.out.printf("[%2d]: %s %n", listIterator2.nextIndex(), listIterator2.next());
         }
     }
 }

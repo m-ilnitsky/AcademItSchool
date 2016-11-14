@@ -10,7 +10,7 @@ public class MyArrayList<E> implements List<E> {
     private class MyIterator implements Iterator<E> {
         protected int index = -1;
 
-        private final long initNumChanges;
+        protected long initNumChanges;
 
         protected MyIterator() {
             initNumChanges = MyArrayList.this.numChanges;
@@ -52,6 +52,7 @@ public class MyArrayList<E> implements List<E> {
         public void remove() {
             check();
             MyArrayList.this.remove(index);
+            initNumChanges = MyArrayList.this.numChanges;
             if (index >= MyArrayList.this.size()) {
                 index = MyArrayList.this.size();
             }
@@ -92,12 +93,14 @@ public class MyArrayList<E> implements List<E> {
         public void set(E e) {
             check();
             MyArrayList.this.set(index, e);
+            initNumChanges = MyArrayList.this.numChanges;
         }
 
         @Override
         public void add(E e) {
             check();
             MyArrayList.this.add(index, e);
+            initNumChanges = MyArrayList.this.numChanges;
         }
     }
 
