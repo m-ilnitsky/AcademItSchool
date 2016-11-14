@@ -64,14 +64,13 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public boolean hasPrevious() {
             check();
-            return index - 1 >= 0;
+            return index >= 0;
         }
 
         @Override
         public E previous() {
             if (hasPrevious()) {
-                index--;
-                return MyArrayList.this.get(index);
+                return MyArrayList.this.get(index--);
             } else {
                 throw new NoSuchElementException("PreviousIndex < 0");
             }
@@ -86,7 +85,7 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public int previousIndex() {
             check();
-            return index - 1;
+            return index;
         }
 
         @Override

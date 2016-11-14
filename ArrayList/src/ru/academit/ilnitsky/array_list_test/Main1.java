@@ -1,16 +1,16 @@
 package ru.academit.ilnitsky.array_list_test;
 
-import java.util.ArrayList;
+import ru.academit.ilnitsky.array_list.MyArrayList;
+
 import java.util.ListIterator;
 import java.util.Scanner;
 
 /**
- * Класс для тестирования стандартного ArrayList
- * Created by UserLabView on 28.10.16.
+ * Created by UserLabView on 14.11.16.
  */
-public class Main2 {
+public class Main1 {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>(10);
+        MyArrayList<String> list = new MyArrayList<>(10);
 
         list.add("A1");
         list.add("A2");

@@ -53,6 +53,9 @@ public class Main {
             System.out.printf("[%2d]: %s %n", i, listIterator.next());
         }
 
+        MyArrayList<String> myArrayList1 = new MyArrayList<>(2);
+        myArrayList1.addAll(myArrayList);
+
         // Тест myArrayList.removeAll(myArrayList2)
         MyArrayList<String> myArrayList2 = new MyArrayList<>(2);
 
