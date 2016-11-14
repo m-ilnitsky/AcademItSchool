@@ -47,6 +47,7 @@ public class Main1 {
         listIterator.next();
         listIterator.next();
         listIterator.remove();
+        //listIterator.remove();
         listIterator.next();
         listIterator.next();
         listIterator.set("listIterator.set");
@@ -65,6 +66,11 @@ public class Main1 {
         }
         while (listIterator.hasNext()) {
             System.out.printf("[%2d]: %s %n", listIterator.nextIndex(), listIterator.next());
+        }
+
+        System.out.println();
+        while (listIterator.hasPrevious()) {
+            System.out.printf("[%2d]: %s %n", listIterator.previousIndex(), listIterator.previous());
         }
 
         Scanner scanner = new Scanner(System.in);

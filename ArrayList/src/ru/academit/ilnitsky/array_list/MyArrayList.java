@@ -8,7 +8,8 @@ import java.util.*;
  */
 public class MyArrayList<E> implements List<E> {
     private class MyIterator implements Iterator<E> {
-        protected int index = -1;
+        protected int index = 0;
+        protected int lastReturned = -1;
 
         protected long initNumChanges;
 
@@ -35,14 +36,15 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public boolean hasNext() {
             check();
-            return index + 1 < MyArrayList.this.size();
+            return index < MyArrayList.this.size();
         }
 
         @Override
         public E next() {
             if (hasNext()) {
+                lastReturned = index;
                 index++;
-                return MyArrayList.this.get(index);
+                return MyArrayList.this.get(lastReturned);
             } else {
                 throw new NoSuchElementException("NextIndex > MaxIndex");
             }
@@ -51,8 +53,13 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public void remove() {
             check();
-            MyArrayList.this.remove(index);
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
+            MyArrayList.this.remove(lastReturned);
             initNumChanges = MyArrayList.this.numChanges;
+            index = lastReturned;
+            lastReturned = -1;
             if (index >= MyArrayList.this.size()) {
                 index = MyArrayList.this.size();
             }
@@ -64,13 +71,15 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public boolean hasPrevious() {
             check();
-            return index >= 0;
+            return index > 0;
         }
 
         @Override
         public E previous() {
             if (hasPrevious()) {
-                return MyArrayList.this.get(index--);
+                index--;
+                lastReturned = index;
+                return MyArrayList.this.get(lastReturned);
             } else {
                 throw new NoSuchElementException("PreviousIndex < 0");
             }
@@ -79,19 +88,22 @@ public class MyArrayList<E> implements List<E> {
         @Override
         public int nextIndex() {
             check();
-            return index + 1;
+            return index;
         }
 
         @Override
         public int previousIndex() {
             check();
-            return index;
+            return index - 1;
         }
 
         @Override
         public void set(E e) {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
             check();
-            MyArrayList.this.set(index, e);
+            MyArrayList.this.set(lastReturned, e);
             initNumChanges = MyArrayList.this.numChanges;
         }
 
@@ -99,6 +111,8 @@ public class MyArrayList<E> implements List<E> {
         public void add(E e) {
             check();
             MyArrayList.this.add(index, e);
+            index++;
+            lastReturned = -1;
             initNumChanges = MyArrayList.this.numChanges;
         }
     }
