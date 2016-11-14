@@ -43,11 +43,13 @@ public class Main1 {
         System.out.println("listIterator.next, next, remove, next, next, set, next, next, add:");
 
         ListIterator listIterator = list.listIterator();
+        ListIterator listIterator2 = list.listIterator();
 
         listIterator.next();
         listIterator.next();
         listIterator.remove();
         //listIterator.remove();
+        //listIterator2.next();
         listIterator.next();
         listIterator.next();
         listIterator.set("listIterator.set");
