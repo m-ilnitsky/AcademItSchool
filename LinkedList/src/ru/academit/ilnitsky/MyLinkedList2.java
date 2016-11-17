@@ -4,15 +4,15 @@ import java.util.*;
 
 /**
  * Моя реализация класса LinkedList
- * Created by Mike on 17.11.2016.
+ * Created by UserLabView on 17.11.16.
  */
-public class MyLinkedList<E> implements List<E>, Deque<E> {
-    private class Entry<E2> {
-        private E2 element;
-        private Entry<E2> next;
-        private Entry<E2> previous;
+public class MyLinkedList2<E> implements List<E>, Deque<E> {
+    private class Entry<E> {
+        private E element;
+        private Entry<E> next;
+        private Entry<E> previous;
 
-        Entry(E2 element, Entry<E2> next, Entry<E2> previous) {
+        Entry(E element, Entry<E> previous, Entry<E> next) {
             this.element = element;
             this.next = next;
             this.previous = previous;
@@ -24,32 +24,34 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
             this.previous = this;
         }
 
-        E2 getElement() {
+        E getElement() {
             return element;
         }
 
-        public void setElement(E2 element) {
+        public void setElement(E element) {
             this.element = element;
         }
 
-        Entry<E2> getNext() {
+        Entry<E> getNext() {
             return next;
         }
 
-        void setNext(Entry<E2> next) {
+        void setNext(Entry<E> next) {
             this.next = next;
         }
 
-        Entry<E2> getPrevious() {
+        Entry<E> getPrevious() {
             return previous;
         }
 
-        void setPrevious(Entry<E2> previous) {
+        void setPrevious(Entry<E> previous) {
             this.previous = previous;
         }
     }
 
-    private final Entry<E> header = new Entry<E>();
+    private Entry<E> first;
+    private Entry<E> last;
+
     private int currentSize = 0;
     private int maxSize = -1;
 
@@ -57,14 +59,14 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
     public void addFirst(E e) {
         Entry<E> newElement;
         if (currentSize == 0) {
-            newElement = new Entry<>(e, header, header);
-            header.setNext(newElement);
-            header.setPrevious(newElement);
+            newElement = new Entry<>(e, null, null);
+            first = newElement;
+            last = newElement;
             currentSize++;
         } else {
-            newElement = new Entry<>(e, header.getNext(), header);
-            header.setNext(newElement);
-            newElement.getNext().setPrevious(newElement);
+            newElement = new Entry<>(e, null, first);
+            first.setPrevious(newElement);
+            first = newElement;
             currentSize++;
         }
     }
@@ -73,14 +75,14 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
     public void addLast(E e) {
         Entry<E> newElement;
         if (currentSize == 0) {
-            newElement = new Entry<>(e, header, header);
-            header.setNext(newElement);
-            header.setPrevious(newElement);
+            newElement = new Entry<>(e, null, null);
+            first = newElement;
+            last = newElement;
             currentSize++;
         } else {
-            newElement = new Entry<>(e, header, header.getPrevious());
-            header.setPrevious(newElement);
-            newElement.getPrevious().setNext(newElement);
+            newElement = new Entry<>(e, last, null);
+            last.setNext(newElement);
+            last = newElement;
             currentSize++;
         }
     }
@@ -128,10 +130,10 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
         if (currentSize == 0) {
             return null;
         } else {
-            Entry<E> removingElement = header.getNext();
+            Entry<E> removingElement = first;
 
-            header.setNext(removingElement.getNext());
-            removingElement.getNext().setPrevious(header);
+            first.getNext().setPrevious(null);
+            first = first.getNext();
 
             return removingElement.getElement();
         }
@@ -142,10 +144,10 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
         if (currentSize == 0) {
             return null;
         } else {
-            Entry<E> removingElement = header.getPrevious();
+            Entry<E> removingElement = last;
 
-            header.setPrevious(removingElement.getPrevious());
-            removingElement.getPrevious().setNext(header);
+            last.getPrevious().setNext(null);
+            last = last.getPrevious();
 
             return removingElement.getElement();
         }
@@ -171,33 +173,51 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public E peekFirst() {
-        return header.getNext().getElement();
+        return first.getElement();
     }
 
     @Override
     public E peekLast() {
-        return header.getPrevious().getElement();
+        return last.getElement();
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        Entry<E> element = header;
+        Entry<E> element = first;
 
         if (o != null) {
             for (int i = 0; i < currentSize; i++) {
-                element = element.getNext();
+                if (i > 0) {
+                    element = element.getNext();
+                }
                 if (o.equals(element.getElement())) {
                     element.getPrevious().setNext(element.getNext());
                     element.getNext().setPrevious(element.getPrevious());
+                    if (element == first) {
+                        first = element.getNext();
+                    }
+                    if (element == last) {
+                        last = element.getPrevious();
+                    }
+                    currentSize--;
                     return true;
                 }
             }
         } else {
             for (int i = 0; i < currentSize; i++) {
-                element = element.getNext();
+                if (i > 0) {
+                    element = element.getNext();
+                }
                 if (element.getElement() == null) {
                     element.getPrevious().setNext(element.getNext());
                     element.getNext().setPrevious(element.getPrevious());
+                    if (element == first) {
+                        first = element.getNext();
+                    }
+                    if (element == last) {
+                        last = element.getPrevious();
+                    }
+                    currentSize--;
                     return true;
                 }
             }
@@ -208,23 +228,42 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        Entry<E> element = header;
+        Entry<E> element = last;
+        int indexLast = currentSize - 1;
 
         if (o != null) {
-            for (int i = currentSize - 1; i >= 0; i--) {
-                element = element.getPrevious();
+            for (int i = indexLast; i >= 0; i--) {
+                if (i < indexLast) {
+                    element = element.getPrevious();
+                }
                 if (o.equals(element.getElement())) {
                     element.getPrevious().setNext(element.getNext());
                     element.getNext().setPrevious(element.getPrevious());
+                    if (element == first) {
+                        first = element.getNext();
+                    }
+                    if (element == last) {
+                        last = element.getPrevious();
+                    }
+                    currentSize--;
                     return true;
                 }
             }
         } else {
-            for (int i = currentSize - 1; i >= 0; i--) {
-                element = element.getPrevious();
+            for (int i = indexLast; i >= 0; i--) {
+                if (i < indexLast) {
+                    element = element.getPrevious();
+                }
                 if (element.getElement() == null) {
                     element.getPrevious().setNext(element.getNext());
                     element.getNext().setPrevious(element.getPrevious());
+                    if (element == first) {
+                        first = element.getNext();
+                    }
+                    if (element == last) {
+                        last = element.getPrevious();
+                    }
+                    currentSize--;
                     return true;
                 }
             }
@@ -366,18 +405,22 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public int indexOf(Object o) {
-        Entry<E> element = header;
+        Entry<E> element = first;
 
         if (o != null) {
             for (int i = 0; i < currentSize; i++) {
-                element = element.getNext();
+                if (i > 0) {
+                    element = element.getNext();
+                }
                 if (o.equals(element.getElement())) {
                     return i;
                 }
             }
         } else {
             for (int i = 0; i < currentSize; i++) {
-                element = element.getNext();
+                if (i > 0) {
+                    element = element.getNext();
+                }
                 if (element.getElement() == null) {
                     return i;
                 }
@@ -389,18 +432,23 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public int lastIndexOf(Object o) {
-        Entry<E> element = header;
+        Entry<E> element = last;
+        int indexLast = currentSize - 1;
 
         if (o != null) {
-            for (int i = currentSize - 1; i >= 0; i--) {
-                element = element.getPrevious();
+            for (int i = indexLast; i >= 0; i--) {
+                if (i < indexLast) {
+                    element = element.getPrevious();
+                }
                 if (o.equals(element.getElement())) {
                     return i;
                 }
             }
         } else {
-            for (int i = currentSize - 1; i >= 0; i--) {
-                element = element.getPrevious();
+            for (int i = indexLast; i >= 0; i--) {
+                if (i < indexLast) {
+                    element = element.getPrevious();
+                }
                 if (element.getElement() == null) {
                     return i;
                 }
