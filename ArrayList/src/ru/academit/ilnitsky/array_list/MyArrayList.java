@@ -273,6 +273,10 @@ public class MyArrayList<E> implements List<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        if(c == null){
+            throw new NullPointerException();
+        }
+
         int size = c.size();
 
         resizeIfNeedForAdd(size);
@@ -293,7 +297,9 @@ public class MyArrayList<E> implements List<E> {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
-            throw new IndexOutOfBoundsException("index > size()");
+            throw new IndexOutOfBoundsException("index >= size()");
+        } else if(c == null){
+            throw new NullPointerException();
         }
 
         int size = c.size();
@@ -378,7 +384,7 @@ public class MyArrayList<E> implements List<E> {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
-            throw new IndexOutOfBoundsException("index > size()");
+            throw new IndexOutOfBoundsException("index >= size()");
         }
 
         return elements[index];
@@ -389,7 +395,7 @@ public class MyArrayList<E> implements List<E> {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
-            throw new IndexOutOfBoundsException("index > size()");
+            throw new IndexOutOfBoundsException("index >= size()");
         }
 
         E oldElement = elements[index];
@@ -404,7 +410,7 @@ public class MyArrayList<E> implements List<E> {
     public void add(int index, E element) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
-        } else if (index >= numElements) {
+        } else if (index > numElements) {
             throw new IndexOutOfBoundsException("index > size()");
         }
 
@@ -422,7 +428,7 @@ public class MyArrayList<E> implements List<E> {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index < 0");
         } else if (index >= numElements) {
-            throw new IndexOutOfBoundsException("index > size()");
+            throw new IndexOutOfBoundsException("index >= size()");
         }
 
         E element = elements[index];
@@ -494,7 +500,7 @@ public class MyArrayList<E> implements List<E> {
             throw new IndexOutOfBoundsException("fromIndex < 0");
         }
         if (toIndex >= numElements) {
-            throw new IndexOutOfBoundsException("toIndex > size()");
+            throw new IndexOutOfBoundsException("toIndex >= size()");
         }
         if (fromIndex > toIndex) {
             throw new IndexOutOfBoundsException("fromIndex > toIndex");
