@@ -170,15 +170,24 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public E peekFirst() {
-        return first.getElement();
+        if (currentSize == 0) {
+            return null;
+        } else {
+            return first.getElement();
+        }
+
     }
 
     @Override
     public E peekLast() {
-        return last.getElement();
+        if (currentSize == 0) {
+            return null;
+        } else {
+            return last.getElement();
+        }
     }
 
-    private void removeEntry(Entry<E> element){
+    private void removeEntry(Entry<E> element) {
         if (element == first && element == last) {
             first = null;
             last = null;
@@ -198,60 +207,23 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        Entry<E> element = first;
-
-        if (o != null) {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (o.equals(element.getElement())) {
-                    removeEntry(element);
-                    return true;
-                }
-            }
-        } else {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (element.getElement() == null) {
-                    removeEntry(element);
-                    return true;
-                }
+        for (Entry<E> element = first; element != null; element = element.getNext()) {
+            if (Objects.equals(o, element.getElement())) {
+                removeEntry(element);
+                return true;
             }
         }
-
         return false;
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        Entry<E> element = last;
-        int indexLast = currentSize - 1;
-
-        if (o != null) {
-            for (int i = indexLast; i >= 0; i--) {
-                if (i < indexLast) {
-                    element = element.getPrevious();
-                }
-                if (o.equals(element.getElement())) {
-                    removeEntry(element);
-                    return true;
-                }
-            }
-        } else {
-            for (int i = indexLast; i >= 0; i--) {
-                if (i < indexLast) {
-                    element = element.getPrevious();
-                }
-                if (element.getElement() == null) {
-                    removeEntry(element);
-                    return true;
-                }
+        for (Entry<E> element = last; element != null; element = element.getPrevious()) {
+            if (Objects.equals(o, element.getElement())) {
+                removeEntry(element);
+                return true;
             }
         }
-
         return false;
     }
 
@@ -307,29 +279,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public boolean contains(Object o) {
-        Entry<E> element = first;
-
-        if (o != null) {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (o.equals(element.getElement())) {
-                    return true;
-                }
-            }
-        } else {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (element.getElement() == null) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return indexOf(o) >= 0;
     }
 
     @Override
@@ -339,15 +289,11 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public Object[] toArray() {
-        Entry<E> element = first;
-
         Object[] array = new Object[currentSize];
 
-        for (int i = 0; i < currentSize; i++) {
-            if (i > 0) {
-                element = element.getNext();
-            }
-            array[i] = element.getElement();
+        int count = 0;
+        for (Entry<E> element = first; element != null; element = element.getNext(), count++) {
+            array[count] = element.getElement();
         }
 
         return array;
@@ -362,24 +308,18 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
             @SuppressWarnings("unchecked")
             T[] a2 = (T[]) new Object[currentSize];
 
-            Entry<E> element = first;
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
+            int count = 0;
+            for (Entry<E> element = first; element != null; element = element.getNext(), count++) {
                 //noinspection unchecked
-                a2[i] = (T) element.getElement();
+                a2[count] = (T) element.getElement();
             }
 
             return a2;
         } else {
-            Entry<E> element = first;
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
+            int count = 0;
+            for (Entry<E> element = first; element != null; element = element.getNext(), count++) {
                 //noinspection unchecked
-                a[i] = (T) element.getElement();
+                a[count] = (T) element.getElement();
             }
 
             if (a.length > currentSize) {
@@ -404,38 +344,14 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
     @Override
     public boolean containsAll(Collection<?> c) {
         int size = c.size();
-        if (size == 0 || currentSize == 0) {
+        if (size == 0) {
+            return true;
+        } else if (currentSize == 0) {
             return false;
         }
 
         for (Object o : c) {
-            boolean hasInThis = false;
-
-            Entry<E> element = first;
-
-            if (o != null) {
-                for (int i = 0; i < currentSize; i++) {
-                    if (i > 0) {
-                        element = element.getNext();
-                    }
-                    if (o.equals(element.getElement())) {
-                        hasInThis = true;
-                        break;
-                    }
-                }
-            } else {
-                for (int i = 0; i < currentSize; i++) {
-                    if (i > 0) {
-                        element = element.getNext();
-                    }
-                    if (element.getElement() == null) {
-                        hasInThis = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!hasInThis) {
+            if (!contains(o)) {
                 return false;
             }
         }
@@ -504,12 +420,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
         boolean isChange = false;
 
-        int size = currentSize;
-        Entry<E> element = first;
-        for (int i = 0; i < size; i++) {
-            if (i > 0) {
-                element = element.getNext();
-            }
+        for (Entry<E> element = first; element != null; element = element.getNext()) {
             if (c.contains(element.getElement())) {
                 isChange = true;
                 removeEntry(element);
@@ -527,12 +438,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
         boolean isChange = false;
 
-        int size = currentSize;
-        Entry<E> element = first;
-        for (int i = 0; i < size; i++) {
-            if (i > 0) {
-                element = element.getNext();
-            }
+        for (Entry<E> element = first; element != null; element = element.getNext()) {
             if (!c.contains(element.getElement())) {
                 isChange = true;
                 removeEntry(element);
@@ -549,7 +455,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
         // Замедлит формальное удаление списка
         Entry<T> element = first;
         element.setNext(null);
-        for (int i = 1; i <= currentSize; i++) {
+        for (int i = 1; i < currentSize; i++) {
             element = element.getNext();
             element.setNext(null);
             element.setPrevious(null);
@@ -646,25 +552,11 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public int indexOf(Object o) {
-        Entry<E> element = first;
 
-        if (o != null) {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (o.equals(element.getElement())) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = 0; i < currentSize; i++) {
-                if (i > 0) {
-                    element = element.getNext();
-                }
-                if (element.getElement() == null) {
-                    return i;
-                }
+        int count = 0;
+        for (Entry<E> element = first; element != null; element = element.getNext(), count++) {
+            if (Objects.equals(o, element.getElement())) {
+                return count;
             }
         }
 
@@ -673,26 +565,11 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public int lastIndexOf(Object o) {
-        Entry<E> element = last;
-        int indexLast = currentSize - 1;
 
-        if (o != null) {
-            for (int i = indexLast; i >= 0; i--) {
-                if (i < indexLast) {
-                    element = element.getPrevious();
-                }
-                if (o.equals(element.getElement())) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = indexLast; i >= 0; i--) {
-                if (i < indexLast) {
-                    element = element.getPrevious();
-                }
-                if (element.getElement() == null) {
-                    return i;
-                }
+        int count = currentSize - 1;
+        for (Entry<E> element = last; element != null; element = element.getPrevious(), count--) {
+            if (Objects.equals(o, element.getElement())) {
+                return count;
             }
         }
 
@@ -723,16 +600,52 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
         MyLinkedList<E> list = new MyLinkedList<>();
 
-        Entry<E> element = first;
-        for (int i = 0; i < currentSize; i++) {
-            if (i > 0) {
-                element = element.getNext();
-            }
-            if (i >= fromIndex && i <= toIndex) {
+        int count = 0;
+        for (Entry<E> element = first; element != null; element = element.getNext(), count++) {
+            if (count >= fromIndex && count <= toIndex) {
                 list.addLast(element.getElement());
             }
         }
 
         return list;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        MyLinkedList<E> that = (MyLinkedList<E>) o;
+
+        if (this.currentSize != that.currentSize) {
+            return false;
+        }
+
+        Entry<E> thisElement = this.first;
+        Entry<E> thatElement = that.first;
+        while (thisElement != null) {
+            if (!Objects.equals(thisElement.getElement(), thatElement.getElement())) {
+                return false;
+            }
+            thisElement = thisElement.getNext();
+            thatElement = thatElement.getNext();
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = currentSize;
+        for (Entry<E> element = first; element != null; element = element.getNext()) {
+            int hash = (element.getElement() != null) ? element.getElement().hashCode() : 37;
+            result = 31 * result + hash;
+        }
+        return result;
     }
 }
