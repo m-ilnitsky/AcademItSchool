@@ -343,8 +343,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        int size = c.size();
-        if (size == 0) {
+        if (c.size() == 0) {
             return true;
         } else if (currentSize == 0) {
             return false;
