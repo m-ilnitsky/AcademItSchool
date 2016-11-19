@@ -1,4 +1,4 @@
-package ru.academit.ilnitsky;
+package ru.academit.ilnitsky.linked_list;
 
 import java.util.*;
 

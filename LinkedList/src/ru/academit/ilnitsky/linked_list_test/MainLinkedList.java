@@ -1,16 +1,17 @@
-package ru.academit.ilnitsky;
+package ru.academit.ilnitsky.linked_list_test;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Scanner;
 
 /**
- * Класс для тестирования MyLinkedList
+ * Класс для тестирования стандартного LinkedList
  * Created by Mike on 17.11.2016.
  */
-public class Main {
+public class MainLinkedList {
     public static void main(String[] args) {
-        MyLinkedList<String> list = new MyLinkedList<>();
+        LinkedList<String> list = new LinkedList<>();
 
         list.add("A1");
         list.add("A2");
