@@ -1,5 +1,6 @@
 package ru.academit.ilnitsky;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Scanner;
@@ -73,6 +74,24 @@ public class MainLinkedList {
         System.out.println();
         while (listIterator.hasPrevious()) {
             System.out.printf("[%2d]: %s %n", listIterator.previousIndex(), listIterator.previous());
+        }
+
+        System.out.println();
+        System.out.println("DescendingIterator:");
+        Iterator descendingIterator = list.descendingIterator();
+        int count2 = 0;
+        while (descendingIterator.hasNext()) {
+            System.out.printf("[%2d]: %s %n", count2, descendingIterator.next());
+            count2++;
+        }
+
+        System.out.println();
+        System.out.println("Iterator:");
+        Iterator iterator = list.iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            System.out.printf("[%2d]: %s %n", count, iterator.next());
+            count++;
         }
 
         Scanner scanner = new Scanner(System.in);

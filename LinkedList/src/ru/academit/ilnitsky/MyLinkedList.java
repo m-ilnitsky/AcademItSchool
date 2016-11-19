@@ -43,12 +43,197 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
         }
     }
 
+    private class MyIterator implements Iterator<E> {
+        protected Entry<E> next;
+        protected Entry<E> returned;
+
+        protected int nextIndex;
+
+        protected long initNumChanges;
+
+        protected MyIterator() {
+            initNumChanges = MyLinkedList.this.numChanges;
+            nextIndex = 0;
+            next = MyLinkedList.this.first;
+            returned = null;
+        }
+
+        protected void check() {
+            if (initNumChanges != MyLinkedList.this.numChanges) {
+                throw new ConcurrentModificationException("MyLinkedList has changed");
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            check();
+            return nextIndex < currentSize;
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+                returned = next;
+                next = next.getNext();
+                nextIndex++;
+                return returned.getElement();
+            } else {
+                throw new NoSuchElementException("NextIndex > MaxIndex");
+            }
+        }
+
+        @Override
+        public void remove() {
+            check();
+            if (returned == null) {
+                throw new IllegalStateException();
+            }
+            Entry<E> returnedNext = returned.getNext();
+            MyLinkedList.this.removeEntry(returned);
+            if (next == returned) {
+                next = returnedNext;
+            } else {
+                nextIndex--;
+            }
+            initNumChanges = MyLinkedList.this.numChanges;
+
+            returned = null;
+        }
+    }
+
+    private class MyDescendingIterator extends MyIterator {
+
+        protected MyDescendingIterator() {
+            nextIndex = MyLinkedList.this.currentSize;
+            initNumChanges = MyLinkedList.this.numChanges;
+            next = null;
+            returned = null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            check();
+            return nextIndex > 0;
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+                next = (next == null) ? last : next.getPrevious();
+                returned = next;
+                nextIndex--;
+                return returned.getElement();
+            } else {
+                throw new NoSuchElementException("NextIndex > MaxIndex");
+            }
+        }
+    }
+
+    private class MyListIterator extends MyIterator implements ListIterator<E> {
+
+        @Override
+        public boolean hasPrevious() {
+            check();
+            return nextIndex > 0;
+        }
+
+        @Override
+        public E previous() {
+            if (hasPrevious()) {
+                next = (next == null) ? last : next.getPrevious();
+                returned = next;
+                nextIndex--;
+                return returned.getElement();
+            } else {
+                throw new NoSuchElementException("PreviousIndex < 0");
+            }
+        }
+
+        @Override
+        public int nextIndex() {
+            check();
+            return nextIndex;
+        }
+
+        @Override
+        public int previousIndex() {
+            check();
+            return nextIndex - 1;
+        }
+
+        @Override
+        public void set(E e) {
+            if (returned == null) {
+                throw new IllegalStateException();
+            }
+            check();
+            returned.setElement(e);
+            MyLinkedList.this.numChanges++;
+            initNumChanges = MyLinkedList.this.numChanges;
+        }
+
+        @Override
+        public void add(E e) {
+            check();
+
+            if (next == null) {
+                MyLinkedList.this.addLast(e);
+            } else {
+                MyLinkedList.this.addEntry(next, e);
+            }
+            nextIndex++;
+            initNumChanges = MyLinkedList.this.numChanges;
+        }
+    }
+
     private Entry<E> first;
     private Entry<E> last;
 
     private int currentSize = 0;
 
     private long numChanges = 0;
+
+    private int indexEntry(Entry<E> element) {
+
+        int count = 0;
+        for (Entry<E> current = first; current != null; current = current.getNext(), count++) {
+            if (current == element) {
+                return count;
+            }
+        }
+
+        return -1;
+    }
+
+    private void addEntry(Entry<E> element, E e) {
+        Entry<E> newElement = new Entry<>(e, element.getPrevious(), element);
+        element.setPrevious(newElement);
+        if (element == first) {
+            first = newElement;
+        } else {
+            newElement.getPrevious().setNext(newElement);
+        }
+        currentSize++;
+        numChanges++;
+    }
+
+    private void removeEntry(Entry<E> element) {
+        if (element == first && element == last) {
+            first = null;
+            last = null;
+        } else if (element == first) {
+            first = element.getNext();
+            element.getNext().setPrevious(null);
+        } else if (element == last) {
+            last = element.getPrevious();
+            element.getPrevious().setNext(null);
+        } else {
+            element.getPrevious().setNext(element.getNext());
+            element.getNext().setPrevious(element.getPrevious());
+        }
+        currentSize--;
+        numChanges++;
+    }
 
     @Override
     public void addFirst(E e) {
@@ -187,24 +372,6 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
         }
     }
 
-    private void removeEntry(Entry<E> element) {
-        if (element == first && element == last) {
-            first = null;
-            last = null;
-        } else if (element == first) {
-            first = element.getNext();
-            element.getNext().setPrevious(null);
-        } else if (element == last) {
-            last = element.getPrevious();
-            element.getPrevious().setNext(null);
-        } else {
-            element.getPrevious().setNext(element.getNext());
-            element.getNext().setPrevious(element.getPrevious());
-        }
-        currentSize--;
-        numChanges++;
-    }
-
     @Override
     public boolean removeFirstOccurrence(Object o) {
         for (Entry<E> element = first; element != null; element = element.getNext()) {
@@ -264,7 +431,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public Iterator<E> descendingIterator() {
-        return null;
+        return new MyDescendingIterator();
     }
 
     @Override
@@ -284,7 +451,7 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new MyIterator();
     }
 
     @Override
@@ -579,12 +746,23 @@ public class MyLinkedList<E> implements List<E>, Deque<E> {
 
     @Override
     public ListIterator<E> listIterator() {
-        return null;
+        return new MyListIterator();
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return null;
+        if (index >= currentSize) {
+            throw new IndexOutOfBoundsException("index >= size");
+        } else if (index < 0) {
+            throw new IndexOutOfBoundsException("index < 0");
+        }
+
+        MyListIterator iterator = new MyListIterator();
+        for (int i = 0; i < index; i++) {
+            iterator.next();
+        }
+
+        return iterator;
     }
 
     @Override
