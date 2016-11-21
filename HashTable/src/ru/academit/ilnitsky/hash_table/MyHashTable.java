@@ -44,9 +44,8 @@ public class MyHashTable<E> implements Collection<E> {
                 nextElement = null;
             } else {
                 nextListIndex = findNextList(-1);
-                nextListElementIndex = 0;
-                nextTotalIndex = 0;
-                nextElement = hashList[nextListIndex].getFirst();
+                nextListElementIndex = -1;
+                nextTotalIndex = -1;
 
                 listIterator = hashList[nextListIndex].iterator();
             }
@@ -61,6 +60,15 @@ public class MyHashTable<E> implements Collection<E> {
             return -1;
         }
 
+        private void setList() {
+            if (nextTotalIndex < numElements && nextListElementIndex == listSize[nextListIndex]) {
+                nextListIndex = findNextList(nextListIndex);
+                nextListElementIndex = 0;
+
+                listIterator = hashList[nextListIndex].iterator();
+            }
+        }
+
         private void check() {
             if (initNumChanges != numChanges) {
                 throw new ConcurrentModificationException("MyHashTable has changed");
@@ -70,65 +78,31 @@ public class MyHashTable<E> implements Collection<E> {
         @Override
         public boolean hasNext() {
             check();
-            return nextTotalIndex < numElements;
+            return numElements != 0 && nextTotalIndex < numElements;
         }
 
         @Override
         public E next() {
             if (hasNext()) {
                 returnedElement = nextElement;
+
                 returnedListIndex = nextListIndex;
                 returnedListElementIndex = nextListElementIndex;
                 returnedTotalIndex = nextTotalIndex;
 
                 nextTotalIndex++;
-                nextListElementIndex++;
 
-                if(nextListElementIndex >= listSize[nextListIndex]){
-                    nextListIndex=findNextList(nextListIndex);
-                    nextListElementIndex=0;
-
-                    listIterator = hashList[nextListIndex].iterator();
+                if (nextTotalIndex < numElements) {
+                    nextListElementIndex++;
+                    setList();
+                    nextElement = listIterator.next();
                 }
-
-                nextElement=listIterator.next();
 
                 return returnedElement;
             } else {
                 throw new NoSuchElementException("NextIndex > MaxIndex");
             }
         }
-
-        /*
-        @Override
-        public E next() {
-            if (hasNext()) {
-                returnedElement = nextElement;
-                returnedListIndex = nextListIndex;
-                returnedListElementIndex = nextListElementIndex;
-                returnedTotalIndex = nextTotalIndex;
-
-                if (nextListElementIndex >= listSize[nextListIndex]) {
-                    for (int i = nextListIndex; i < hashList.length; i++) {
-                        if (listSize[i] > 0) {
-                            nextListIndex = i;
-                            listIterator = hashList[nextListIndex].iterator();
-                            nextListElementIndex = 0;
-                            break;
-                        }
-                    }
-                }
-
-                nextElement = listIterator.next();
-                nextListElementIndex++;
-                nextTotalIndex++;
-
-                return returnedElement;
-            } else {
-                throw new NoSuchElementException("NextIndex > MaxIndex");
-            }
-        }
-        */
 
         @Override
         public void remove() {
@@ -137,9 +111,16 @@ public class MyHashTable<E> implements Collection<E> {
                 throw new IllegalStateException();
             }
             hashList[returnedListIndex].remove(returnedListElementIndex);
-            numChanges++;
+            setSizes(returnedListIndex);
             initNumChanges = numChanges;
+
             nextTotalIndex = returnedTotalIndex;
+            nextListIndex = returnedListIndex;
+            nextListElementIndex = returnedListElementIndex;
+            setList();
+
+            returnedListElementIndex = -1;
+            returnedListIndex = -1;
             returnedTotalIndex = -1;
         }
     }
@@ -164,8 +145,6 @@ public class MyHashTable<E> implements Collection<E> {
         listSize = new int[hashSize];
         //noinspection unchecked
         hashList = new LinkedList[hashSize];
-
-        setSizes();
     }
 
     private int hashIndex(E e) {
@@ -190,20 +169,6 @@ public class MyHashTable<E> implements Collection<E> {
         } else {
             return false;
         }
-    }
-
-
-    private void setSizes() {
-        int sum = 0;
-        for (int i = 0; i < hashList.length; i++) {
-            if (hashList[i] != null) {
-                listSize[i] = hashList[i].size();
-                sum += listSize[i];
-            } else {
-                listSize[i] = 0;
-            }
-        }
-        numElements = sum;
     }
 
     @Override
