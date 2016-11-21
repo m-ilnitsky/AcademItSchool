@@ -11,7 +11,7 @@ import java.util.ConcurrentModificationException;
  * Моя реализация класса HashTable
  * Created by Mike on 19.11.2016.
  */
-public class MyStrangeHashTable<E> implements Collection<E> {
+public class MyHashTable<E> implements Collection<E> {
     private class MyIterator implements Iterator<E> {
         private Iterator<E> listIterator;
 
@@ -32,10 +32,10 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         MyIterator() {
             initNumChanges = numChanges;
 
+            returnedElement = null;
             returnedListIndex = -1;
             returnedListElementIndex = -1;
             returnedTotalIndex = -1;
-            returnedElement = null;
 
             if (isEmpty()) {
                 nextListIndex = -1;
@@ -43,18 +43,31 @@ public class MyStrangeHashTable<E> implements Collection<E> {
                 nextTotalIndex = 0;
                 nextElement = null;
             } else {
-                nextListIndex = firstList;
+                nextListIndex = findNextList();
                 nextListElementIndex = 0;
                 nextTotalIndex = 0;
                 nextElement = hashList[nextListIndex].getFirst();
 
-                listIterator = hashList[firstList].iterator();
+                listIterator = hashList[nextListIndex].iterator();
             }
+        }
+
+        private int findNextList() {
+            if (numElements == 0) {
+                return -1;
+            } else {
+                for (int i = 0; i < hashList.length; i++) {
+                    if (listSize[i] > 0) {
+                        return i;
+                    }
+                }
+            }
+            return -1;
         }
 
         private void check() {
             if (initNumChanges != numChanges) {
-                throw new ConcurrentModificationException("MyStrangeHashTable has changed");
+                throw new ConcurrentModificationException("MyHashTable has changed");
             }
         }
 
@@ -110,23 +123,17 @@ public class MyStrangeHashTable<E> implements Collection<E> {
     private LinkedList<E>[] hashList;
     private int[] listSize;
 
-    private int firstList;
-    private int lastList;
-
     private int numElements;
 
     private long numChanges;
 
-    private final static int HASH_SIZE = 65536;
+    private final static int HASH_SIZE = 1024;
 
-    public MyStrangeHashTable() {
+    public MyHashTable() {
         this(HASH_SIZE);
     }
 
-    public MyStrangeHashTable(int hashSize) {
-        firstList = hashSize;
-        lastList = -1;
-
+    public MyHashTable(int hashSize) {
         numElements = 0;
         numChanges = 0;
 
@@ -145,93 +152,6 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         return hashIndex;
     }
 
-    private boolean setFirstLast() {
-        boolean changed = false;
-        if (numElements == 0) {
-            if (firstList != hashList.length) {
-                firstList = hashList.length;
-                changed = true;
-            }
-            if (lastList != -1) {
-                lastList = -1;
-                changed = true;
-            }
-        } else {
-            for (int i = 0; i < hashList.length; i++) {
-                if (listSize[i] > 0) {
-                    firstList = i;
-                    changed = true;
-                    break;
-                }
-            }
-            for (int i = hashList.length - 1; i >= 0; i++) {
-                if (listSize[i] > 0) {
-                    lastList = i;
-                    changed = true;
-                    break;
-                }
-            }
-        }
-        return changed;
-    }
-
-    private boolean setFirstLastAfterRemove(int hashIndex) {
-        boolean changed = false;
-        if (numElements == 0) {
-            if (firstList != hashList.length) {
-                firstList = hashList.length;
-                changed = true;
-            }
-            if (lastList != -1) {
-                lastList = -1;
-                changed = true;
-            }
-        } else {
-            if (firstList == hashIndex && listSize[hashIndex] == 0) {
-                int start = firstList + 1;
-                firstList = hashList.length;
-                for (int i = start; i <= lastList; i++) {
-                    if (listSize[i] > 0) {
-                        firstList = i;
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-            if (lastList == hashIndex && listSize[hashIndex] == 0) {
-                int start = lastList - 1;
-                lastList = -1;
-                for (int i = start; i >= firstList; i--) {
-                    if (listSize[i] > 0) {
-                        lastList = i;
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return changed;
-    }
-
-    private boolean setFirstLast(int hashIndex) {
-        boolean changed = false;
-        if (numElements == 0) {
-            firstList = hashIndex;
-            lastList = hashIndex;
-            changed = true;
-        } else {
-            if (hashIndex > lastList) {
-                lastList = hashIndex;
-                changed = true;
-            }
-            if (hashIndex < firstList) {
-                firstList = hashIndex;
-                changed = true;
-            }
-        }
-        return changed;
-    }
-
     private boolean setSizes(int hashIndex) {
         int oldSize = listSize[hashIndex];
         listSize[hashIndex] = hashList[hashIndex].size();
@@ -244,11 +164,6 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         } else {
             return false;
         }
-    }
-
-    private boolean setParameters(int hashIndex) {
-        setFirstLast(hashIndex);
-        return setSizes(hashIndex);
     }
 
     @Override
@@ -283,12 +198,10 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         Object[] array = new Object[numElements];
 
         int count = 0;
-        for (int i = firstList; i <= lastList; i++) {
-            if (listSize[i] > 0) {
-                for (E e : hashList[i]) {
-                    array[count] = e;
-                    count++;
-                }
+        for (LinkedList<E> list : hashList) {
+            for (E e : list) {
+                array[count] = e;
+                count++;
             }
         }
 
@@ -310,13 +223,11 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         }
 
         int count = 0;
-        for (int i = firstList; i <= lastList; i++) {
-            if (listSize[i] > 0) {
-                for (E e : hashList[i]) {
-                    //noinspection unchecked
-                    array[count] = (T) e;
-                    count++;
-                }
+        for (LinkedList<E> list : hashList) {
+            for (E e : list) {
+                //noinspection unchecked
+                array[count] = (T) e;
+                count++;
             }
         }
 
@@ -336,7 +247,7 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         }
         hashList[hashIndex].add(e);
 
-        return setParameters(hashIndex);
+        return setSizes(hashIndex);
     }
 
     @Override
@@ -348,9 +259,8 @@ public class MyStrangeHashTable<E> implements Collection<E> {
             return false;
         } else {
             hashList[hashIndex].remove(o);
-            boolean changed = setSizes(hashIndex);
-            setFirstLastAfterRemove(hashIndex);
-            return changed;
+
+            return setSizes(hashIndex);
         }
     }
 
@@ -417,7 +327,7 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         }
 
         boolean changed = false;
-        for (int i = firstList; i <= lastList; i++) {
+        for (int i = 0; i <= hashList.length; i++) {
             if (listSize[i] != 0) {
                 hashList[i].retainAll(c);
                 if (setSizes(i)) {
@@ -426,20 +336,16 @@ public class MyStrangeHashTable<E> implements Collection<E> {
             }
         }
 
-        setFirstLast();
-
         return changed;
     }
 
     @Override
     public void clear() {
-        for (int i = firstList; i <= lastList; i++) {
+        for (int i = 0; i <= hashList.length; i++) {
             hashList[i].clear();
             listSize[i] = 0;
         }
         numElements = 0;
-        firstList = hashList.length;
-        lastList = -1;
         numChanges++;
     }
 }
