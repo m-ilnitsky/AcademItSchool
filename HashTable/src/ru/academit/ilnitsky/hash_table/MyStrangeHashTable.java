@@ -133,6 +133,8 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         listSize = new int[hashSize];
         //noinspection unchecked
         hashList = new LinkedList[hashSize];
+
+        setSizes();
     }
 
     private int hashIndex(E e) {
@@ -244,6 +246,19 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         } else {
             return false;
         }
+    }
+
+    private void setSizes() {
+        int sum = 0;
+        for (int i = 0; i < hashList.length; i++) {
+            if (hashList[i] != null) {
+                listSize[i] = hashList[i].size();
+                sum += listSize[i];
+            } else {
+                listSize[i] = 0;
+            }
+        }
+        numElements = sum;
     }
 
     private boolean setParameters(int hashIndex) {

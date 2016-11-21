@@ -38,17 +38,17 @@ public class Main {
         Iterator iterator1 = list.iterator();
         Iterator iterator2 = list.iterator();
 
-        iterator1.next();
-        iterator1.next();
-        iterator1.remove();
-        //iterator1.remove();
-        //iterator2.next();
-        iterator1.next();
-        iterator1.remove();
-        iterator1.next();
-        iterator1.next();
-        iterator1.remove();
-        iterator1.next();
+        System.out.println("Iterator1.next: " + iterator1.next());
+        System.out.println("Iterator1.next: " + iterator1.next());
+        //System.out.println("Iterator1.remove: "); iterator1.remove();
+        //System.out.println("Iterator1.remove: "); iterator1.remove();
+        //System.out.println("Iterator2.next: " + iterator2.next());
+        System.out.println("Iterator1.next: " + iterator1.next());
+        //System.out.println("Iterator1.remove: "); iterator1.remove();
+        System.out.println("Iterator1.next: " + iterator1.next());
+        System.out.println("Iterator1.next: " + iterator1.next());
+        //System.out.println("Iterator1.remove: "); iterator1.remove();
+        System.out.println("Iterator1.next: " + iterator1.next());
 
         System.out.println();
         System.out.println("End state:");
