@@ -1,38 +1,48 @@
 package ru.academit.ilnitsky.hash_table;
 
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Iterator;
+
+import java.util.NoSuchElementException;
+import java.util.ConcurrentModificationException;
 
 /**
- * Моя реализация класса MyHashTable
+ * Моя реализация класса HashTable
  * Created by Mike on 19.11.2016.
  */
-public class MyHashTable<E> implements Collection<E> {
+public class MyStrangeHashTable<E> implements Collection<E> {
     private class MyIterator implements Iterator<E> {
-        protected LinkedList<E> nextList;
-        protected LinkedList<E> returnedList;
+        protected Iterator<E> listIterator;
 
         protected E nextElement;
         protected E returnedElement;
 
-        protected int nextIndex;
-        protected int returnedIndex;
+        protected int nextListIndex;
+        protected int returnedListIndex;
+
+        protected int nextListElementIndex;
+        protected int returnedListElementIndex;
+
+        protected int nextTotalIndex;
+        protected int returnedTotalIndex;
 
         protected long initNumChanges;
 
         protected MyIterator() {
             initNumChanges = numChanges;
 
-            nextIndex = 0;
-            returnedIndex = -1;
-
-            nextElement = null;
             returnedElement = null;
+            returnedListIndex = -1;
+            returnedListElementIndex = -1;
+            returnedTotalIndex = -1;
 
-            nextList = null;
-            returnedList = null;
+            nextElement = hashList[nextListIndex].getFirst();
+            nextListIndex = firstList;
+            nextListElementIndex = 0;
+            nextTotalIndex = 0;
+
+            listIterator = hashList[firstList].iterator();
         }
 
         protected void check() {
@@ -43,17 +53,50 @@ public class MyHashTable<E> implements Collection<E> {
 
         @Override
         public boolean hasNext() {
-            return false;
+            check();
+            return nextTotalIndex < numElements;
         }
 
         @Override
         public E next() {
-            return null;
+            if (hasNext()) {
+                returnedElement = nextElement;
+                returnedListIndex = nextListIndex;
+                returnedListElementIndex = nextListElementIndex;
+                returnedTotalIndex = nextTotalIndex;
+
+                if (nextListElementIndex >= listSize[nextListIndex]) {
+                    for (int i = nextListIndex; i < hashList.length; i++) {
+                        if (listSize[i] > 0) {
+                            nextListIndex = i;
+                            listIterator = hashList[nextListIndex].iterator();
+                            nextListElementIndex = 0;
+                            break;
+                        }
+                    }
+                }
+
+                nextElement = listIterator.next();
+                nextListElementIndex++;
+                nextTotalIndex++;
+
+                return returnedElement;
+            } else {
+                throw new NoSuchElementException("NextIndex > MaxIndex");
+            }
         }
 
         @Override
         public void remove() {
-
+            check();
+            if (returnedListIndex < 0) {
+                throw new IllegalStateException();
+            }
+            hashList[returnedListIndex].remove(returnedListElementIndex);
+            numChanges++;
+            initNumChanges = numChanges;
+            nextTotalIndex = returnedTotalIndex;
+            returnedTotalIndex = -1;
         }
     }
 
@@ -69,20 +112,20 @@ public class MyHashTable<E> implements Collection<E> {
 
     private final static int HASH_SIZE = 65536;
 
-    public MyHashTable() {
+    public MyStrangeHashTable() {
         this(HASH_SIZE);
     }
 
-    public MyHashTable(int hashSize) {
-        //noinspection unchecked
-        hashList = (LinkedList<E>[]) new Object[hashSize];
-        listSize = new int[hashSize];
-
+    public MyStrangeHashTable(int hashSize) {
         firstList = hashSize;
         lastList = -1;
 
         numElements = 0;
         numChanges = 0;
+
+        listSize = new int[hashSize];
+        //noinspection unchecked
+        hashList = (LinkedList<E>[]) new Object[hashSize];
     }
 
     private int hashIndex(E e) {
@@ -90,7 +133,7 @@ public class MyHashTable<E> implements Collection<E> {
         if (e == null) {
             hashIndex = hashList.length - 1;
         } else {
-            hashIndex = Math.abs(e.hashCode() / (hashList.length - 1));
+            hashIndex = Math.abs(e.hashCode() % (hashList.length - 1));
         }
         return hashIndex;
     }
