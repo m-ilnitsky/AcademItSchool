@@ -139,7 +139,7 @@ public class MyHashTable<E> implements Collection<E> {
 
         listSize = new int[hashSize];
         //noinspection unchecked
-        hashList = (LinkedList<E>[]) new Object[hashSize];
+        hashList = new LinkedList[hashSize];
     }
 
     private int hashIndex(E e) {

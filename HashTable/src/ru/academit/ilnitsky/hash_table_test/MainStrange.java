@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.hash_table_test;
 import ru.academit.ilnitsky.hash_table.MyStrangeHashTable;
 
 import java.util.Iterator;
+import java.util.Scanner;
 
 /**
  * Программа для тестирования класса MyStrangeHashTable
@@ -57,5 +58,8 @@ public class MainStrange {
             System.out.printf("[%2d]: %s %n", count, iterator3.next());
             count++;
         }
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
     }
 }
