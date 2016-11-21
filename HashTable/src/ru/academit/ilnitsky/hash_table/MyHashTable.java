@@ -145,9 +145,9 @@ public class MyHashTable<E> implements Collection<E> {
     private int hashIndex(E e) {
         int hashIndex;
         if (e == null) {
-            hashIndex = hashList.length - 1;
+            hashIndex = 0;
         } else {
-            hashIndex = Math.abs(e.hashCode() % (hashList.length - 1));
+            hashIndex = Math.abs(e.hashCode() % hashList.length);
         }
         return hashIndex;
     }
