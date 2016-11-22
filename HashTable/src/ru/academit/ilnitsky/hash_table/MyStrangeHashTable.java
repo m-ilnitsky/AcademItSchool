@@ -40,14 +40,14 @@ public class MyStrangeHashTable<E> implements Collection<E> {
             if (numElements == 0) {
                 nextListIndex = -1;
                 nextListElementIndex = -1;
-                nextTotalIndex = 0;
+                nextTotalIndex = -1;
                 nextElement = null;
             } else {
                 nextListIndex = firstList;
-                nextListElementIndex = -1;
-                nextTotalIndex = -1;
-
+                nextListElementIndex = 0;
+                nextTotalIndex = 0;
                 listIterator = hashList[nextListIndex].iterator();
+                nextElement = listIterator.next();
             }
         }
 
@@ -182,7 +182,7 @@ public class MyStrangeHashTable<E> implements Collection<E> {
                     break;
                 }
             }
-            for (int i = hashList.length - 1; i >= 0; i++) {
+            for (int i = hashList.length - 1; i >= 0; i--) {
                 if (listSize[i] > 0) {
                     lastList = i;
                     changed = true;

@@ -40,14 +40,14 @@ public class MyHashTable<E> implements Collection<E> {
             if (numElements == 0) {
                 nextListIndex = -1;
                 nextListElementIndex = -1;
-                nextTotalIndex = 0;
+                nextTotalIndex = -1;
                 nextElement = null;
             } else {
                 nextListIndex = findNextList(-1);
-                nextListElementIndex = -1;
-                nextTotalIndex = -1;
-
+                nextListElementIndex = 0;
+                nextTotalIndex = 0;
                 listIterator = hashList[nextListIndex].iterator();
+                nextElement = listIterator.next();
             }
         }
 
