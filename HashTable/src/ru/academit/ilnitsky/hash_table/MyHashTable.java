@@ -203,13 +203,10 @@ public class MyHashTable<E> implements Collection<E> {
         Object[] array = new Object[numElements];
 
         int count = 0;
-        for (LinkedList<E> list : hashList) {
-            for (E e : list) {
-                array[count] = e;
-                count++;
-            }
+        for (E e : this) {
+            array[count] = e;
+            count++;
         }
-
         return array;
     }
 
@@ -228,12 +225,10 @@ public class MyHashTable<E> implements Collection<E> {
         }
 
         int count = 0;
-        for (LinkedList<E> list : hashList) {
-            for (E e : list) {
-                //noinspection unchecked
-                array[count] = (T) e;
-                count++;
-            }
+        for (E e : this) {
+            //noinspection unchecked
+            array[count] = (T) e;
+            count++;
         }
 
         if (array.length > numElements) {
@@ -296,9 +291,8 @@ public class MyHashTable<E> implements Collection<E> {
         }
 
         boolean changed = false;
-        for (Object o : c) {
-            //noinspection unchecked
-            if (add((E) o)) {
+        for (E e : c) {
+            if (add(e)) {
                 changed = true;
             }
         }
@@ -315,7 +309,6 @@ public class MyHashTable<E> implements Collection<E> {
 
         boolean changed = false;
         for (Object o : c) {
-            //noinspection unchecked
             if (remove(o)) {
                 changed = true;
             }
@@ -332,7 +325,7 @@ public class MyHashTable<E> implements Collection<E> {
         }
 
         boolean changed = false;
-        for (int i = 0; i <= hashList.length; i++) {
+        for (int i = 0; i < hashList.length; i++) {
             if (listSize[i] != 0) {
                 hashList[i].retainAll(c);
                 if (setSizes(i)) {
@@ -346,8 +339,10 @@ public class MyHashTable<E> implements Collection<E> {
 
     @Override
     public void clear() {
-        for (int i = 0; i <= hashList.length; i++) {
-            hashList[i].clear();
+        for (int i = 0; i < hashList.length; i++) {
+            if (hashList[i] != null) {
+                hashList[i].clear();
+            }
             listSize[i] = 0;
         }
         numElements = 0;

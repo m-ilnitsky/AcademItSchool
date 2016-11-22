@@ -301,13 +301,9 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         Object[] array = new Object[numElements];
 
         int count = 0;
-        for (int i = firstList; i <= lastList; i++) {
-            if (listSize[i] > 0) {
-                for (E e : hashList[i]) {
-                    array[count] = e;
-                    count++;
-                }
-            }
+        for (E e : this) {
+            array[count] = e;
+            count++;
         }
 
         return array;
@@ -328,14 +324,10 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         }
 
         int count = 0;
-        for (int i = firstList; i <= lastList; i++) {
-            if (listSize[i] > 0) {
-                for (E e : hashList[i]) {
-                    //noinspection unchecked
-                    array[count] = (T) e;
-                    count++;
-                }
-            }
+        for (E e : this) {
+            //noinspection unchecked
+            array[count] = (T) e;
+            count++;
         }
 
         if (array.length > numElements) {
@@ -399,9 +391,8 @@ public class MyStrangeHashTable<E> implements Collection<E> {
         }
 
         boolean changed = false;
-        for (Object o : c) {
-            //noinspection unchecked
-            if (add((E) o)) {
+        for (E o : c) {
+            if (add(o)) {
                 changed = true;
             }
         }
@@ -452,7 +443,9 @@ public class MyStrangeHashTable<E> implements Collection<E> {
     @Override
     public void clear() {
         for (int i = firstList; i <= lastList; i++) {
-            hashList[i].clear();
+            if (hashList[i] != null) {
+                hashList[i].clear();
+            }
             listSize[i] = 0;
         }
         numElements = 0;
