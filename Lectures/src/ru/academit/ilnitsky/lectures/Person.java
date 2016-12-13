@@ -75,10 +75,14 @@ public class Person {
                 );
         mapOfNames.forEach(
                 (name, age) -> {
-                    System.out.printf(name + ": ");
+                    System.out.print(name + ": ");
                     age.ifPresent(System.out::print);
                     System.out.println();
                 }
         );
+
+        System.out.println("\n4.Средний возраст для каждого имени (правильный вариант).");
+        Map<String, Double> nameAge = list.stream().collect(Collectors.groupingBy(Person::getName, Collectors.averagingDouble(Person::getAge)));
+        nameAge.forEach((name, age) -> System.out.printf("%-6s: %.2f%n", name, age));
     }
 }
