@@ -17,14 +17,6 @@ class Pair {
         this.previous = previous;
         this.current = current;
     }
-
-    public void setPrevious(long previous) {
-        this.previous = previous;
-    }
-
-    public void setCurrent(long current) {
-        this.current = current;
-    }
 }
 
 public class EndlessStream {
