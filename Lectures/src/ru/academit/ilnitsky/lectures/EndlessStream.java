@@ -1,7 +1,6 @@
 package ru.academit.ilnitsky.lectures;
 
 import java.util.Scanner;
-import java.util.function.Function;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 

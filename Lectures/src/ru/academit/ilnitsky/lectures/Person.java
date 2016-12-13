@@ -15,16 +15,16 @@ public class Person {
     private String name;
     private int age;
 
-    public Person(String name, int age) {
+    private Person(String name, int age) {
         this.name = name;
         this.age = age;
     }
 
-    public String getName() {
+    private String getName() {
         return name;
     }
 
-    public int getAge() {
+    private int getAge() {
         return age;
     }
 
