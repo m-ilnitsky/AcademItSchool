@@ -21,7 +21,7 @@ public class ConverterFrame extends JFrame {
 
     private ConverterFrame() {
         super("Конвертер температуры");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(580, 400);
         setMinimumSize(getSize());
 
