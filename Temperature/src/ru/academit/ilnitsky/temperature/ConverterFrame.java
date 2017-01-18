@@ -10,16 +10,19 @@ import java.awt.event.ActionListener;
  * Created by Mike on 09.12.2016.
  */
 public class ConverterFrame extends JFrame {
-    private double number = 0;
-    private boolean isNumber = false;
     private EnergyConverter energyConverter = new EnergyConverter();
 
-    private final String separator = ":   ";
+    private String[] outItems;
+    private JLabel[] valueLabels;
+    private JComboBox type;
+    private JTextField text;
 
-    ConverterFrame() {
-        super("Конвертер");
+    private static final String separator = ":   ";
+
+    private ConverterFrame() {
+        super("Конвертер температуры");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(540, 400);
+        setSize(580, 400);
         setMinimumSize(getSize());
 
         JPanel inputPanel = new JPanel();
@@ -27,26 +30,28 @@ public class ConverterFrame extends JFrame {
         add(inputPanel, BorderLayout.NORTH);
         add(outputPanel, BorderLayout.CENTER);
 
-        String[] item = new String[11];
-        item[0] = "Температура, К";
-        item[1] = "Температура, C";
-        item[2] = "Температура, F";
-        item[3] = "Энергия,    Дж";
-        item[4] = "Энергия,   Эрг";
-        item[5] = "Энергия,    эВ";
-        item[6] = "Длина волны макисмума интенсивности,   м";
-        item[7] = "Длина волны макисмума интенсивности, мкм";
-        item[8] = "Частота излучения,      Гц";
-        item[9] = "Длина волны излучения,   м";
-        item[10] = "Длина волны излучения, мкм";
+        String[] items = new String[]{
+                "Температура, К",
+                "Температура, C",
+                "Температура, F",
+                "Энергия,    Дж",
+                "Энергия,   Эрг",
+                "Энергия,    эВ",
+                "Длина волны макисмума интенсивности,   м",
+                "Длина волны макисмума интенсивности, мкм",
+                "Частота излучения,      Гц",
+                "Длина волны излучения,   м",
+                "Длина волны излучения, мкм"
+        };
 
-        String[] itemOut = new String[item.length];
-        for (int i = 0; i < item.length; i++) {
-            itemOut[i] = item[i] + separator;
+        outItems = new String[items.length];
+        for (int i = 0; i < items.length; i++) {
+            outItems[i] = items[i] + separator;
         }
 
-        JComboBox type = new JComboBox(item);
-        JTextField text = new JTextField();
+        type = new JComboBox(items);
+        text = new JTextField();
+
         JButton button = new JButton();
 
         type.setMaximumRowCount(11);
@@ -60,116 +65,133 @@ public class ConverterFrame extends JFrame {
         inputPanel.add(text);
         inputPanel.add(button);
 
-        JLabel[] groupLabel = new JLabel[4];
-        JLabel[] valueLabel = new JLabel[11];
+        valueLabels = new JLabel[items.length];
 
-        Font groupFont = new Font("TimesRoman", Font.BOLD, 14);
+        Font groupFont = new Font("TimesRoman", Font.BOLD, 12);
         Font labelFont = new Font("Courier New", Font.PLAIN, 14);
 
-        for (int i = 0; i < valueLabel.length; i++) {
-            valueLabel[i] = new JLabel(itemOut[i]);
-            valueLabel[i].setFont(labelFont);
+        for (int i = 0; i < valueLabels.length; i++) {
+            valueLabels[i] = new JLabel(outItems[i]);
+            valueLabels[i].setFont(labelFont);
         }
 
-        groupLabel[0] = new JLabel("Заданные температуры");
-        groupLabel[1] = new JLabel("Энергия для данной температуры");
-        groupLabel[2] = new JLabel("Длина волны макисмума интенсивности излучения для данной температуры");
-        groupLabel[3] = new JLabel("Параметры излучения в вакууме для данной энергии фотона");
+        JLabel[] groupLabels = new JLabel[]{
+                new JLabel("Заданные температуры"),
+                new JLabel("Энергия для данной температуры"),
+                new JLabel("Длина волны макисмума интенсивности излучения для данной температуры"),
+                new JLabel("Параметры излучения в вакууме для данной энергии фотона")
+        };
 
-        outputPanel.setLayout(new GridLayout(valueLabel.length + groupLabel.length, 1));
-        outputPanel.add(groupLabel[0]);
-        outputPanel.add(valueLabel[0]);
-        outputPanel.add(valueLabel[1]);
-        outputPanel.add(valueLabel[2]);
+        for (JLabel gl : groupLabels) {
+            gl.setFont(groupFont);
+        }
 
-        outputPanel.add(groupLabel[1]);
-        outputPanel.add(valueLabel[3]);
-        outputPanel.add(valueLabel[4]);
-        outputPanel.add(valueLabel[5]);
+        outputPanel.setLayout(new GridLayout(valueLabels.length + groupLabels.length, 1));
+        outputPanel.add(groupLabels[0]);
+        outputPanel.add(valueLabels[0]);
+        outputPanel.add(valueLabels[1]);
+        outputPanel.add(valueLabels[2]);
 
-        outputPanel.add(groupLabel[2]);
-        outputPanel.add(valueLabel[6]);
-        outputPanel.add(valueLabel[7]);
+        outputPanel.add(groupLabels[1]);
+        outputPanel.add(valueLabels[3]);
+        outputPanel.add(valueLabels[4]);
+        outputPanel.add(valueLabels[5]);
 
-        outputPanel.add(groupLabel[3]);
-        outputPanel.add(valueLabel[8]);
-        outputPanel.add(valueLabel[9]);
-        outputPanel.add(valueLabel[10]);
+        outputPanel.add(groupLabels[2]);
+        outputPanel.add(valueLabels[6]);
+        outputPanel.add(valueLabels[7]);
+
+        outputPanel.add(groupLabels[3]);
+        outputPanel.add(valueLabels[8]);
+        outputPanel.add(valueLabels[9]);
+        outputPanel.add(valueLabels[10]);
 
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    number = Double.parseDouble(text.getText());
-                    isNumber = true;
-                } catch (Exception exc) {
-                    isNumber = false;
-                }
-
-                if (isNumber) {
-                    switch (type.getSelectedIndex()) {
-                        case 0:
-                            energyConverter.setK(number);
-                            break;
-                        case 1:
-                            energyConverter.setC(number);
-                            break;
-                        case 2:
-                            energyConverter.setF(number);
-                            break;
-                        case 3:
-                            energyConverter.setEnergyJ(number);
-                            break;
-                        case 4:
-                            energyConverter.setEnergyErg(number);
-                            break;
-                        case 5:
-                            energyConverter.setEnergyEV(number);
-                            break;
-                        case 6:
-                            energyConverter.setLambdaTm(number);
-                            break;
-                        case 7:
-                            energyConverter.setLambdaTum(number);
-                            break;
-                        case 8:
-                            energyConverter.setFrequency(number);
-                            break;
-                        case 9:
-                            energyConverter.setLambdaEm(number);
-                            break;
-                        case 10:
-                            energyConverter.setLambdaEum(number);
-                            break;
-                        default:
-                            return;
-                    }
-
-                    valueLabel[0].setText(itemOut[0] + energyConverter.getK());
-                    valueLabel[1].setText(itemOut[1] + energyConverter.getC());
-                    valueLabel[2].setText(itemOut[2] + energyConverter.getF());
-
-                    valueLabel[3].setText(itemOut[3] + energyConverter.getEnergyJ());
-                    valueLabel[4].setText(itemOut[4] + energyConverter.getEnergyErg());
-                    valueLabel[5].setText(itemOut[5] + energyConverter.getEnergyEV());
-
-                    valueLabel[6].setText(itemOut[6] + energyConverter.getLambdaTm());
-                    valueLabel[7].setText(itemOut[7] + energyConverter.getLambdaTum());
-
-                    valueLabel[8].setText(itemOut[8] + energyConverter.getFrequency());
-                    valueLabel[9].setText(itemOut[9] + energyConverter.getLambdaEm());
-                    valueLabel[10].setText(itemOut[10] + energyConverter.getLambdaEum());
-                } else {
-                    for (int i = 0; i < valueLabel.length; i++) {
-                        valueLabel[i].setText(itemOut[i]);
-                    }
-                }
+                convert();
             }
         });
     }
 
+    private void convert() {
+        double number = 0;
+        boolean isNumber;
+
+        try {
+            number = Double.parseDouble(text.getText());
+            isNumber = true;
+        } catch (Exception exc) {
+            isNumber = false;
+        }
+
+        if (isNumber) {
+            switch (type.getSelectedIndex()) {
+                case 0:
+                    energyConverter.setK(number);
+                    break;
+                case 1:
+                    energyConverter.setC(number);
+                    break;
+                case 2:
+                    energyConverter.setF(number);
+                    break;
+                case 3:
+                    energyConverter.setEnergyJ(number);
+                    break;
+                case 4:
+                    energyConverter.setEnergyErg(number);
+                    break;
+                case 5:
+                    energyConverter.setEnergyEV(number);
+                    break;
+                case 6:
+                    energyConverter.setLambdaTm(number);
+                    break;
+                case 7:
+                    energyConverter.setLambdaTum(number);
+                    break;
+                case 8:
+                    energyConverter.setFrequency(number);
+                    break;
+                case 9:
+                    energyConverter.setLambdaEm(number);
+                    break;
+                case 10:
+                    energyConverter.setLambdaEum(number);
+                    break;
+                default:
+                    return;
+            }
+
+            valueLabels[0].setText(outItems[0] + energyConverter.getK());
+            valueLabels[1].setText(outItems[1] + energyConverter.getC());
+            valueLabels[2].setText(outItems[2] + energyConverter.getF());
+
+            valueLabels[3].setText(outItems[3] + energyConverter.getEnergyJ());
+            valueLabels[4].setText(outItems[4] + energyConverter.getEnergyErg());
+            valueLabels[5].setText(outItems[5] + energyConverter.getEnergyEV());
+
+            valueLabels[6].setText(outItems[6] + energyConverter.getLambdaTm());
+            valueLabels[7].setText(outItems[7] + energyConverter.getLambdaTum());
+
+            valueLabels[8].setText(outItems[8] + energyConverter.getFrequency());
+            valueLabels[9].setText(outItems[9] + energyConverter.getLambdaEm());
+            valueLabels[10].setText(outItems[10] + energyConverter.getLambdaEum());
+        } else {
+            for (int i = 0; i < valueLabels.length; i++) {
+                valueLabels[i].setText(outItems[i]);
+            }
+        }
+    }
+
     public static void main(String... arg) {
-        JFrame converterWindow = new ConverterFrame();
-        converterWindow.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame converterWindow = new ConverterFrame();
+                converterWindow.setVisible(true);
+            }
+        });
     }
 }
