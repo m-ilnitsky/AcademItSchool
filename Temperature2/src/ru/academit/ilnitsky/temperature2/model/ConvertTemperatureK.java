@@ -1,13 +1,16 @@
 package ru.academit.ilnitsky.temperature2.model;
 
-import ru.academit.ilnitsky.temperature2.common.TemperatureConverter;
+import ru.academit.ilnitsky.temperature2.common.Unit;
 
 /**
  * Класс преобразования температуры для K
  * Created by Mike on 27.01.2017.
  */
-public class ConvertTemperatureK implements TemperatureConverter {
-    protected static final String description = "Температура, К";
+public class ConvertTemperatureK extends ConvertAbstract {
+    public ConvertTemperatureK() {
+        description = "Температура, К";
+        unit = Unit.K;
+    }
 
     @Override
     public double toK(double value) {
@@ -19,8 +22,4 @@ public class ConvertTemperatureK implements TemperatureConverter {
         return k;
     }
 
-    @Override
-    public String toString() {
-        return description;
-    }
 }

@@ -4,8 +4,8 @@ package ru.academit.ilnitsky.temperature2.model;
  * Библиотека функций преобразования температуры
  * Created by Mike on 27.01.2017.
  */
-public class ConvertFunctions {
-    private ConvertFunctions() {
+public class Functions {
+    private Functions() {
     }
 
     public static final double zeroC = 273.15;          // [K]
@@ -64,19 +64,27 @@ public class ConvertFunctions {
         return to_J_from_K(t) / 1e-7;
     }
 
-    public static double to_K_from_LambdaTm(double lambda) {
+    public static double to_K_from_FrequencyTHz(double hz) {
+        return lambdaTm * hz / c;
+    }
+
+    public static double to_FrequencyTHz_from_K(double t) {
+        return c * t / lambdaTm;
+    }
+
+    public static double to_K_from_WavelengthTm(double lambda) {
         return lambdaTm / lambda;
     }
 
-    public static double to_LambdaTm_from_K(double t) {
+    public static double to_WavelengthTm_from_K(double t) {
         return lambdaTm / t;
     }
 
-    public static double to_K_from_LambdaTum(double lambda) {
+    public static double to_K_from_WavelengthTum(double lambda) {
         return lambdaTum / lambda;
     }
 
-    public static double to_LambdaTum_from_K(double t) {
+    public static double to_WavelengthTum_from_K(double t) {
         return lambdaTum / t;
     }
 
@@ -88,19 +96,19 @@ public class ConvertFunctions {
         return to_J_from_K(t) / h;
     }
 
-    public static double to_K_from_LambdaEm(double lambda) {
+    public static double to_K_from_WavelengthEm(double lambda) {
         return to_K_from_J(h * c / lambda);
     }
 
-    public static double to_LambdaEm_from_K(double t) {
+    public static double to_WavelengthEm_from_K(double t) {
         return h * c / to_J_from_K(t);
     }
 
-    public static double to_K_from_LambdaEum(double lambda) {
-        return to_K_from_LambdaEm(lambda / 1e6);
+    public static double to_K_from_WavelengthEum(double lambda) {
+        return to_K_from_WavelengthEm(lambda / 1e6);
     }
 
-    public static double to_LambdaEum_from_K(double t) {
-        return to_LambdaEm_from_K(t) * 1e6;
+    public static double to_WavelengthEum_from_K(double t) {
+        return to_WavelengthEm_from_K(t) * 1e6;
     }
 }

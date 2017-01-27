@@ -1,26 +1,25 @@
 package ru.academit.ilnitsky.temperature2.model;
 
-import ru.academit.ilnitsky.temperature2.common.TemperatureConverter;
+import ru.academit.ilnitsky.temperature2.common.Unit;
 
 /**
  * Класс преобразования энергии для эВ
  * Created by Mike on 27.01.2017.
  */
-public class ConvertEnergyEV implements TemperatureConverter {
-    protected String description = "Энергия,    эВ";
+public class ConvertEnergyEV extends ConvertAbstract {
+    public ConvertEnergyEV() {
+        description = "Энергия,    эВ";
+        unit = Unit.EV;
+    }
 
     @Override
     public double toK(double value) {
-        return ConvertFunctions.to_K_from_eV(value);
+        return Functions.to_K_from_eV(value);
     }
 
     @Override
     public double fromK(double k) {
-        return ConvertFunctions.to_eV_from_K(k);
+        return Functions.to_eV_from_K(k);
     }
 
-    @Override
-    public String toString() {
-        return description;
-    }
 }
