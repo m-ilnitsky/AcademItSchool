@@ -9,7 +9,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
 public class ConvertEnergyErg extends ConvertAbstract {
     public ConvertEnergyErg() {
         description = "Энергия,   Эрг";
-        unit = Unit.K;
+        unit = Unit.ERG;
     }
 
     @Override

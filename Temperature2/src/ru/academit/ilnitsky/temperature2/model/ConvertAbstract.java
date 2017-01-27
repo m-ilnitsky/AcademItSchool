@@ -8,8 +8,8 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  * Created by UserLabView on 27.01.17.
  */
 public abstract class ConvertAbstract implements ConvertUnit {
-    protected static String description;
-    protected static Unit unit;
+    protected String description;
+    protected Unit unit;
 
     @Override
     public Unit getUnit() {

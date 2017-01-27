@@ -13,5 +13,9 @@ public interface UnitConverter {
 
     Unit[] getUnits();
 
+    ConvertUnit[] getConverters();
+
+    UnitGroup[] getGroups();
+
     int getSize();
 }

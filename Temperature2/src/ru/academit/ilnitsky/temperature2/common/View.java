@@ -6,23 +6,11 @@ package ru.academit.ilnitsky.temperature2.common;
  * акже содержит методы, которые будут вызываться контроллером.
  */
 public interface View extends AutoCloseable {
-    /**
-     * Запуск View
-     */
-    void startApplication();
-
-    /**
-     * Метод вызывается, когда контроллер переведет температуру
-     */
-    void onTemperatureConverted(double convertedTemperature);
-
-    /**
-     * Добавление ViewListener'а
-     */
     void addViewListener(ViewListener listener);
 
-    /**
-     * Удаление ViewListener'а
-     */
     void removeViewListener(ViewListener listener);
+
+    void startApplication();
+
+    void onValueConverted(double[] results);
 }
