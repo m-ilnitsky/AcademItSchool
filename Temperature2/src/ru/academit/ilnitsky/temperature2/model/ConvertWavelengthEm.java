@@ -8,8 +8,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertWavelengthEm extends ConvertAbstract {
     public ConvertWavelengthEm() {
-        description = "Длина волны излучения,   м";
-        unit = Unit.WAVELENGTH_E_M;
+        super("Длина волны излучения,   м", Unit.WAVELENGTH_E_M);
     }
 
     @Override

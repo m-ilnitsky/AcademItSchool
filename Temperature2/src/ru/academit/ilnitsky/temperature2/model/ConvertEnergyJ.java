@@ -8,8 +8,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertEnergyJ extends ConvertAbstract {
     public ConvertEnergyJ() {
-        description = "Энергия,    Дж";
-        unit = Unit.J;
+        super("Энергия,    Дж", Unit.J);
     }
 
     @Override

@@ -8,8 +8,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertTemperatureC extends ConvertAbstract {
     public ConvertTemperatureC() {
-        description = "Температура, C";
-        unit = Unit.C;
+        super("Температура, C", Unit.C);
     }
 
     @Override

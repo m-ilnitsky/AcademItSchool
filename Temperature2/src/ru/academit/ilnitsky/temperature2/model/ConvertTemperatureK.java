@@ -8,8 +8,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertTemperatureK extends ConvertAbstract {
     public ConvertTemperatureK() {
-        description = "Температура, К";
-        unit = Unit.K;
+        super("Температура, К", Unit.K);
     }
 
     @Override

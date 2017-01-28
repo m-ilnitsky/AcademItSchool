@@ -9,8 +9,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertWavelengthTm extends ConvertAbstract {
     public ConvertWavelengthTm() {
-        description = "Длина волны макисмума интенсивности,   м";
-        unit = Unit.WAVELENGTH_T_M;
+        super("Длина волны макисмума интенсивности,   м", Unit.WAVELENGTH_T_M);
     }
 
     @Override

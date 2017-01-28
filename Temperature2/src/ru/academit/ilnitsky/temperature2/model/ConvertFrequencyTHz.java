@@ -9,8 +9,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertFrequencyTHz extends ConvertAbstract {
     public ConvertFrequencyTHz() {
-        description = "Частота макисмума интенсивности,      Гц";
-        unit = Unit.FREQUENCY_T_HZ;
+        super("Частота макисмума интенсивности,      Гц", Unit.FREQUENCY_T_HZ);
     }
 
     @Override

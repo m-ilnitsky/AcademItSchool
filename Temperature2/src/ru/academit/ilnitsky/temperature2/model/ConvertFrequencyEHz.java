@@ -8,8 +8,7 @@ import ru.academit.ilnitsky.temperature2.common.Unit;
  */
 public class ConvertFrequencyEHz extends ConvertAbstract {
     public ConvertFrequencyEHz() {
-        description = "Частота излучения,      Гц";
-        unit = Unit.FREQUENCY_E_HZ;
+        super("Частота излучения,      Гц", Unit.FREQUENCY_E_HZ);
     }
 
     @Override

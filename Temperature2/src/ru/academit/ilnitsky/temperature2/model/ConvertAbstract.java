@@ -11,6 +11,11 @@ public abstract class ConvertAbstract implements ConvertUnit {
     protected String description;
     protected Unit unit;
 
+    protected ConvertAbstract(String description, Unit unit) {
+        this.description = description;
+        this.unit = unit;
+    }
+
     @Override
     public Unit getUnit() {
         return unit;
