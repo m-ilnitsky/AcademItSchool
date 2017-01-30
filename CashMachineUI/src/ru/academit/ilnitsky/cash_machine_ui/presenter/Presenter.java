@@ -39,7 +39,8 @@ public class Presenter implements ViewListener {
                         for (int i = 0; i < nominals.length; i++) {
                             numBanknotes[i] = moneyBox.getAvailableBanknote(nominals[i]);
                         }
-                        view.showMenu(nextMenuLevel, numBanknotes);
+                        int sumMoney = moneyBox.getAvailableMoney();
+                        view.showMenu(nextMenuLevel, sumMoney, numBanknotes);
                         break;
                     case 2:
                         nextMenuLevel = M0_2;
@@ -87,6 +88,39 @@ public class Presenter implements ViewListener {
                 view.showMenu(nextMenuLevel);
 
                 break;
+            case M0_3:
+                if (choice == 0) {
+                    nextMenuLevel = M0;
+                    view.showMenu(nextMenuLevel);
+                } else if (choice > 0 && choice < 9) {
+                    value = nominals[choice - 1].getValue();
+                    if (moneyBox.isAvailable(value)) {
+                        nextMenuLevel = M0_3_2;
+                        int[] numBanknotes = new int[nominals.length];
+                        for (int i = 0; i < nominals.length; i++) {
+                            numBanknotes[i] = moneyBox.getAvailableBanknote(nominals[i]);
+                        }
+                        view.showMenu(nextMenuLevel, value, numBanknotes);
+                    } else {
+                        nextMenuLevel = M0_3_2_1;
+                        view.showMenu(nextMenuLevel);
+                    }
+                } else if (choice == 9) {
+                    nextMenuLevel = M0_3_1;
+                    view.showMenu(nextMenuLevel);
+                }
+
+                break;
+            case M0_3_1:
+                nextMenuLevel = M0;
+                view.showMenu(nextMenuLevel);
+
+                break;
+            case M0_3_2:
+                nextMenuLevel = M0;
+                view.showMenu(nextMenuLevel);
+
+                break;
             case M0_3_2_1:
                 if (choice == 0) {
                     nextMenuLevel = M0;
@@ -107,28 +141,14 @@ public class Presenter implements ViewListener {
         MenuLevel nextMenuLevel;
 
         switch (currentMenuLevel) {
-            case M0_3:
-                if (choice == 0) {
-                    nextMenuLevel = M0;
-                    view.showMenu(nextMenuLevel);
-                } else if (choice > 0 && choice < 9) {
-                    if (moneyBox.isAvailable(value)) {
-                        nextMenuLevel = M0_3_2;
-                        view.showMenu(nextMenuLevel, value);
-                    } else {
-                        nextMenuLevel = M0_3_2_1;
-                        view.showMenu(nextMenuLevel);
-                    }
-                } else if (choice == 9) {
-                    nextMenuLevel = M0_3_1;
-                    view.showMenu(nextMenuLevel);
-                }
-
-                break;
             case M0_3_1:
                 if (moneyBox.isAvailable(value)) {
                     nextMenuLevel = M0_3_2;
-                    view.showMenu(nextMenuLevel, value);
+                    int[] numBanknotes = new int[nominals.length];
+                    for (int i = 0; i < nominals.length; i++) {
+                        numBanknotes[i] = moneyBox.getAvailableBanknote(nominals[i]);
+                    }
+                    view.showMenu(nextMenuLevel, value, numBanknotes);
                 } else {
                     nextMenuLevel = M0_3_2_1;
                     view.showMenu(nextMenuLevel);

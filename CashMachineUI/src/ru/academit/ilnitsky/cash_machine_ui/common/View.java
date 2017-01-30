@@ -18,7 +18,7 @@ public interface View extends AutoCloseable {
 
     void showMenu(MenuLevel menuLevel, int value);
 
-    void showMenu(MenuLevel menuLevel, int[] numberBanknotes);
+    void showMenu(MenuLevel menuLevel, int[] numBanknotes);
 
-    void showMenu(MenuLevel menuLevel, int value, int[] numberBanknotes);
+    void showMenu(MenuLevel menuLevel, int value, int[] numBanknotes);
 }
