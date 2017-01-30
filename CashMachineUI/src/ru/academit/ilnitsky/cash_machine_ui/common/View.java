@@ -1,4 +1,4 @@
-package ru.academit.ilnitsky.common;
+package ru.academit.ilnitsky.cash_machine_ui.common;
 
 import ru.academit.ilnitsky.console_ui.MenuLevel;
 import ru.academit.ilnitsky.moneybox.RubleBanknote;
@@ -18,7 +18,7 @@ public interface View extends AutoCloseable {
 
     void showMenu(MenuLevel menuLevel, int value);
 
-    void showMenu(MenuLevel menuLevel, RubleBanknote[] rubleBanknotes, int[] numberBanknotes);
+    void showMenu(MenuLevel menuLevel, int[] numberBanknotes);
 
-    void showMenu(MenuLevel menuLevel, int value, RubleBanknote[] rubleBanknotes, int[] numberBanknotes);
+    void showMenu(MenuLevel menuLevel, int value, int[] numberBanknotes);
 }

@@ -1,7 +1,7 @@
-package ru.academit.ilnitsky.presenter;
+package ru.academit.ilnitsky.cash_machine_ui.presenter;
 
-import ru.academit.ilnitsky.common.View;
-import ru.academit.ilnitsky.common.ViewListener;
+import ru.academit.ilnitsky.cash_machine_ui.common.View;
+import ru.academit.ilnitsky.cash_machine_ui.common.ViewListener;
 import ru.academit.ilnitsky.console_ui.MenuLevel;
 import ru.academit.ilnitsky.moneybox.MoneyBox;
 import ru.academit.ilnitsky.moneybox.RubleBanknote;
@@ -39,7 +39,7 @@ public class Presenter implements ViewListener {
                         for (int i = 0; i < nominals.length; i++) {
                             numBanknotes[i] = moneyBox.getAvailableBanknote(nominals[i]);
                         }
-                        view.showMenu(nextMenuLevel, nominals, numBanknotes);
+                        view.showMenu(nextMenuLevel, numBanknotes);
                         break;
                     case 2:
                         nextMenuLevel = M0_2;
@@ -60,6 +60,7 @@ public class Presenter implements ViewListener {
             case M0_2:
                 if (choice == 0) {
                     nextMenuLevel = M0;
+                    view.showMenu(nextMenuLevel);
                 } else if (choice > 0 && choice <= nominals.length) {
                     int i = nominals.length - choice;
                     if (moneyBox.hasUnoccupiedSpace(nominals[i])) {
@@ -69,8 +70,8 @@ public class Presenter implements ViewListener {
                     } else {
                         nextMenuLevel = M0_2_2;
                     }
+                    view.showMenu(nextMenuLevel, value);
                 }
-                view.showMenu(nextMenuLevel, value);
 
                 break;
             case M0_2_1:
@@ -144,7 +145,7 @@ public class Presenter implements ViewListener {
                         moneyBox.removeMoney(value, priorityBanknote);
                         nextMenuLevel = M0_3_2_2;
                         int[] setForRemove = moneyBox.getSetOfBanknotes();
-                        view.showMenu(nextMenuLevel, value, nominals, setForRemove);
+                        view.showMenu(nextMenuLevel, value, setForRemove);
                     } else {
                         nextMenuLevel = M0_3_2_1;
                         view.showMenu(nextMenuLevel);

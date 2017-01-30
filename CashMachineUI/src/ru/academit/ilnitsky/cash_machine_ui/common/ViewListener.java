@@ -1,4 +1,4 @@
-package ru.academit.ilnitsky.common;
+package ru.academit.ilnitsky.cash_machine_ui.common;
 
 import ru.academit.ilnitsky.console_ui.MenuLevel;
 
