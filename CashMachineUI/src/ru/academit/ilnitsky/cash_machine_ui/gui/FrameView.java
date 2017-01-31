@@ -254,7 +254,7 @@ public class FrameView implements View {
         }
 
         for (int i = 0; i < buttons.length; i++) {
-            final Integer returnedValue = i;
+            final Integer returnedValue = offerForRemove[i];
             buttons[i].addActionListener((ActionEvent) -> {
                 for (ViewListener listener : listeners) {
                     listener.onInputValue(returnedValue);

@@ -68,6 +68,7 @@ public class Presenter implements ViewListener {
                     int value = nominals[i].getValue();
                     if (moneyBox.hasUnoccupiedSpace(nominals[i])) {
                         moneyBox.addMoney(nominals[i]);
+                        System.out.println("New Balance: " + moneyBox.getAvailableMoney());
                         nextMenuLevel = M0_2_1;
                     } else {
                         nextMenuLevel = M0_2_2;
@@ -111,6 +112,7 @@ public class Presenter implements ViewListener {
                     RubleBanknote priorityBanknote = nominals[nominals.length - choice];
                     if (moneyBox.isAvailable(valueForRemove, priorityBanknote)) {
                         moneyBox.removeMoney(valueForRemove, priorityBanknote);
+                        System.out.println("New Balance: " + moneyBox.getAvailableMoney());
                         int[] setForRemove = moneyBox.getSetOfBanknotes();
                         nextMenuLevel = M0_3_2_2;
                         view.showMenu(nextMenuLevel, valueForRemove, setForRemove);

@@ -23,6 +23,7 @@ public class Application {
 
             view.addViewListener(presenter);
             view.startApplication();
+            System.out.println("Initial Balance: " + model.getAvailableMoney());
         } catch (Exception e) {
             e.printStackTrace();
         }
