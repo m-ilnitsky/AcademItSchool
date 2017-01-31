@@ -493,7 +493,11 @@ public class FrameView implements View {
         }
         frame.add(menuPanels[index], BorderLayout.CENTER);
         frame.setSize(frameLength, frameLines[index] * lineHeight);
-        frame.repaint();
+        //frame.setMinimumSize(frame.getSize());
+        //frame.setMinimumSize(new Dimension(frameLength, frameLines[index] * lineHeight));
+        //frame.repaint();
+        //menuPanels[index].repaint();
+        menuPanels[index].updateUI();
     }
 
     @Override
@@ -516,7 +520,8 @@ public class FrameView implements View {
 
     private void initFrame() {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(frameLength, frameLines[0] * lineHeight);
+        frame.setSize(frameLength, 4 * lineHeight);
+        frame.setMinimumSize(frame.getSize());
 
         // заставляет фрейм располагаться по центру экрана при запуске
         frame.setLocationRelativeTo(null);
