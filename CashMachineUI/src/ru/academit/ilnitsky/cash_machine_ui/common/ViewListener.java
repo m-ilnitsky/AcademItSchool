@@ -9,5 +9,5 @@ import ru.academit.ilnitsky.console_ui.MenuLevel;
 public interface ViewListener {
     void onMenuChoice(MenuLevel currentMenuLevel, int choice);
 
-    void onInputValue(MenuLevel currentMenuLevel, int choice, int value);
+    void onInputValue(int value);
 }

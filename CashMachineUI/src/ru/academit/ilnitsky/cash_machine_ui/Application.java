@@ -6,12 +6,12 @@ import ru.academit.ilnitsky.cash_machine_ui.common.View;
 import ru.academit.ilnitsky.cash_machine_ui.gui.FrameView;
 
 /**
- * Приложение с графическим интерфейсом
+ * Приложение "Банкомат" с графическим интерфейсом
  * Created by Mike on 29.01.2017.
  */
 public class Application {
     public static void main(String[] args) {
-        int containerSize = 50;
+        int containerSize = 15;
         int numBanknotes = 10;
         MoneyBox model = new MoneyBox(containerSize, numBanknotes);
 

@@ -7,8 +7,6 @@ import ru.academit.ilnitsky.moneybox.RubleBanknote;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +19,6 @@ public class FrameView implements View {
     private int[] numBanknotes;
 
     private int lastValue = 0;
-    private MenuLevel lastMenuLevel = MenuLevel.M0;
 
     private final ArrayList<ViewListener> listeners = new ArrayList<>();
 
@@ -257,10 +254,10 @@ public class FrameView implements View {
         }
 
         for (int i = 0; i < buttons.length; i++) {
-            final Integer returnedValue = new Integer(i + 1);
+            final Integer returnedValue = new Integer(offerForRemove[i]);
             buttons[i].addActionListener((ActionEvent) -> {
                 for (ViewListener listener : listeners) {
-                    listener.onMenuChoice(MenuLevel.M0_3, returnedValue);
+                    listener.onInputValue(returnedValue);
                 }
             });
         }
@@ -301,8 +298,9 @@ public class FrameView implements View {
                 lastValue = Integer.parseInt(textField0_3_1.getText());
 
                 for (ViewListener listener : listeners) {
-                    listener.onInputValue(MenuLevel.M0_3_1, 1, lastValue);
+                    listener.onInputValue(lastValue);
                 }
+                textField0_3_1.setText("");
                 errorLabel.setText("");
             } catch (NumberFormatException ex) {
                 errorLabel.setText("Введите корректное число!");
@@ -434,29 +432,29 @@ public class FrameView implements View {
 
     private void setMenu(MenuLevel newMenuLevel) {
         switch (newMenuLevel) {
-            case M0_1:
+            case M0_1://БАЛАНС
                 for (int i = 0; i < nominals.length; i++) {
                     labels0_1[i].setText(String.format("%5d %-6s номиналом %4d рублей.%n", numBanknotes[i], printBanknotes(numBanknotes[i]), nominals[i].getValue()));
                 }
                 labels0_1[nominals.length].setText(String.format("Всего имеется: %d руб.%n", lastValue));
 
                 break;
-            case M0_2:
+            case M0_2://ПРИЁМ НАЛИЧНЫХ
                 for (int i = nominals.length - 1; i >= 0; i--) {
                     int j = nominals.length - i;
                     buttons0_2[j - 1].setText(String.format("%d: Пополнить счёт на %4d рублей%n", j, nominals[i].getValue()));
                 }
 
                 break;
-            case M0_2_1:
+            case M0_2_1://ПРИЁМ НАЛИЧНЫХ Счёт пополнен на
                 label0_2_1.setText(String.format("Счёт пополнен на %d рублей%n", lastValue));
 
                 break;
-            case M0_2_2:
+            case M0_2_2://ПРИЁМ НАЛИЧНЫХ Извините, счёт не был пополнен
                 label0_2_2.setText(String.format("В данный момент, банкомат не может принимать купюры номиналом %d рублей%n", lastValue));
 
                 break;
-            case M0_3_2:
+            case M0_3_2://СНЯТИЕ НАЛИЧНЫХ Выберете приоритетные купюры
                 for (int i = nominals.length - 1; i >= 0; i--) {
                     int j = nominals.length - i - 1;
                     if (lastValue >= nominals[i].getValue() && numBanknotes[i] > 0) {
@@ -467,12 +465,18 @@ public class FrameView implements View {
                 }
 
                 break;
-            case M0_3_2_2:
+            case M0_3_2_2://СНЯТИЕ НАЛИЧНЫХ К выдаче подготовлено %d рублей
                 labels0_3_2_2[0].setText(String.format("К выдаче подготовлено %d рублей%n", lastValue));
-                for (int i = 1; i < nominals.length; i++) {
-                    if (numBanknotes[i - 1] > 0) {
-                        labels0_3_2_2[i].setText(String.format("Возьмите %d %s номиналом %3d рублей%n", numBanknotes[i - 1], printBanknotes2(numBanknotes[i - 1]), nominals[i - 1].getValue()));
+
+                int count = 1;
+                for (int i = 0; i < nominals.length; i++) {
+                    if (numBanknotes[i] > 0) {
+                        labels0_3_2_2[count].setText(String.format("Возьмите %d %s номиналом %3d рублей%n", numBanknotes[i], printBanknotes2(numBanknotes[i]), nominals[i].getValue()));
+                        count++;
                     }
+                }
+                for (int i = count; i < nominals.length; i++) {
+                    labels0_3_2_2[i].setText("");
                 }
         }
 
@@ -489,22 +493,21 @@ public class FrameView implements View {
         }
         frame.add(menuPanels[index], BorderLayout.CENTER);
         frame.setSize(frameLength, frameLines[index] * lineHeight);
+        frame.repaint();
     }
 
+    @Override
     public void showMenu(MenuLevel menuLevel) {
         setMenu(menuLevel);
     }
 
+    @Override
     public void showMenu(MenuLevel menuLevel, int value) {
         lastValue = value;
         setMenu(menuLevel);
     }
 
-    public void showMenu(MenuLevel menuLevel, int[] numBanknotes) {
-        this.numBanknotes = numBanknotes;
-        setMenu(menuLevel);
-    }
-
+    @Override
     public void showMenu(MenuLevel menuLevel, int value, int[] numBanknotes) {
         lastValue = value;
         this.numBanknotes = numBanknotes;
@@ -523,13 +526,10 @@ public class FrameView implements View {
 
     @Override
     public void startApplication() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                initPanels();
-                initFrame();
-                setMenu(MenuLevel.M0);
-            }
+        SwingUtilities.invokeLater(() -> {
+            initPanels();
+            initFrame();
+            setMenu(MenuLevel.M0);
         });
     }
 
