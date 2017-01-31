@@ -161,7 +161,7 @@ public class FrameView implements View {
         menuPanels[2].add(button);
 
         for (int i = 0; i < buttons0_2.length; i++) {
-            final Integer returnedValue = new Integer(i + 1);
+            final Integer returnedValue = i + 1;
             buttons0_2[i].addActionListener((ActionEvent) -> {
                 for (ViewListener listener : listeners) {
                     listener.onMenuChoice(MenuLevel.M0_2, returnedValue);
@@ -254,7 +254,7 @@ public class FrameView implements View {
         }
 
         for (int i = 0; i < buttons.length; i++) {
-            final Integer returnedValue = new Integer(offerForRemove[i]);
+            final Integer returnedValue = i;
             buttons[i].addActionListener((ActionEvent) -> {
                 for (ViewListener listener : listeners) {
                     listener.onInputValue(returnedValue);
@@ -332,7 +332,7 @@ public class FrameView implements View {
         menuPanels[7].add(button);
 
         for (int i = 0; i < buttons0_3_2.length; i++) {
-            final Integer returnedValue = new Integer(i + 1);
+            final Integer returnedValue = i + 1;
             buttons0_3_2[i].addActionListener((ActionEvent) -> {
                 for (ViewListener listener : listeners) {
                     listener.onMenuChoice(MenuLevel.M0_3_2, returnedValue);
@@ -404,7 +404,7 @@ public class FrameView implements View {
         initPanel_0_3_2_2();
     }
 
-    private String printBanknotes(int numBanknotes) {
+    private static String printBanknotes(int numBanknotes) {
         int num = numBanknotes % 10;
         if (numBanknotes > 4 && numBanknotes < 21) {
             return "купюр";
@@ -417,7 +417,7 @@ public class FrameView implements View {
         }
     }
 
-    private String printBanknotes2(int numBanknotes) {
+    private static String printBanknotes2(int numBanknotes) {
         int num = numBanknotes % 10;
         if (numBanknotes > 4 && numBanknotes < 21) {
             return "купюр";
