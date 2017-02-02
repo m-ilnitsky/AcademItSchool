@@ -1,7 +1,7 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
 /**
- * Интерфейс модели игры "Минёр"
+ * Интерфейс модели игры "Сапёр"
  * Created by Mike on 02.02.2017.
  */
 public interface MinesweeperCoreInterface {
@@ -10,9 +10,17 @@ public interface MinesweeperCoreInterface {
 
     void setGameNumMine(int numMines);
 
+    void initNewGame();
+
     int getGameNumMines();
 
     GameBoardSize getGameBoardSize();
+
+    GameBoard linkToGameBoard();
+
+    int getGameStartTime();
+
+    int getGameTime();
 
     void setFlag(int xPosition, int yPosition);
 

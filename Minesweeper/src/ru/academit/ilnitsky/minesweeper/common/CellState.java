@@ -1,33 +1,35 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
 /**
- * Состояние ячейки игровой доски игры "Минёр"
+ * Состояние ячейки игровой доски игры "Сапёр"
  * Created by Mike on 02.02.2017.
  */
 public enum CellState {
-    DETONATION(-10),
+    DETONATION(-7),
     MINE(-5),
+    FLAG(-3),
     CLOSE(-1),
     FREE(0),
-    N1(1), N2(2), N3(3), N4(4), N5(5), N6(6), N7(7), N8(8),
-    FLAG(10);
+    N1(1), N2(2), N3(3), N4(4), N5(5), N6(6), N7(7), N8(8);
 
-    private int state;
+    private int value;
 
-    CellState(int state) {
-        this.state = state;
+    CellState(int value) {
+        this.value = value;
     }
 
-    public int getState() {
-        return state;
+    public int getValue() {
+        return value;
     }
 
-    public static CellState setState(int state) {
-        switch (state) {
-            case -10:
+    public static CellState state(int value) {
+        switch (value) {
+            case -7:
                 return DETONATION;
             case -5:
                 return MINE;
+            case -3:
+                return FLAG;
             case -1:
                 return CLOSE;
             case 0:
@@ -48,8 +50,6 @@ public enum CellState {
                 return N7;
             case 8:
                 return N8;
-            case 10:
-                return FLAG;
             default:
                 throw new IllegalArgumentException("Unknown Value");
         }
