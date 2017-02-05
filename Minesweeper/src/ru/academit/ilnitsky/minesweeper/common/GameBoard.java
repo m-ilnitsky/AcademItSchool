@@ -20,25 +20,6 @@ public class GameBoard {
         }
     }
 
-    public GameBoard(GameBoardSize size) {
-        this(size.getXSize(), size.getYSize());
-    }
-
-    public GameBoard(int xSize, int ySize) {
-        if (xSize < 5) {
-            throw new IllegalArgumentException("xSize < 5");
-        }
-        if (ySize < 5) {
-            throw new IllegalArgumentException("ySize < 5");
-        }
-
-        cells = new int[xSize][];
-
-        for (int i = 0; i < xSize; i++) {
-            cells[i] = new int[ySize];
-        }
-    }
-
     private GameBoard() {
     }
 
@@ -70,6 +51,21 @@ public class GameBoard {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
                 if (cells[i][j] == cellState.getValue()) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public int getNumCloseAndFlagCells() {
+        int count = 0;
+
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[i].length; j++) {
+                if (cells[i][j] == CellState.CLOSE.getValue()
+                        || cells[i][j] == CellState.FLAG.getValue()) {
                     count++;
                 }
             }

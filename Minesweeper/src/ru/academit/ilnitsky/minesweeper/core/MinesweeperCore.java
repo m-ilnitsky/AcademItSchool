@@ -2,6 +2,7 @@ package ru.academit.ilnitsky.minesweeper.core;
 
 import ru.academit.ilnitsky.minesweeper.common.*;
 
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.Random;
 
@@ -17,24 +18,22 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     private int[][] visibleBoard;
     private GameBoard outputBoard;
 
-    private LocalTime time = LocalTime.now();
+    private GameStatus gameStatus;
 
-    private boolean isStarted;
-    private boolean isEnded;
-    private boolean isDetonated;
-
-    private int numFlagActions;
     private int numActions;
-    private int startTime;
-    private int currentTime;
-    private int stopTime;
+
+    private Instant startTime;
+    private Instant winTime;
 
     private final static double MINE_COEFFICIENT = 0.3;
     private final static int MIN_SIZE = 5;
     private final static int MAX_SIZE = 64;
 
-    @Override
-    public void setGameBoardSize(int xSize, int ySize) {
+    MinesweeperCore() {
+        gameStatus = GameStatus.NONE;
+    }
+
+    private void setBoardSize(int xSize, int ySize) {
         if (xSize < MIN_SIZE) {
             throw new IllegalArgumentException("xSize < MIN_SIZE");
         } else if (xSize > MAX_SIZE) {
@@ -49,11 +48,9 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
 
         this.xSize = xSize;
         this.ySize = ySize;
-        initNewGame();
     }
 
-    @Override
-    public void setGameNumMine(int numMines) {
+    private void setNumMine(int numMines) {
         int maxNumMines = (int) (MINE_COEFFICIENT * xSize * ySize);
 
         if (numMines > maxNumMines) {
@@ -61,22 +58,16 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         }
 
         this.numMines = numMines;
-        initNewGame();
     }
 
     @Override
-    public void initNewGame() {
-        isStarted = false;
-        isEnded = false;
-        isDetonated = false;
+    public void startGame(int xSize, int ySize, int numMines) {
+        setBoardSize(xSize, ySize);
+        setNumMine(numMines);
+
+        gameStatus = GameStatus.STARTED;
 
         numActions = 0;
-        numFlagActions = 0;
-    }
-
-    public void startNewGame() {
-        initNewGame();
-        isStarted = true;
 
         hiddenBoard = new int[xSize][];
         visibleBoard = new int[xSize][];
@@ -89,33 +80,72 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
                 hiddenBoard[i][j] = 0;
                 visibleBoard[i][j] = -1;
             }
-
-            outputBoard = new GameBoard(visibleBoard);
         }
+
+        outputBoard = new GameBoard(visibleBoard);
+    }
+
+    @Override
+    public void stopGame() {
+        checkGameStatus();
+        gameStatus = GameStatus.ENDED_WITH_STOP;
     }
 
     @Override
     public int getGameNumMines() {
+        checkGameStatus();
         return numMines;
     }
 
     @Override
     public GameBoardSize getGameBoardSize() {
+        checkGameStatus();
         return new GameBoardSize(xSize, ySize);
     }
 
     @Override
     public GameBoard linkToGameBoard() {
+        checkGameStatus();
         return outputBoard;
     }
 
-    public int getGameStartTime() {
+    public Instant getStartTime() {
+        checkGameStatus();
         return startTime;
     }
 
     @Override
-    public int getGameTime() {
-        return 0;
+    public Instant getGameTime() {
+        checkGameStatus();
+        return Instant.now().minusNanos(startTime.getNano());
+    }
+
+    @Override
+    public Instant getWinGameTime() {
+        if (gameStatus == GameStatus.ENDED_WITH_WIN) {
+            return winTime;
+        } else {
+            throw new IllegalStateException("Calling getWinGameTime() while status != ENDED_WITH_WIN");
+        }
+    }
+
+    @Override
+    public GameInfo getWinGameInfo() {
+        if (gameStatus == GameStatus.ENDED_WITH_WIN) {
+            return new GameInfo(xSize, ySize, numMines, numActions, winTime);
+        } else {
+            throw new IllegalStateException("Calling getWinGameInfo() while status != ENDED_WITH_WIN");
+        }
+    }
+
+    @Override
+    public int getNumActions() {
+        return numActions;
+    }
+
+    @Override
+    public GameStatus getGameStatus() {
+        return gameStatus;
     }
 
     private void checkPosition(int xPosition, int yPosition) {
@@ -132,8 +162,15 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         }
     }
 
+    private void checkGameStatus() {
+        if (gameStatus.isNoGame()) {
+            throw new IllegalStateException("Calling game.method while status == NoGame");
+        }
+    }
+
     @Override
     public void setFlag(int xPosition, int yPosition) {
+        checkGameStatus();
         checkPosition(xPosition, yPosition);
 
         if (visibleBoard[xPosition][yPosition] == CellState.CLOSE.getValue()) {
@@ -143,24 +180,25 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         } else {
             throw new IllegalArgumentException("FLAG in impossible position!");
         }
-
-        numFlagActions++;
     }
 
     @Override
     public boolean setOpen(int xPosition, int yPosition) {
+        checkGameStatus();
         checkPosition(xPosition, yPosition);
 
-        if (isEnded || !isStarted) return false;
-
-        if (numActions == 0) {
+        if (gameStatus.isStarted()) {
             initCellsForFirstPosition(xPosition, yPosition);
+            gameStatus = GameStatus.CONTINUED;
+            startTime = Instant.now();
         }
 
         return makeStep(xPosition, yPosition);
     }
 
     private Position[] getPositionOfMines() {
+        LocalTime time = LocalTime.now();
+
         Random random = new Random(time.toNanoOfDay());
 
         Position[] positions = new Position[numMines];
@@ -261,7 +299,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         if (isMine(xPosition, yPosition)) {
             showHiddenBoard();
             visibleBoard[xPosition][yPosition] = CellState.DETONATION.getValue();
-            isDetonated = true;
+            gameStatus = GameStatus.ENDED_WITH_LOSS;
             return false;
 
         } else if (isNumber(xPosition, yPosition)) {
@@ -275,8 +313,9 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
                     + xPosition + " ][ " + yPosition + "] = " + hiddenBoard[xPosition][yPosition]);
         }
 
-        if (outputBoard.getNumCells(CellState.CLOSE) + outputBoard.getNumCells(CellState.FLAG) == numMines) {
-            isEnded = true;
+        if (outputBoard.getNumCloseAndFlagCells() == numMines) {
+            gameStatus = GameStatus.ENDED_WITH_WIN;
+            winTime = Instant.now().minusNanos(startTime.getNano());
         }
 
         return true;
