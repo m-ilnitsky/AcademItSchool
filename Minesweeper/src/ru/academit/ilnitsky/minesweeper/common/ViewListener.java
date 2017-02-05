@@ -1,7 +1,5 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
-import ru.academit.ilnitsky.minesweeper.core.GameStatus;
-
 import java.time.Instant;
 
 /**
@@ -16,7 +14,7 @@ public interface ViewListener {
 
     void setFlag(int xPosition, int yPosition);
 
-    boolean setOpen(int xPosition, int yPosition);
+    void setOpen(int xPosition, int yPosition);
 
     Instant getStartTime();
 

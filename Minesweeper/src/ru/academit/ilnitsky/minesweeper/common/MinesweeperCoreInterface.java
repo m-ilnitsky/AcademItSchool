@@ -1,7 +1,5 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
-import ru.academit.ilnitsky.minesweeper.core.GameStatus;
-
 import java.time.Instant;
 
 /**

@@ -1,4 +1,4 @@
-package ru.academit.ilnitsky.minesweeper.core;
+package ru.academit.ilnitsky.minesweeper.common;
 
 /**
  * Статус игры "Сапёр"

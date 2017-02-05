@@ -4,7 +4,7 @@ import ru.academit.ilnitsky.minesweeper.common.GameBoard;
 import ru.academit.ilnitsky.minesweeper.common.GameInfo;
 import ru.academit.ilnitsky.minesweeper.common.View;
 import ru.academit.ilnitsky.minesweeper.common.ViewListener;
-import ru.academit.ilnitsky.minesweeper.core.GameStatus;
+import ru.academit.ilnitsky.minesweeper.common.GameStatus;
 import ru.academit.ilnitsky.minesweeper.core.MinesweeperCore;
 
 import java.time.Instant;
@@ -35,8 +35,8 @@ public class Controller implements ViewListener {
         model.setFlag(xPosition, yPosition);
     }
 
-    public boolean setOpen(int xPosition, int yPosition) {
-        return model.setOpen(xPosition, yPosition);
+    public void setOpen(int xPosition, int yPosition) {
+        model.setOpen(xPosition, yPosition);
     }
 
     public Instant getStartTime() {
