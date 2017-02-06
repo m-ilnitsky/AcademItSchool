@@ -196,10 +196,10 @@ public class ConsoleView implements View {
 
         System.out.println("ИГРА *САПЁР*");
         System.out.println("ГЛАВНОЕ МЕНЮ");
-        System.out.println("Выберите размер игры:");
-        System.out.println("1: Малый размер 9Х9");
-        System.out.println("2: Средний размер 16Х16");
-        System.out.println("3: Бльшой размер 16Х30");
+        System.out.println("Выберите сложность (размер) игры:");
+        System.out.println("1: Новичёк (малый размер 9х9 ячеек, 10 мин)");
+        System.out.println("2: Любитель (средний размер 16х16 ячеек, 40 мин)");
+        System.out.println("3: Профессионал (большой размер 16х30 ячеек, 99 мин)");
         System.out.println("4: Произвольный размер");
         System.out.println("0: ВЫХОД");
         System.out.println("Введите номер вашего выбора:");
@@ -216,13 +216,13 @@ public class ConsoleView implements View {
                 case 1:
                     xSize = 9;
                     ySize = 9;
-                    numMines = 18;
+                    numMines = 10;
 
                     break;
                 case 2:
                     xSize = 16;
                     ySize = 16;
-                    numMines = 32;
+                    numMines = 40;
 
                     break;
                 case 3:
