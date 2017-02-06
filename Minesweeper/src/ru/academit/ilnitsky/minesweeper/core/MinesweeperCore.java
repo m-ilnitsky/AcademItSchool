@@ -29,7 +29,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     private final static int MIN_SIZE = 5;
     private final static int MAX_SIZE = 64;
 
-    MinesweeperCore() {
+    public MinesweeperCore() {
         gameStatus = GameStatus.NONE;
     }
 
@@ -256,9 +256,20 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
             minePositions = getPositionOfMines();
             isNonAdequatePositions = false;
 
+            for (int i = 0; i < minePositions.length - 1; i++) {
+                for (int j = i + 1; j < minePositions.length; j++) {
+                    if (minePositions[i].getX() == minePositions[j].getX()
+                            && minePositions[i].getY() == minePositions[j].getY()) {
+                        isNonAdequatePositions = true;
+                        break;
+                    }
+                }
+            }
+
             for (Position p : minePositions) {
                 if (p.getX() == xPosition && p.getY() == yPosition) {
                     isNonAdequatePositions = true;
+                    break;
                 }
             }
         } while (isNonAdequatePositions);

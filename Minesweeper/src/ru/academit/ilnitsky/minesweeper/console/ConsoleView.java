@@ -27,9 +27,11 @@ public class ConsoleView implements View {
     private final static String SYMBOL_MINE = "*";
     private final static String SYMBOL_FLAG = "F";
     private final static String SYMBOL_FREE = " ";
-    private final static String SYMBOL_CLOSE = "+";
+    private final static String SYMBOL_CLOSE = "#";
 
     public ConsoleView() {
+        scanner = new Scanner(System.in);
+
         gameStatus = GameStatus.NONE;
         continued = true;
     }
@@ -55,6 +57,11 @@ public class ConsoleView implements View {
                 case CONTINUED:
                     showBoard();
 
+                    readCommand();
+
+                    showMessage("Здесь должен быть выбор команд игрока..");
+                    gameStatus = GameStatus.ENDED_WITH_LOSS;
+
                     break;
                 case ENDED_WITH_STOP:
                     showMessage("Вы выбрали завершение текущей игры!");
@@ -70,13 +77,12 @@ public class ConsoleView implements View {
 
                     break;
                 case ENDED_WITH_WIN:
+                    showMessage("Поздравляем! Вы победили!");
+                    gameStatus = GameStatus.NONE;
+                    showStartMenu();
 
                     break;
             }
-            if (gameStatus.isNone()) {
-                showStartMenu();
-            }
-            showStartMenu();
         } while (continued);
     }
 
@@ -92,9 +98,9 @@ public class ConsoleView implements View {
 
     }
 
-    private void checkGameStatus() {
-        if (gameStatus.isNoGame()) {
-            throw new IllegalStateException("Calling game.method while status == NoGame");
+    private void checkNoneGameStatus() {
+        if (gameStatus.isNone()) {
+            throw new IllegalStateException("Calling game.method while status == None");
         }
     }
 
@@ -105,25 +111,43 @@ public class ConsoleView implements View {
     }
 
     private void printLine() {
-        int xS = xSize + 6;
 
-        for (int i = 0; i < xS; i++) {
-            System.out.print("-");
+        System.out.print("   ");
+        for (int i = 0; i < xSize; i++) {
+            if (i > 8) {
+                if ((i - 8) % 4 == 0) {
+                    System.out.print("---+");
+
+                    if (xSize - 1 - i < 4) {
+                        for (int j = i + 1; j < xSize; j++) {
+                            System.out.print("-");
+                        }
+                    }
+                }
+            } else {
+                if (i % 2 == 0) {
+                    System.out.print("+");
+                } else {
+                    System.out.print("-");
+                }
+            }
         }
         System.out.println();
     }
 
     private void printLineOfNumbers() {
-        int xS = xSize + 6;
 
         System.out.print("   ");
-        for (int i = 0; i < xS; i++) {
-            int iX = i - 3;
-            if (iX % 2 == 0) {
-                if (iX > 9) {
-                    System.out.print(iX);
+        for (int i = 0; i < xSize; i++) {
+            if (i > 8) {
+                if ((i - 8) % 4 == 0) {
+                    System.out.print("  " + i);
+                }
+            } else {
+                if (i % 2 == 0) {
+                    System.out.print(i);
                 } else {
-                    System.out.print(iX + " ");
+                    System.out.print(" ");
                 }
             }
         }
@@ -131,9 +155,9 @@ public class ConsoleView implements View {
     }
 
     private void showBoard() {
-        checkGameStatus();
+        checkNoneGameStatus();
 
-        int xS = xSize + 6;
+        int xS = xSize + 2;
 
         clear();
         printLineOfNumbers();
@@ -141,20 +165,18 @@ public class ConsoleView implements View {
 
         for (int iY = 0; iY < ySize; iY++) {
             for (int j = 0; j < xS; j++) {
-                if (j < 2) {
+                if (j < 1) {
                     if (iY % 2 == 0) {
                         if (iY > 9) {
-                            System.out.print(iY);
+                            System.out.print(iY + "+");
                         } else {
-                            System.out.print(" " + iY);
+                            System.out.print(" " + iY + "+");
                         }
                     } else {
-                        System.out.print("  ");
+                        System.out.print("  |");
                     }
-                } else if (j == 2) {
-                    System.out.print("|");
-                } else if (j < xS - 3) {
-                    int iX = j - 3;
+                } else if (j < xS - 1) {
+                    int iX = j - 1;
 
                     if (gameBoard.getCell(iX, iY) == CellState.FREE) {
                         System.out.print(SYMBOL_FREE);
@@ -172,15 +194,15 @@ public class ConsoleView implements View {
                     } else {
                         throw new IllegalArgumentException("Unknown Status: " + gameBoard.getCell(iX, iY).getValue());
                     }
-                } else if (j == xS - 3) {
-                    System.out.print("|");
                 } else {
                     if (iY % 2 == 0) {
                         if (iY > 9) {
-                            System.out.print(iY);
+                            System.out.print("+" + iY);
                         } else {
-                            System.out.print(" " + iY);
+                            System.out.print("+ " + iY);
                         }
+                    } else {
+                        System.out.print("|");
                     }
                     System.out.println();
                 }
@@ -223,6 +245,7 @@ public class ConsoleView implements View {
                     xSize = 16;
                     ySize = 16;
                     numMines = 40;
+                    System.out.println("2");
 
                     break;
                 case 3:
@@ -234,6 +257,9 @@ public class ConsoleView implements View {
                 case 4:
                     showGameSizeMenu();
                     break;
+
+                default:
+                    continued = false;
             }
 
             if (choice >= 1 && choice <= 3) {
@@ -242,12 +268,8 @@ public class ConsoleView implements View {
                     gameStatus = listener.getGameStatus();
                 }
             }
-        } catch (NumberFormatException e) {
-            showStartMenu();
-        }
-
-        if (gameStatus.isNone()) {
-            showStartMenu();
+        } catch (Exception e) {
+            showMessage("Чтоб выбрать пункт меню, введите цело число!");
         }
     }
 
@@ -256,6 +278,7 @@ public class ConsoleView implements View {
         System.out.println(message);
         System.out.println("Для продолжения нажмите Enter");
 
+        scanner.nextLine();
         scanner.nextLine();
     }
 
@@ -328,6 +351,26 @@ public class ConsoleView implements View {
         for (ViewListener listener : listeners) {
             gameBoard = listener.startGame(xSize, ySize, numMines);
             gameStatus = listener.getGameStatus();
+        }
+    }
+
+    private void readCommand() {
+        System.out.println("Доступные команды:");
+        System.out.println("stop или exit - останов игры");
+        System.out.println("xXyY или yYxX - где X и Y целые числа - открыть ячейку с адресом (X;Y)");
+        System.out.println("fyYxX или fxXyY - где X и Y целые числа - установить флаг на ячейку с адресом (X;Y)");
+
+        String line = scanner.nextLine();
+        line = line.trim();
+
+        if (line.equals("stop") || line.equals("Stop") || line.equals("STOP")
+                || line.equals("exit") || line.equals("Exit") || line.equals("EXIT")) {
+            for (ViewListener listener : listeners) {
+                listener.stopGame();
+                gameStatus = listener.getGameStatus();
+            }
+        } else {
+
         }
     }
 }
