@@ -59,8 +59,8 @@ public class ConsoleView implements View {
 
                     readCommand();
 
-                    showMessage("Здесь должен быть выбор команд игрока..");
-                    gameStatus = GameStatus.ENDED_WITH_LOSS;
+                    //showMessage("Здесь должен быть выбор команд игрока..");
+                    //gameStatus = GameStatus.ENDED_WITH_LOSS;
 
                     break;
                 case ENDED_WITH_STOP:
@@ -77,6 +77,7 @@ public class ConsoleView implements View {
 
                     break;
                 case ENDED_WITH_WIN:
+                    showBoard();
                     showMessage("Поздравляем! Вы победили!");
                     gameStatus = GameStatus.NONE;
                     showStartMenu();
@@ -363,14 +364,82 @@ public class ConsoleView implements View {
         String line = scanner.nextLine();
         line = line.trim();
 
+        boolean isFlag = false;
+        boolean isX = false;
+        boolean isY = false;
+
+        String x = "";
+        String y = "";
+
+        int xPosition;
+        int yPosition;
+
         if (line.equals("stop") || line.equals("Stop") || line.equals("STOP")
                 || line.equals("exit") || line.equals("Exit") || line.equals("EXIT")) {
             for (ViewListener listener : listeners) {
                 listener.stopGame();
                 gameStatus = listener.getGameStatus();
             }
-        } else {
+        } else if (!line.isEmpty()) {
+            int iX = 0;
+            int iY = 0;
 
+            if (line.substring(0, 1).equals("f") || line.substring(0, 1).equals("F")) {
+                isFlag = true;
+                System.out.println("isFlag = true");
+            }
+
+            if (line.contains("x")) {
+                iX = line.indexOf("x");
+                isX = true;
+            } else if (line.contains("X")) {
+                iX = line.indexOf("X");
+                isX = true;
+            }
+
+            if (line.contains("y")) {
+                iY = line.indexOf("y");
+                isY = true;
+            } else if (line.contains("Y")) {
+                iY = line.indexOf("Y");
+                isY = true;
+            }
+
+            if (isX && isY) {
+                iX++;
+                while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
+                    x += line.substring(iX, iX + 1);
+                    iX++;
+                }
+
+                iY++;
+                while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
+                    y += line.substring(iY, iY + 1);
+                    iY++;
+                }
+
+                if (!x.isEmpty() && !y.isEmpty()) {
+                    try {
+                        xPosition = Integer.parseInt(x);
+                        yPosition = Integer.parseInt(y);
+
+                        if (isFlag) {
+                            for (ViewListener listener : listeners) {
+                                listener.setFlag(xPosition, yPosition);
+                                gameStatus = listener.getGameStatus();
+                            }
+                        } else {
+                            for (ViewListener listener : listeners) {
+                                listener.setOpen(xPosition, yPosition);
+                                gameStatus = listener.getGameStatus();
+                            }
+                        }
+
+                    } catch (NumberFormatException e) {
+                        showMessage("Ошибка:" + e);
+                    }
+                }
+            }
         }
     }
 }

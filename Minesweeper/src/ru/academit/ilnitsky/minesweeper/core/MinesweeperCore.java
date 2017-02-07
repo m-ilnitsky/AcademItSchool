@@ -14,6 +14,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     private int xSize, ySize;
     private int numMines;
 
+    private boolean[][] mask;
     private int[][] hiddenBoard;
     private int[][] visibleBoard;
     private GameBoard outputBoard;
@@ -69,14 +70,17 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
 
         numActions = 0;
 
+        mask = new boolean[xSize][];
         hiddenBoard = new int[xSize][];
         visibleBoard = new int[xSize][];
 
         for (int i = 0; i < xSize; i++) {
+            mask[i] = new boolean[ySize];
             hiddenBoard[i] = new int[ySize];
             visibleBoard[i] = new int[ySize];
 
             for (int j = 0; j < ySize; j++) {
+                mask[i][j] = true;
                 hiddenBoard[i][j] = 0;
                 visibleBoard[i][j] = -1;
             }
@@ -196,16 +200,34 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         return makeStep(xPosition, yPosition);
     }
 
-    private Position[] getPositionOfMines() {
-        LocalTime time = LocalTime.now();
-
-        Random random = new Random(time.toNanoOfDay());
-
+    private Position[] getPositionOfMines(int xPosition, int yPosition) {
         Position[] positions = new Position[numMines];
 
+        boolean isOldPosition;
+        int x;
+        int y;
+
+        Random random = new Random(LocalTime.now().toNanoOfDay());
+
         for (int i = 0; i < numMines; i++) {
-            positions[i].setX(random.nextInt(xSize));
-            positions[i].setY(random.nextInt(ySize));
+            do {
+                isOldPosition = false;
+                x = random.nextInt(xSize);
+                y = random.nextInt(ySize);
+
+                if (x == xPosition && y == yPosition) {
+                    isOldPosition = true;
+                } else {
+                    for (int j = 0; j < i; j++) {
+                        if (x == positions[j].getX() && y == positions[j].getY()) {
+                            isOldPosition = true;
+                            break;
+                        }
+                    }
+                }
+            } while (isOldPosition);
+
+            positions[i] = new Position(x, y);
         }
 
         return positions;
@@ -249,30 +271,8 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     }
 
     private void initCellsForFirstPosition(int xPosition, int yPosition) {
-        boolean isNonAdequatePositions;
-        Position[] minePositions;
 
-        do {
-            minePositions = getPositionOfMines();
-            isNonAdequatePositions = false;
-
-            for (int i = 0; i < minePositions.length - 1; i++) {
-                for (int j = i + 1; j < minePositions.length; j++) {
-                    if (minePositions[i].getX() == minePositions[j].getX()
-                            && minePositions[i].getY() == minePositions[j].getY()) {
-                        isNonAdequatePositions = true;
-                        break;
-                    }
-                }
-            }
-
-            for (Position p : minePositions) {
-                if (p.getX() == xPosition && p.getY() == yPosition) {
-                    isNonAdequatePositions = true;
-                    break;
-                }
-            }
-        } while (isNonAdequatePositions);
+        Position[] minePositions = getPositionOfMines(xPosition, yPosition);
 
         for (Position p : minePositions) {
             hiddenBoard[p.getX()][p.getY()] = CellState.MINE.getValue();
@@ -317,7 +317,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
             visibleBoard[xPosition][yPosition] = hiddenBoard[xPosition][yPosition];
 
         } else if (isFree(xPosition, yPosition)) {
-            showFreeCellsAround(xPosition, yPosition);
+            showFreeCellsAround(xPosition, yPosition, true);
 
         } else {
             throw new IllegalArgumentException("Unknown Cell State: hiddenBoard[ "
@@ -332,7 +332,16 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         return true;
     }
 
-    private void showFreeCellsAround(int xPosition, int yPosition) {
+    private void showFreeCellsAround(int xPosition, int yPosition, boolean clearMask) {
+
+        if (clearMask) {
+            for (int i = 0; i < mask.length; i++) {
+                for (int j = 0; j < mask[i].length; j++) {
+                    mask[i][j] = true;
+                }
+            }
+        }
+
         int xStart = xPosition - 1;
         int xEnd = xPosition + 1;
         int yStart = yPosition - 1;
@@ -353,14 +362,18 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
 
         for (int iX = xStart; iX <= xEnd; iX++) {
             for (int iY = yStart; iY <= yEnd; iY++) {
-                if (iX != xPosition && iY != yPosition) {
-                    if (isNumber(iX, iY)) {
-                        visibleBoard[iX][iY] = hiddenBoard[iX][iY];
-                    } else if (isFree(iX, iY)) {
-                        showFreeCellsAround(iX, iY);
+                if (mask[iX][iY]) {
+                    if (iX == xPosition && iY == yPosition) {
+                        visibleBoard[iX][iY] = CellState.FREE.getValue();
+                        mask[iX][iY] = false;
+                    } else {
+                        if (isNumber(iX, iY)) {
+                            visibleBoard[iX][iY] = hiddenBoard[iX][iY];
+                            mask[iX][iY] = false;
+                        } else if (isFree(iX, iY)) {
+                            showFreeCellsAround(iX, iY, false);
+                        }
                     }
-                } else {
-                    visibleBoard[iX][iY] = CellState.FREE.getValue();
                 }
             }
         }
