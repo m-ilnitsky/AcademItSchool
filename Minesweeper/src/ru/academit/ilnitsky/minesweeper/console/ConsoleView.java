@@ -3,6 +3,8 @@ package ru.academit.ilnitsky.minesweeper.console;
 import ru.academit.ilnitsky.minesweeper.common.*;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -20,6 +22,7 @@ public class ConsoleView implements View {
     private Instant startTime;
     private int xSize;
     private int ySize;
+    private int numMines;
 
     private boolean continued;
 
@@ -54,13 +57,14 @@ public class ConsoleView implements View {
 
                     break;
                 case STARTED:
-                case CONTINUED:
                     showBoard();
-
                     readCommand();
 
-                    //showMessage("Здесь должен быть выбор команд игрока..");
-                    //gameStatus = GameStatus.ENDED_WITH_LOSS;
+                    break;
+                case CONTINUED:
+                    showBoard();
+                    showStatusBar();
+                    readCommand();
 
                     break;
                 case ENDED_WITH_STOP:
@@ -214,6 +218,17 @@ public class ConsoleView implements View {
         printLineOfNumbers();
     }
 
+    private void showStatusBar() {
+        long time = 0;
+        for (ViewListener listener : listeners) {
+            time = listener.getGameTime();
+        }
+
+        int numFlags = gameBoard.getNumCells(CellState.FLAG);
+        System.out.printf("С начала игры прошло: %6d s      Число установленных флагов: %2d%n", time, numFlags);
+
+    }
+
     private void showStartMenu() {
         clear();
 
@@ -228,7 +243,6 @@ public class ConsoleView implements View {
         System.out.println("Введите номер вашего выбора:");
 
         try {
-            int numMines = 0;
             int choice = scanner.nextInt();
 
             switch (choice) {
@@ -374,10 +388,19 @@ public class ConsoleView implements View {
         int xPosition;
         int yPosition;
 
-        if (line.equals("stop") || line.equals("Stop") || line.equals("STOP")
-                || line.equals("exit") || line.equals("Exit") || line.equals("EXIT")) {
+        if (line.equals("stop") || line.equals("Stop") || line.equals("STOP")) {
             for (ViewListener listener : listeners) {
                 listener.stopGame();
+                gameStatus = listener.getGameStatus();
+            }
+        } else if (line.equals("exit") || line.equals("Exit") || line.equals("EXIT")) {
+            for (ViewListener listener : listeners) {
+                listener.stopGame();
+            }
+            gameStatus = GameStatus.NONE;
+        } else if (line.equals("new") || line.equals("New") || line.equals("NEW")) {
+            for (ViewListener listener : listeners) {
+                gameBoard = listener.startGame(xSize, ySize, numMines);
                 gameStatus = listener.getGameStatus();
             }
         } else if (!line.isEmpty()) {
@@ -386,7 +409,6 @@ public class ConsoleView implements View {
 
             if (line.substring(0, 1).equals("f") || line.substring(0, 1).equals("F")) {
                 isFlag = true;
-                System.out.println("isFlag = true");
             }
 
             if (line.contains("x")) {
@@ -423,20 +445,50 @@ public class ConsoleView implements View {
                         xPosition = Integer.parseInt(x);
                         yPosition = Integer.parseInt(y);
 
-                        if (isFlag) {
-                            for (ViewListener listener : listeners) {
-                                listener.setFlag(xPosition, yPosition);
-                                gameStatus = listener.getGameStatus();
-                            }
-                        } else {
-                            for (ViewListener listener : listeners) {
-                                listener.setOpen(xPosition, yPosition);
-                                gameStatus = listener.getGameStatus();
-                            }
+                        boolean isError = false;
+                        String errorString = "";
+
+                        if (xPosition < 0) {
+                            errorString += " x < 0 ";
+                            isError = true;
+                        } else if (xPosition >= xSize) {
+                            errorString += " x >= xSize ";
+                            isError = true;
+                        }
+                        if (yPosition < 0) {
+                            errorString += " y < 0 ";
+                            isError = true;
+                        } else if (yPosition >= xSize) {
+                            errorString += " y >= ySize ";
+                            isError = true;
                         }
 
+                        if (isError) {
+                            showMessage("ОШИБКА: координаты выходят за пределы игрового поля (" + errorString + ")!");
+                        } else {
+
+                            if (gameBoard.getCell(xPosition, yPosition) != CellState.CLOSE) {
+                                if (gameBoard.getCell(xPosition, yPosition) == CellState.FLAG) {
+                                    showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
+                                } else {
+                                    showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
+                                }
+                            } else {
+                                if (isFlag) {
+                                    for (ViewListener listener : listeners) {
+                                        listener.setFlag(xPosition, yPosition);
+                                        gameStatus = listener.getGameStatus();
+                                    }
+                                } else {
+                                    for (ViewListener listener : listeners) {
+                                        listener.setOpen(xPosition, yPosition);
+                                        gameStatus = listener.getGameStatus();
+                                    }
+                                }
+                            }
+                        }
                     } catch (NumberFormatException e) {
-                        showMessage("Ошибка:" + e);
+                        showMessage("ОШИБКА: неправильный формат координат: " + e);
                     }
                 }
             }

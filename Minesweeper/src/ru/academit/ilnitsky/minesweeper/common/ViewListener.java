@@ -18,7 +18,7 @@ public interface ViewListener {
 
     Instant getStartTime();
 
-    Instant getGameTime();
+    long getGameTime();
 
     GameInfo getWinGameInfo();
 

@@ -18,7 +18,7 @@ public interface MinesweeperCoreInterface {
 
     Instant getStartTime();
 
-    Instant getGameTime();
+    long getGameTime();
 
     Instant getWinGameTime();
 

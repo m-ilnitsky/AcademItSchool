@@ -119,9 +119,9 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     }
 
     @Override
-    public Instant getGameTime() {
+    public long getGameTime() {
         checkGameStatus();
-        return Instant.now().minusNanos(startTime.getNano());
+        return Instant.now().getEpochSecond() - startTime.getEpochSecond();
     }
 
     @Override
@@ -195,6 +195,10 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
             initCellsForFirstPosition(xPosition, yPosition);
             gameStatus = GameStatus.CONTINUED;
             startTime = Instant.now();
+        }
+
+        if (visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) {
+            return true;
         }
 
         return makeStep(xPosition, yPosition);

@@ -22,35 +22,43 @@ public class Controller implements ViewListener {
         this.view = view;
     }
 
+    @Override
     public GameBoard startGame(int xSize, int ySize, int numMines) {
         model.startGame(xSize, ySize, numMines);
         return model.linkToGameBoard();
     }
 
+    @Override
     public void stopGame() {
         model.stopGame();
     }
 
+    @Override
     public void setFlag(int xPosition, int yPosition) {
         model.setFlag(xPosition, yPosition);
     }
 
+    @Override
     public void setOpen(int xPosition, int yPosition) {
         model.setOpen(xPosition, yPosition);
     }
 
+    @Override
     public Instant getStartTime() {
         return model.getStartTime();
     }
 
-    public Instant getGameTime() {
+    @Override
+    public long getGameTime() {
         return model.getGameTime();
     }
 
+    @Override
     public GameInfo getWinGameInfo() {
         return model.getWinGameInfo();
     }
 
+    @Override
     public GameStatus getGameStatus() {
         return model.getGameStatus();
     }
