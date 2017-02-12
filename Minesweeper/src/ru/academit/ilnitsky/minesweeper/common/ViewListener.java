@@ -16,11 +16,21 @@ public interface ViewListener {
 
     void setOpen(int xPosition, int yPosition);
 
+    int getNumActions();
+
     Instant getStartTime();
 
     long getGameTime();
 
+    GameStatus getGameStatus();
+
     GameInfo getWinGameInfo();
 
-    GameStatus getGameStatus();
+    void saveWinGameInfo(GameInfo gameInfo);
+
+    boolean isTopScores(GameSize gameSize);
+
+    GameInfo[] getTopScores(GameSize gameSize);
+
+    String getTopScoresName(GameSize gameSize);
 }

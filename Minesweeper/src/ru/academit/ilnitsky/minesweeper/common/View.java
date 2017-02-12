@@ -1,7 +1,5 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
-import java.time.Instant;
-
 /**
  * Интерфейс представления View для игры "Сапёр"
  * Created by UserLabView on 02.02.17.
@@ -14,9 +12,9 @@ public interface View {
 
     void startApplication();
 
-    void onGameStart(Instant startTime);
+    GameSize[] getStandardGameSizes();
 
-    void onGameStep(GameStatus gameStatus);
+    String[] getStandardGameNames();
 
-    void onSaveResult(GameInfo gameInfo);
+    int getTopLength();
 }

@@ -20,7 +20,7 @@ public interface MinesweeperCoreInterface {
 
     long getGameTime();
 
-    Instant getWinGameTime();
+    long getWinGameTime();
 
     GameInfo getWinGameInfo();
 

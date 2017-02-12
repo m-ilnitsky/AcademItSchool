@@ -1,25 +1,14 @@
 package ru.academit.ilnitsky.minesweeper.common;
 
 /**
- * Размер игрового поля
+ * Размер игрового поля для игры "Сапёр"
  * Created by Mike on 02.02.2017.
  */
 public class GameBoardSize {
-    private int xSize;
-    private int ySize;
-
-    public GameBoardSize() {
-    }
+    private final int xSize;
+    private final int ySize;
 
     public GameBoardSize(int xSize, int ySize) {
-        setSize(xSize, ySize);
-    }
-
-    public GameBoardSize(GameBoardSize boardSize) {
-        setSize(boardSize);
-    }
-
-    public void setSize(int xSize, int ySize) {
         if (xSize < 0) {
             throw new IllegalArgumentException("xSize < 0");
         }
@@ -31,8 +20,8 @@ public class GameBoardSize {
         this.ySize = ySize;
     }
 
-    public void setSize(GameBoardSize boardSize) {
-        setSize(boardSize.xSize, boardSize.ySize);
+    public GameBoardSize(GameBoardSize boardSize) {
+        this(boardSize.xSize, boardSize.ySize);
     }
 
     public GameBoardSize getSize() {

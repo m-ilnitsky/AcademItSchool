@@ -11,7 +11,7 @@ public class Console {
     public static void main(String[] args) {
 
         MinesweeperCore minesweeperCore = new MinesweeperCore();
-        ConsoleView consoleView = new ConsoleView();
+        ConsoleView consoleView = new ConsoleView(30);
 
         Controller controller = new Controller(minesweeperCore, consoleView);
 

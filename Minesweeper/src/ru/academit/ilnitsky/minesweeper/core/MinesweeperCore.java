@@ -24,7 +24,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     private int numActions;
 
     private Instant startTime;
-    private Instant winTime;
+    private long winTime;
 
     private final static double MINE_COEFFICIENT = 0.3;
     private final static int MIN_SIZE = 5;
@@ -113,6 +113,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         return outputBoard;
     }
 
+    @Override
     public Instant getStartTime() {
         checkGameStatus();
         return startTime;
@@ -125,7 +126,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     }
 
     @Override
-    public Instant getWinGameTime() {
+    public long getWinGameTime() {
         if (gameStatus == GameStatus.ENDED_WITH_WIN) {
             return winTime;
         } else {
@@ -330,7 +331,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
 
         if (outputBoard.getNumCloseAndFlagCells() == numMines) {
             gameStatus = GameStatus.ENDED_WITH_WIN;
-            winTime = Instant.now().minusNanos(startTime.getNano());
+            winTime = Instant.now().getEpochSecond() - startTime.getEpochSecond();
         }
 
         return true;

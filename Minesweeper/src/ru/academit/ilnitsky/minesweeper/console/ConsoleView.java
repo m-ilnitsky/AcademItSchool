@@ -2,9 +2,6 @@ package ru.academit.ilnitsky.minesweeper.console;
 
 import ru.academit.ilnitsky.minesweeper.common.*;
 
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -15,11 +12,9 @@ import java.util.Scanner;
 public class ConsoleView implements View {
     private final ArrayList<ViewListener> listeners = new ArrayList<>();
 
-    private Scanner scanner;
-
     private GameStatus gameStatus;
     private GameBoard gameBoard;
-    private Instant startTime;
+
     private int xSize;
     private int ySize;
     private int numMines;
@@ -32,23 +27,55 @@ public class ConsoleView implements View {
     private final static String SYMBOL_FREE = " ";
     private final static String SYMBOL_CLOSE = "#";
 
-    public ConsoleView() {
-        scanner = new Scanner(System.in);
+    private final int topLength;
 
+    private final GameSize[] standardGameSizes = {
+            new GameSize(9, 9, 10),
+            new GameSize(16, 16, 40),
+            new GameSize(30, 16, 99)
+    };
+
+    private final String[] standardGameNames = {
+            "Новичёк (малый размер 9х9 ячеек, 10 мин)",
+            "Любитель (средний размер 16х16 ячеек, 40 мин)",
+            "Профессионал (большой размер 16х30 ячеек, 99 мин)"
+    };
+
+    public ConsoleView(int topLength) {
         gameStatus = GameStatus.NONE;
         continued = true;
+
+        this.topLength = topLength;
     }
 
+    @Override
     public void addViewListener(ViewListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
     }
 
+    @Override
     public void removeViewListener(ViewListener listener) {
         listeners.remove(listener);
     }
 
+    @Override
+    public GameSize[] getStandardGameSizes() {
+        return standardGameSizes;
+    }
+
+    @Override
+    public String[] getStandardGameNames() {
+        return standardGameNames;
+    }
+
+    @Override
+    public int getTopLength() {
+        return topLength;
+    }
+
+    @Override
     public void startApplication() {
         do {
             switch (gameStatus) {
@@ -83,24 +110,13 @@ public class ConsoleView implements View {
                 case ENDED_WITH_WIN:
                     showBoard();
                     showMessage("Поздравляем! Вы победили!");
+
+                    showSaveResult();
+
                     gameStatus = GameStatus.NONE;
                     showStartMenu();
-
-                    break;
             }
         } while (continued);
-    }
-
-    public void onGameStart(Instant startTime) {
-
-    }
-
-    public void onGameStep(GameStatus gameStatus) {
-
-    }
-
-    public void onSaveResult(GameInfo gameInfo) {
-
     }
 
     private void checkNoneGameStatus() {
@@ -220,27 +236,39 @@ public class ConsoleView implements View {
 
     private void showStatusBar() {
         long time = 0;
+        int numActions = 0;
+
         for (ViewListener listener : listeners) {
             time = listener.getGameTime();
+            numActions = listener.getNumActions();
         }
 
         int numFlags = gameBoard.getNumCells(CellState.FLAG);
-        System.out.printf("С начала игры прошло: %6d s      Число установленных флагов: %2d%n", time, numFlags);
-
+        System.out.printf("С начала игры прошло: %4ds    Действий: %2d    Флагов: %2d    Мин: %d%n", time, numActions, numFlags, numMines);
     }
 
     private void showStartMenu() {
         clear();
 
-        System.out.println("ИГРА *САПЁР*");
-        System.out.println("ГЛАВНОЕ МЕНЮ");
-        System.out.println("Выберите сложность (размер) игры:");
-        System.out.println("1: Новичёк (малый размер 9х9 ячеек, 10 мин)");
-        System.out.println("2: Любитель (средний размер 16х16 ячеек, 40 мин)");
-        System.out.println("3: Профессионал (большой размер 16х30 ячеек, 99 мин)");
-        System.out.println("4: Произвольный размер");
-        System.out.println("0: ВЫХОД");
-        System.out.println("Введите номер вашего выбора:");
+        System.out.println("*********************** ИГРА <САПЁР> **********************");
+        System.out.println("*                       ГЛАВНОЕ МЕНЮ                      *");
+        System.out.println("************** * * * * * * * * * * * * * * * **************");
+        System.out.println("* СЛОЖНОСТЬ ИГРЫ:                                         *");
+        System.out.println("* 1: Новичёк (малый размер 9х9 ячеек, 10 мин)             *");
+        System.out.println("* 2: Любитель (средний размер 16х16 ячеек, 40 мин)        *");
+        System.out.println("* 3: Профессионал (большой размер 16х30 ячеек, 99 мин)    *");
+        System.out.println("* 4: Произвольный размер                                  *");
+        System.out.println("************** * * * * * * * * * * * * * * * **************");
+        System.out.println("* ТОП ЛУЧШИХ РЕЗУЛЬТАТОВ:                                 *");
+        System.out.println("* 5: Новичёк (малый размер 9х9 ячеек, 10 мин)             *");
+        System.out.println("* 6: Любитель (средний размер 16х16 ячеек, 40 мин)        *");
+        System.out.println("* 7: Профессионал (большой размер 16х30 ячеек, 99 мин)    *");
+        System.out.println("************** * * * * * * * * * * * * * * * **************");
+        System.out.println("* 9: О ПРОГРАММЕ                                          *");
+        System.out.println("* 0: ВЫХОД                                                *");
+        System.out.println("*************** Введите номер вашего выбора ***************");
+
+        Scanner scanner = new Scanner(System.in);
 
         try {
             int choice = scanner.nextInt();
@@ -271,10 +299,22 @@ public class ConsoleView implements View {
                     break;
                 case 4:
                     showGameSizeMenu();
-                    break;
 
-                default:
-                    continued = false;
+                    break;
+                case 5:
+                    showTopScores(new GameSize(9, 9, 10));
+
+                    break;
+                case 6:
+                    showTopScores(new GameSize(16, 16, 40));
+
+                    break;
+                case 7:
+                    showTopScores(new GameSize(30, 16, 99));
+
+                    break;
+                case 9:
+                    showAbout();
             }
 
             if (choice >= 1 && choice <= 3) {
@@ -288,18 +328,35 @@ public class ConsoleView implements View {
         }
     }
 
+    private void showAbout() {
+        clear();
+
+        System.out.println("************** О ПРОГРАММЕ ***************");
+        System.out.println("*  Консольная версия игры САПЁР          *");
+        System.out.println("*  М.Ильницкий, Новосибирск, 2017        *");
+        System.out.println("******************************************");
+        System.out.println("Для выхода в главное меню нажмите Enter");
+
+        Scanner scanner = new Scanner(System.in);
+
+        scanner.nextLine();
+    }
+
     private void showMessage(String message) {
         System.out.println();
         System.out.println(message);
         System.out.println("Для продолжения нажмите Enter");
 
-        scanner.nextLine();
+        Scanner scanner = new Scanner(System.in);
+
         scanner.nextLine();
     }
 
     private int readGameParameter(String line) {
         int choice = 0;
         boolean notInt;
+
+        Scanner scanner = new Scanner(System.in);
 
         do {
             System.out.print(line);
@@ -370,10 +427,15 @@ public class ConsoleView implements View {
     }
 
     private void readCommand() {
-        System.out.println("Доступные команды:");
-        System.out.println("stop или exit - останов игры");
-        System.out.println("xXyY или yYxX - где X и Y целые числа - открыть ячейку с адресом (X;Y)");
-        System.out.println("fyYxX или fxXyY - где X и Y целые числа - установить флаг на ячейку с адресом (X;Y)");
+        System.out.println("*****************************************************************************************");
+        System.out.println("*  stop - остановить текущую игру                                                       *");
+        System.out.println("*  exit - остановить текущую игру и выйти в главное меню                                *");
+        System.out.println("*  new  - остановить текущую игру и начать новую с теми же параметрами                  *");
+        System.out.println("*   xXyY или  yYxX - где X и Y целые числа - открыть ячейку с адресом (X;Y)             *");
+        System.out.println("*  fxXyY или fyYxX - где X и Y целые числа - установить флаг на ячейку с адресом (X;Y)  *");
+        System.out.println("********************************* Введите команду ***************************************");
+
+        Scanner scanner = new Scanner(System.in);
 
         String line = scanner.nextLine();
         line = line.trim();
@@ -466,18 +528,23 @@ public class ConsoleView implements View {
                         if (isError) {
                             showMessage("ОШИБКА: координаты выходят за пределы игрового поля (" + errorString + ")!");
                         } else {
+                            CellState cellState = gameBoard.getCell(xPosition, yPosition);
 
-                            if (gameBoard.getCell(xPosition, yPosition) != CellState.CLOSE) {
-                                if (gameBoard.getCell(xPosition, yPosition) == CellState.FLAG) {
-                                    showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
+                            if (isFlag) {
+                                if (cellState != CellState.CLOSE && cellState != CellState.FLAG) {
+                                    showMessage("ОШИБКА: нельзя поставить флаг в уже открытую ячейку!");
                                 } else {
-                                    showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
-                                }
-                            } else {
-                                if (isFlag) {
                                     for (ViewListener listener : listeners) {
                                         listener.setFlag(xPosition, yPosition);
                                         gameStatus = listener.getGameStatus();
+                                    }
+                                }
+                            } else {
+                                if (cellState != CellState.CLOSE) {
+                                    if (cellState == CellState.FLAG) {
+                                        showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
+                                    } else {
+                                        showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
                                     }
                                 } else {
                                     for (ViewListener listener : listeners) {
@@ -490,6 +557,89 @@ public class ConsoleView implements View {
                     } catch (NumberFormatException e) {
                         showMessage("ОШИБКА: неправильный формат координат: " + e);
                     }
+                }
+            }
+        }
+    }
+
+    private void showSaveResult() {
+        GameInfo gameInfo = null;
+        boolean isTop = false;
+
+        for (ViewListener listener : listeners) {
+            gameInfo = listener.getWinGameInfo();
+            isTop = listener.isTopScores(gameInfo);
+        }
+
+        if (gameInfo != null && isTop) {
+            clear();
+            System.out.println("ИГРА *САПЁР*");
+            System.out.println("МЕНЮ СОХРАНЕНИЯ РЕЗУЛЬТАТА");
+            System.out.println("Параметры выигрышной партии");
+            System.out.println("Размер доски (X,Y) = ( " + gameInfo.getXSize() + " , " + gameInfo.getYSize() + " )");
+            System.out.println("Число мин = " + gameInfo.getNumMines());
+            System.out.println("Число действий = " + gameInfo.getNumActions());
+            System.out.println("Время игры = " + gameInfo.getTime() + " сек");
+            System.out.println("Введите ваше имя:");
+
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+
+            if (line.isEmpty() || line.equals("") || line.equals(" ")) {
+                gameInfo.setUserName("anonymous");
+            } else {
+                gameInfo.setUserName(line);
+            }
+
+            for (ViewListener listener : listeners) {
+                listener.saveWinGameInfo(gameInfo);
+            }
+
+            showTopScores(gameInfo);
+        }
+    }
+
+    private void showTopScores(GameSize gameSize) {
+        boolean isTop = false;
+        GameInfo[] gameArray = null;
+        String gameName = null;
+
+        for (ViewListener listener : listeners) {
+            isTop = listener.isTopScores(gameSize);
+        }
+
+        if (isTop) {
+            for (ViewListener listener : listeners) {
+                gameArray = listener.getTopScores(gameSize);
+                gameName = listener.getTopScoresName(gameSize);
+            }
+
+            if (gameArray != null && gameName != null) {
+                int length = 0;
+                for (int i = gameArray.length - 1; i >= 0; i--) {
+                    if (gameArray[i] != null) {
+                        length = i + 1;
+                        break;
+                    }
+                }
+
+                if (length > 0) {
+                    clear();
+                    System.out.println("Лучшие результаты <Топ " + gameArray.length + ">");
+                    System.out.println("ДЛЯ ИГРЫ: " + gameName);
+                    System.out.println("******************************** Результаты ******************************");
+
+                    for (int i = 0; i < length; i++) {
+                        System.out.printf("* %3d    * Время: %4d сек    * Действий: %3d    * Игрок: %s%n",
+                                i + 1, gameArray[i].getTime(), gameArray[i].getNumActions(), gameArray[i].getUserName());
+                    }
+
+                    System.out.println("**************************************************************************");
+
+                    showMessage("");
+                } else {
+                    clear();
+                    showMessage("Извините для данных параметров игры ещё нет сохранённых результатов побед!");
                 }
             }
         }
