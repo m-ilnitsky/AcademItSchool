@@ -8,6 +8,7 @@ public enum CellState {
     DETONATION(-7),
     MINE(-5),
     FLAG(-3),
+    QUERY(-2),
     CLOSE(-1),
     FREE(0),
     N1(1), N2(2), N3(3), N4(4), N5(5), N6(6), N7(7), N8(8);
@@ -30,6 +31,8 @@ public enum CellState {
                 return MINE;
             case -3:
                 return FLAG;
+            case -2:
+                return QUERY;
             case -1:
                 return CLOSE;
             case 0:

@@ -11,7 +11,8 @@ import java.util.Random;
  * Created by UserLabView on 02.02.17.
  */
 public class MinesweeperCore implements MinesweeperCoreInterface {
-    private int xSize, ySize;
+    private int xSize;
+    private int ySize;
     private int numMines;
 
     private boolean[][] mask;
@@ -198,11 +199,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
             startTime = Instant.now();
         }
 
-        if (visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) {
-            return true;
-        }
-
-        return makeStep(xPosition, yPosition);
+        return (visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) || makeStep(xPosition, yPosition);
     }
 
     private Position[] getPositionOfMines(int xPosition, int yPosition) {

@@ -48,9 +48,9 @@ public class GameBoard {
     public int getNumCells(CellState cellState) {
         int count = 0;
 
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells[i].length; j++) {
-                if (cells[i][j] == cellState.getValue()) {
+        for (int[] vc : cells) {
+            for (int c : vc) {
+                if (c == cellState.getValue()) {
                     count++;
                 }
             }
@@ -62,10 +62,9 @@ public class GameBoard {
     public int getNumCloseAndFlagCells() {
         int count = 0;
 
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells[i].length; j++) {
-                if (cells[i][j] == CellState.CLOSE.getValue()
-                        || cells[i][j] == CellState.FLAG.getValue()) {
+        for (int[] vc : cells) {
+            for (int c : vc) {
+                if (c == CellState.CLOSE.getValue() || c == CellState.FLAG.getValue()) {
                     count++;
                 }
             }

@@ -21,6 +21,10 @@ public class ConsoleView implements View {
 
     private boolean continued;
 
+    private boolean isWideBoard = true;
+
+    private String warning = "";
+
     private final static String SYMBOL_DETONATION = "X";
     private final static String SYMBOL_MINE = "*";
     private final static String SYMBOL_FLAG = "F";
@@ -36,7 +40,7 @@ public class ConsoleView implements View {
     };
 
     private final String[] standardGameNames = {
-            "Новичёк (малый размер 9х9 ячеек, 10 мин)",
+            "Новичок (малый размер 9х9 ячеек, 10 мин)",
             "Любитель (средний размер 16х16 ячеек, 40 мин)",
             "Профессионал (большой размер 16х30 ячеек, 99 мин)"
     };
@@ -134,13 +138,13 @@ public class ConsoleView implements View {
     private void printLine() {
 
         System.out.print("   ");
-        for (int i = 0; i < xSize; i++) {
+        for (int i = 1; i <= xSize; i++) {
             if (i > 8) {
                 if ((i - 8) % 4 == 0) {
                     System.out.print("---+");
 
-                    if (xSize - 1 - i < 4) {
-                        for (int j = i + 1; j < xSize; j++) {
+                    if (xSize - i < 4) {
+                        for (int j = i + 1; j <= xSize; j++) {
                             System.out.print("-");
                         }
                     }
@@ -159,7 +163,7 @@ public class ConsoleView implements View {
     private void printLineOfNumbers() {
 
         System.out.print("   ");
-        for (int i = 0; i < xSize; i++) {
+        for (int i = 1; i <= xSize; i++) {
             if (i > 8) {
                 if ((i - 8) % 4 == 0) {
                     System.out.print("  " + i);
@@ -175,29 +179,76 @@ public class ConsoleView implements View {
         System.out.println();
     }
 
+    private void printWideLine() {
+
+        System.out.print("   +");
+        for (int i = 2; i <= xSize; i++) {
+            if (i > 10) {
+                if ((i - 8) % 2 == 0) {
+                    System.out.print("~-~+");
+
+                    if (xSize - i == 1) {
+                        System.out.print("~-");
+                    }
+                }
+            } else {
+                System.out.print("~+");
+            }
+        }
+        System.out.println();
+    }
+
+    private void printWideLineOfNumbers() {
+
+        System.out.print("   1");
+        for (int i = 2; i <= xSize; i++) {
+            if (i > 10) {
+                if ((i - 8) % 2 == 0) {
+                    System.out.print("  " + i);
+                }
+            } else {
+                System.out.print(" " + i);
+            }
+        }
+        System.out.println();
+    }
+
     private void showBoard() {
         checkNoneGameStatus();
 
         int xS = xSize + 2;
 
         clear();
-        printLineOfNumbers();
-        printLine();
+
+        if (isWideBoard) {
+            printWideLineOfNumbers();
+            printWideLine();
+        } else {
+            printLineOfNumbers();
+            printLine();
+        }
 
         for (int iY = 0; iY < ySize; iY++) {
             for (int j = 0; j < xS; j++) {
+
+                int y = iY + 1;
+
                 if (j < 1) {
-                    if (iY % 2 == 0) {
-                        if (iY > 9) {
-                            System.out.print(iY + "+");
+                    if (y % 2 == 0) {
+                        if (y > 9) {
+                            System.out.print(y + "+");
                         } else {
-                            System.out.print(" " + iY + "+");
+                            System.out.print(" " + y + "+");
                         }
                     } else {
                         System.out.print("  |");
                     }
                 } else if (j < xS - 1) {
                     int iX = j - 1;
+
+                    if (isWideBoard && iX != 0) {
+                        System.out.print(" ");
+                    }
 
                     if (gameBoard.getCell(iX, iY) == CellState.FREE) {
                         System.out.print(SYMBOL_FREE);
@@ -216,11 +267,11 @@ public class ConsoleView implements View {
                         throw new IllegalArgumentException("Unknown Status: " + gameBoard.getCell(iX, iY).getValue());
                     }
                 } else {
-                    if (iY % 2 == 0) {
-                        if (iY > 9) {
-                            System.out.print("+" + iY);
+                    if (y % 2 == 0) {
+                        if (y > 9) {
+                            System.out.print("+" + y);
                         } else {
-                            System.out.print("+ " + iY);
+                            System.out.print("+ " + y);
                         }
                     } else {
                         System.out.print("|");
@@ -230,8 +281,15 @@ public class ConsoleView implements View {
             }
         }
 
-        printLine();
-        printLineOfNumbers();
+        if (isWideBoard) {
+            printWideLine();
+            printWideLineOfNumbers();
+        } else {
+            printLine();
+            printLineOfNumbers();
+        }
+
+        showWarning();
     }
 
     private void showStatusBar() {
@@ -254,7 +312,7 @@ public class ConsoleView implements View {
         System.out.println("*                       ГЛАВНОЕ МЕНЮ                      *");
         System.out.println("************** * * * * * * * * * * * * * * * **************");
         System.out.println("* СЛОЖНОСТЬ ИГРЫ:                                         *");
-        System.out.println("* 1: Новичёк (малый размер 9х9 ячеек, 10 мин)             *");
+        System.out.println("* 1: Новичок (малый размер 9х9 ячеек, 10 мин)             *");
         System.out.println("* 2: Любитель (средний размер 16х16 ячеек, 40 мин)        *");
         System.out.println("* 3: Профессионал (большой размер 16х30 ячеек, 99 мин)    *");
         System.out.println("* 4: Произвольный размер                                  *");
@@ -342,6 +400,14 @@ public class ConsoleView implements View {
         scanner.nextLine();
     }
 
+    private void showWarning() {
+        if (!warning.isEmpty()) {
+            System.out.println(warning);
+
+            warning = "";
+        }
+    }
+
     private void showMessage(String message) {
         System.out.println();
         System.out.println(message);
@@ -427,22 +493,25 @@ public class ConsoleView implements View {
     }
 
     private void readCommand() {
-        System.out.println("*****************************************************************************************");
-        System.out.println("*  stop - остановить текущую игру                                                       *");
-        System.out.println("*  exit - остановить текущую игру и выйти в главное меню                                *");
-        System.out.println("*  new  - остановить текущую игру и начать новую с теми же параметрами                  *");
-        System.out.println("*   xXyY или  yYxX - где X и Y целые числа - открыть ячейку с адресом (X;Y)             *");
-        System.out.println("*  fxXyY или fyYxX - где X и Y целые числа - установить флаг на ячейку с адресом (X;Y)  *");
-        System.out.println("********************************* Введите команду ***************************************");
+        System.out.println("***************************************************************************************************");
+        System.out.println("*  stop - остановить текущую игру                                                                 *");
+        System.out.println("*  exit - остановить текущую игру и выйти в главное меню                                          *");
+        System.out.println("*  new  - остановить текущую игру и начать новую с теми же параметрами                            *");
+        System.out.println("*  wide / narrow  - установить режим широкого / узкого поля                                       *");
+        System.out.println("*  ?xXyY или ?yYxX или ?X,Y - где X и Y целые числа - установить вопрос на ячейку с адресом (X;Y) *");
+        System.out.println("*  fxXyY или fyYxX или fX,Y - где X и Y целые числа - установить флаг на ячейку с адресом (X;Y)   *");
+        System.out.println("*  &xXyY или &yYxX или &X,Y - где X и Y целые числа - открыть все ячейки соседние с адресом (X;Y) *");
+        System.out.println("*   xXyY или  yYxX или  X,Y - где X и Y целые числа - открыть ячейку с адресом (X;Y)              *");
+        System.out.println("**************************************** Введите команду ******************************************");
 
         Scanner scanner = new Scanner(System.in);
 
-        String line = scanner.nextLine();
-        line = line.trim();
+        String line = scanner.nextLine().trim().toLowerCase();
 
         boolean isFlag = false;
         boolean isX = false;
         boolean isY = false;
+        boolean isComma = false;
 
         String x = "";
         String y = "";
@@ -450,56 +519,65 @@ public class ConsoleView implements View {
         int xPosition;
         int yPosition;
 
-        if (line.equals("stop") || line.equals("Stop") || line.equals("STOP")) {
+        if (line.equals("stop")) {
             for (ViewListener listener : listeners) {
                 listener.stopGame();
                 gameStatus = listener.getGameStatus();
             }
-        } else if (line.equals("exit") || line.equals("Exit") || line.equals("EXIT")) {
+        } else if (line.equals("exit")) {
             for (ViewListener listener : listeners) {
                 listener.stopGame();
             }
             gameStatus = GameStatus.NONE;
-        } else if (line.equals("new") || line.equals("New") || line.equals("NEW")) {
+        } else if (line.equals("new")) {
             for (ViewListener listener : listeners) {
                 gameBoard = listener.startGame(xSize, ySize, numMines);
                 gameStatus = listener.getGameStatus();
             }
+        } else if (line.equals("wide")) {
+            isWideBoard = true;
+        } else if (line.equals("narrow")) {
+            isWideBoard = false;
         } else if (!line.isEmpty()) {
             int iX = 0;
             int iY = 0;
 
-            if (line.substring(0, 1).equals("f") || line.substring(0, 1).equals("F")) {
+            if (line.substring(0, 1).equals("f")) {
                 isFlag = true;
             }
 
             if (line.contains("x")) {
                 iX = line.indexOf("x");
                 isX = true;
-            } else if (line.contains("X")) {
-                iX = line.indexOf("X");
-                isX = true;
             }
 
             if (line.contains("y")) {
                 iY = line.indexOf("y");
                 isY = true;
-            } else if (line.contains("Y")) {
-                iY = line.indexOf("Y");
-                isY = true;
             }
 
-            if (isX && isY) {
-                iX++;
-                while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
-                    x += line.substring(iX, iX + 1);
-                    iX++;
-                }
+            if (line.contains(",")) {
+                iY = line.indexOf(",");
+                isComma = true;
+            } else if (line.contains(".")) {
+                iY = line.indexOf(".");
+                isComma = true;
+            }
 
-                iY++;
-                while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
-                    y += line.substring(iY, iY + 1);
+            if ((isX && isY) || isComma) {
+
+                if (isX && isY) {
+                    iX++;
+                    while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
+                        x += line.substring(iX, iX + 1);
+                        iX++;
+                    }
+
                     iY++;
+                    while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
+                        y += line.substring(iY, iY + 1);
+                        iY++;
+                    }
                 }
 
                 if (!x.isEmpty() && !y.isEmpty()) {
@@ -510,24 +588,27 @@ public class ConsoleView implements View {
                         boolean isError = false;
                         String errorString = "";
 
-                        if (xPosition < 0) {
-                            errorString += " x < 0 ";
+                        if (xPosition < 1) {
+                            errorString += " x < 1 ";
                             isError = true;
-                        } else if (xPosition >= xSize) {
-                            errorString += " x >= xSize ";
+                        } else if (xPosition > xSize) {
+                            errorString += " x > xSize ";
                             isError = true;
                         }
-                        if (yPosition < 0) {
-                            errorString += " y < 0 ";
+                        if (yPosition < 1) {
+                            errorString += " y < 1 ";
                             isError = true;
-                        } else if (yPosition >= xSize) {
-                            errorString += " y >= ySize ";
+                        } else if (yPosition > xSize) {
+                            errorString += " y > ySize ";
                             isError = true;
                         }
 
                         if (isError) {
                             showMessage("ОШИБКА: координаты выходят за пределы игрового поля (" + errorString + ")!");
                         } else {
+                            xPosition--;
+                            yPosition--;
+
                             CellState cellState = gameBoard.getCell(xPosition, yPosition);
 
                             if (isFlag) {
@@ -558,6 +639,8 @@ public class ConsoleView implements View {
                         showMessage("ОШИБКА: неправильный формат координат: " + e);
                     }
                 }
+            } else {
+                warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;
             }
         }
     }
