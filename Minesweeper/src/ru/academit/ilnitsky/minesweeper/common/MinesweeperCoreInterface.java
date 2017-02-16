@@ -30,7 +30,11 @@ public interface MinesweeperCoreInterface {
 
     GameBoard linkToGameBoard();
 
+    void setQuery(int xPosition, int yPosition);
+
     void setFlag(int xPosition, int yPosition);
 
     boolean setOpen(int xPosition, int yPosition);
+
+    boolean setOpenAllAround(int xPosition, int yPosition);
 }

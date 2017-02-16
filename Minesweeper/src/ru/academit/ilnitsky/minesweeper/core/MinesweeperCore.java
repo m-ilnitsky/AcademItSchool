@@ -175,6 +175,21 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     }
 
     @Override
+    public void setQuery(int xPosition, int yPosition) {
+        checkGameStatus();
+        checkPosition(xPosition, yPosition);
+
+        if (visibleBoard[xPosition][yPosition] == CellState.CLOSE.getValue()
+                || visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) {
+            visibleBoard[xPosition][yPosition] = CellState.QUERY.getValue();
+        } else if (visibleBoard[xPosition][yPosition] == CellState.QUERY.getValue()) {
+            visibleBoard[xPosition][yPosition] = CellState.CLOSE.getValue();
+        } else {
+            throw new IllegalArgumentException("QUERY in impossible position!");
+        }
+    }
+
+    @Override
     public void setFlag(int xPosition, int yPosition) {
         checkGameStatus();
         checkPosition(xPosition, yPosition);
@@ -182,9 +197,49 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         if (visibleBoard[xPosition][yPosition] == CellState.CLOSE.getValue()) {
             visibleBoard[xPosition][yPosition] = CellState.FLAG.getValue();
         } else if (visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) {
+            visibleBoard[xPosition][yPosition] = CellState.QUERY.getValue();
+        } else if (visibleBoard[xPosition][yPosition] == CellState.QUERY.getValue()) {
             visibleBoard[xPosition][yPosition] = CellState.CLOSE.getValue();
         } else {
             throw new IllegalArgumentException("FLAG in impossible position!");
+        }
+    }
+
+    @Override
+    public boolean setOpenAllAround(int xPosition, int yPosition) {
+        checkGameStatus();
+        checkPosition(xPosition, yPosition);
+
+        if (isNumber(xPosition, yPosition)) {
+            if (visibleBoard[xPosition][yPosition] == CellState.CLOSE.getValue()) {
+                throw new IllegalArgumentException("OpenAllAround in CLOSE position!");
+            } else if (visibleBoard[xPosition][yPosition] == CellState.QUERY.getValue()) {
+                throw new IllegalArgumentException("OpenAllAround in QUERY position!");
+            } else if (visibleBoard[xPosition][yPosition] == CellState.FLAG.getValue()) {
+                throw new IllegalArgumentException("OpenAllAround in FLAG position!");
+            } else {
+
+                if (visibleBoard[xPosition][yPosition] == calcNumFlagsAround(xPosition, yPosition)) {
+
+                    Position[] positions = getAllPositionsAround(xPosition, yPosition);
+
+                    int vClose = CellState.CLOSE.getValue();
+                    int vQuery = CellState.QUERY.getValue();
+
+                    for (Position p : positions) {
+                        int x = p.getX();
+                        int y = p.getY();
+
+                        if ((visibleBoard[x][y] == vClose || visibleBoard[x][y] == vQuery) && !makeStep(x, y)) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+        } else {
+            throw new IllegalArgumentException("OpenAllAround in impossible position!");
         }
     }
 
@@ -235,6 +290,98 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         return positions;
     }
 
+    private Position[] getAllPositionsAround(int xPosition, int yPosition) {
+        int xStart;
+        int xEnd;
+        int yStart;
+        int yEnd;
+
+        if (xPosition == 0) {
+            xStart = 0;
+        } else {
+            xStart = xPosition - 1;
+        }
+
+        if (yPosition == 0) {
+            yStart = 0;
+        } else {
+            yStart = yPosition - 1;
+        }
+
+        if (xPosition == (xSize - 1)) {
+            xEnd = xSize - 1;
+        } else {
+            xEnd = xPosition + 1;
+        }
+
+        if (yPosition == (ySize - 1)) {
+            yEnd = ySize - 1;
+        } else {
+            yEnd = yPosition + 1;
+        }
+
+        int count = 0;
+        Position[] positions = new Position[8];
+
+        for (int iX = xStart; iX <= xEnd; iX++) {
+            for (int iY = yStart; iY <= yEnd; iY++) {
+                if (iX != xPosition || iY != yPosition) {
+                    positions[count] = new Position(iX, iY);
+                    count++;
+                }
+            }
+        }
+
+        Position[] result = new Position[count];
+        System.arraycopy(positions, 0, result, 0, count);
+
+        return result;
+    }
+
+    private int calcNumFlagsAround(int xPosition, int yPosition) {
+        int xStart;
+        int xEnd;
+        int yStart;
+        int yEnd;
+
+        if (xPosition == 0) {
+            xStart = 0;
+        } else {
+            xStart = xPosition - 1;
+        }
+
+        if (yPosition == 0) {
+            yStart = 0;
+        } else {
+            yStart = yPosition - 1;
+        }
+
+        if (xPosition == (xSize - 1)) {
+            xEnd = xSize - 1;
+        } else {
+            xEnd = xPosition + 1;
+        }
+
+        if (yPosition == (ySize - 1)) {
+            yEnd = ySize - 1;
+        } else {
+            yEnd = yPosition + 1;
+        }
+
+        int numFlags = 0;
+        int flagValue = CellState.FLAG.getValue();
+
+        for (int iX = xStart; iX <= xEnd; iX++) {
+            for (int iY = yStart; iY <= yEnd; iY++) {
+                if ((iX != xPosition || iY != yPosition) && visibleBoard[iX][iY] == flagValue) {
+                    numFlags++;
+                }
+            }
+        }
+
+        return numFlags;
+    }
+
     private int calcNumMinesAround(int xPosition, int yPosition) {
         if (hiddenBoard[xPosition][yPosition] == CellState.MINE.getValue()) {
             return hiddenBoard[xPosition][yPosition];
@@ -258,18 +405,18 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
             yEnd = ySize - 1;
         }
 
-        int numMines = 0;
+        int numberMines = 0;
         int mineValue = CellState.MINE.getValue();
 
         for (int iX = xStart; iX <= xEnd; iX++) {
             for (int iY = yStart; iY <= yEnd; iY++) {
                 if (hiddenBoard[iX][iY] == mineValue) {
-                    numMines++;
+                    numberMines++;
                 }
             }
         }
 
-        return numMines;
+        return numberMines;
     }
 
     private void initCellsForFirstPosition(int xPosition, int yPosition) {

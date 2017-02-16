@@ -50,6 +50,11 @@ public class Controller implements ViewListener {
     }
 
     @Override
+    public void setQuery(int xPosition, int yPosition) {
+        model.setQuery(xPosition, yPosition);
+    }
+
+    @Override
     public void setFlag(int xPosition, int yPosition) {
         model.setFlag(xPosition, yPosition);
     }
@@ -57,6 +62,11 @@ public class Controller implements ViewListener {
     @Override
     public void setOpen(int xPosition, int yPosition) {
         model.setOpen(xPosition, yPosition);
+    }
+
+    @Override
+    public void setOpenAllAround(int xPosition, int yPosition) {
+        model.setOpenAllAround(xPosition, yPosition);
     }
 
     @Override

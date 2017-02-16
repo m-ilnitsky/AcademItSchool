@@ -25,8 +25,11 @@ public class ConsoleView implements View {
 
     private String warning = "";
 
+    private LastCommands lastCommands = new LastCommands(5);
+
     private final static String SYMBOL_DETONATION = "X";
     private final static String SYMBOL_MINE = "*";
+    private final static String SYMBOL_QUERY = "?";
     private final static String SYMBOL_FLAG = "F";
     private final static String SYMBOL_FREE = " ";
     private final static String SYMBOL_CLOSE = "#";
@@ -89,30 +92,39 @@ public class ConsoleView implements View {
                     break;
                 case STARTED:
                     showBoard();
+                    showWarning();
                     readCommand();
 
                     break;
                 case CONTINUED:
                     showBoard();
                     showStatusBar();
+                    showLastCommands();
+                    showWarning();
                     readCommand();
 
                     break;
                 case ENDED_WITH_STOP:
                     showMessage("Вы выбрали завершение текущей игры!");
+
                     gameStatus = GameStatus.NONE;
                     showStartMenu();
 
                     break;
                 case ENDED_WITH_LOSS:
                     showBoard();
+                    showLastCommands();
+
                     showMessage("Вы проиграли!");
+
                     gameStatus = GameStatus.NONE;
                     showStartMenu();
 
                     break;
                 case ENDED_WITH_WIN:
                     showBoard();
+                    showLastCommands();
+
                     showMessage("Поздравляем! Вы победили!");
 
                     showSaveResult();
@@ -254,6 +266,8 @@ public class ConsoleView implements View {
                         System.out.print(SYMBOL_FREE);
                     } else if (gameBoard.getCell(iX, iY) == CellState.CLOSE) {
                         System.out.print(SYMBOL_CLOSE);
+                    } else if (gameBoard.getCell(iX, iY) == CellState.QUERY) {
+                        System.out.print(SYMBOL_QUERY);
                     } else if (gameBoard.getCell(iX, iY) == CellState.FLAG) {
                         System.out.print(SYMBOL_FLAG);
                     } else if (gameBoard.getCell(iX, iY) == CellState.MINE) {
@@ -288,8 +302,20 @@ public class ConsoleView implements View {
             printLine();
             printLineOfNumbers();
         }
+    }
 
-        showWarning();
+    private void showLastCommands() {
+        if (lastCommands.getCurrentSize() > 0) {
+            System.out.println("Список последних " + lastCommands.getMaxSize() + " выполненных команд: " + lastCommands);
+        }
+    }
+
+    private void showWarning() {
+        if (!warning.isEmpty()) {
+            System.out.println(warning);
+
+            warning = "";
+        }
     }
 
     private void showStatusBar() {
@@ -303,6 +329,30 @@ public class ConsoleView implements View {
 
         int numFlags = gameBoard.getNumCells(CellState.FLAG);
         System.out.printf("С начала игры прошло: %4ds    Действий: %2d    Флагов: %2d    Мин: %d%n", time, numActions, numFlags, numMines);
+    }
+
+    private void showMessage(String message) {
+        System.out.println();
+        System.out.println(message);
+        System.out.println("Для продолжения нажмите Enter");
+
+        Scanner scanner = new Scanner(System.in);
+
+        scanner.nextLine();
+    }
+
+    private void showAbout() {
+        clear();
+
+        System.out.println("************** О ПРОГРАММЕ ***************");
+        System.out.println("*  Консольная версия игры САПЁР          *");
+        System.out.println("*  М.Ильницкий, Новосибирск, 2017        *");
+        System.out.println("******************************************");
+        System.out.println("Для выхода в главное меню нажмите Enter");
+
+        Scanner scanner = new Scanner(System.in);
+
+        scanner.nextLine();
     }
 
     private void showStartMenu() {
@@ -379,43 +429,12 @@ public class ConsoleView implements View {
                 for (ViewListener listener : listeners) {
                     gameBoard = listener.startGame(xSize, ySize, numMines);
                     gameStatus = listener.getGameStatus();
+                    lastCommands.clear();
                 }
             }
         } catch (Exception e) {
             showMessage("Чтоб выбрать пункт меню, введите цело число!");
         }
-    }
-
-    private void showAbout() {
-        clear();
-
-        System.out.println("************** О ПРОГРАММЕ ***************");
-        System.out.println("*  Консольная версия игры САПЁР          *");
-        System.out.println("*  М.Ильницкий, Новосибирск, 2017        *");
-        System.out.println("******************************************");
-        System.out.println("Для выхода в главное меню нажмите Enter");
-
-        Scanner scanner = new Scanner(System.in);
-
-        scanner.nextLine();
-    }
-
-    private void showWarning() {
-        if (!warning.isEmpty()) {
-            System.out.println(warning);
-
-            warning = "";
-        }
-    }
-
-    private void showMessage(String message) {
-        System.out.println();
-        System.out.println(message);
-        System.out.println("Для продолжения нажмите Enter");
-
-        Scanner scanner = new Scanner(System.in);
-
-        scanner.nextLine();
     }
 
     private int readGameParameter(String line) {
@@ -489,6 +508,7 @@ public class ConsoleView implements View {
         for (ViewListener listener : listeners) {
             gameBoard = listener.startGame(xSize, ySize, numMines);
             gameStatus = listener.getGameStatus();
+            lastCommands.clear();
         }
     }
 
@@ -509,6 +529,9 @@ public class ConsoleView implements View {
         String line = scanner.nextLine().trim().toLowerCase();
 
         boolean isFlag = false;
+        boolean isQuery = false;
+        boolean isAllAround = false;
+
         boolean isX = false;
         boolean isY = false;
         boolean isComma = false;
@@ -533,6 +556,7 @@ public class ConsoleView implements View {
             for (ViewListener listener : listeners) {
                 gameBoard = listener.startGame(xSize, ySize, numMines);
                 gameStatus = listener.getGameStatus();
+                lastCommands.clear();
             }
         } else if (line.equals("wide")) {
             isWideBoard = true;
@@ -541,9 +565,14 @@ public class ConsoleView implements View {
         } else if (!line.isEmpty()) {
             int iX = 0;
             int iY = 0;
+            int iComma = 0;
 
             if (line.substring(0, 1).equals("f")) {
                 isFlag = true;
+            } else if (line.substring(0, 1).equals("?")) {
+                isQuery = true;
+            } else if (line.substring(0, 1).equals("&")) {
+                isAllAround = true;
             }
 
             if (line.contains("x")) {
@@ -557,10 +586,10 @@ public class ConsoleView implements View {
             }
 
             if (line.contains(",")) {
-                iY = line.indexOf(",");
+                iComma = line.indexOf(",");
                 isComma = true;
             } else if (line.contains(".")) {
-                iY = line.indexOf(".");
+                iComma = line.indexOf(".");
                 isComma = true;
             }
 
@@ -574,6 +603,25 @@ public class ConsoleView implements View {
                     }
 
                     iY++;
+                    while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
+                        y += line.substring(iY, iY + 1);
+                        iY++;
+                    }
+                } else {
+
+                    if (isFlag || isQuery || isAllAround) {
+                        iX = 1;
+                    } else {
+                        iX = 0;
+                    }
+
+                    while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
+                        x += line.substring(iX, iX + 1);
+                        iX++;
+                    }
+
+                    iY = iComma + 1;
+
                     while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
                         y += line.substring(iY, iY + 1);
                         iY++;
@@ -611,26 +659,47 @@ public class ConsoleView implements View {
 
                             CellState cellState = gameBoard.getCell(xPosition, yPosition);
 
-                            if (isFlag) {
-                                if (cellState != CellState.CLOSE && cellState != CellState.FLAG) {
+                            if (isFlag || isQuery) {
+                                if (cellState != CellState.CLOSE && cellState != CellState.FLAG && cellState != CellState.QUERY) {
                                     showMessage("ОШИБКА: нельзя поставить флаг в уже открытую ячейку!");
                                 } else {
+                                    if (isFlag) {
+                                        for (ViewListener listener : listeners) {
+                                            listener.setFlag(xPosition, yPosition);
+                                            gameStatus = listener.getGameStatus();
+                                        }
+                                    } else {
+                                        for (ViewListener listener : listeners) {
+                                            listener.setQuery(xPosition, yPosition);
+                                            gameStatus = listener.getGameStatus();
+                                        }
+                                    }
+                                    lastCommands.add(line);
+                                }
+                            } else if (isAllAround) {
+                                if (cellState == CellState.CLOSE || cellState == CellState.FLAG || cellState == CellState.QUERY) {
+                                    showMessage("ОШИБКА: нельзя открыть окружение неоткрытой ячейки!");
+                                } else if (cellState == CellState.FREE) {
+                                    showMessage("ОШИБКА: нельзя открыть окружение ячейки не граничащей с минами!");
+                                } else {
                                     for (ViewListener listener : listeners) {
-                                        listener.setFlag(xPosition, yPosition);
+                                        listener.setOpenAllAround(xPosition, yPosition);
                                         gameStatus = listener.getGameStatus();
                                     }
+                                    lastCommands.add(line);
                                 }
                             } else {
-                                if (cellState != CellState.CLOSE) {
+                                if (cellState == CellState.CLOSE || cellState == CellState.QUERY) {
+                                    for (ViewListener listener : listeners) {
+                                        listener.setOpen(xPosition, yPosition);
+                                        gameStatus = listener.getGameStatus();
+                                    }
+                                    lastCommands.add(line);
+                                } else {
                                     if (cellState == CellState.FLAG) {
                                         showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
                                     } else {
                                         showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
-                                    }
-                                } else {
-                                    for (ViewListener listener : listeners) {
-                                        listener.setOpen(xPosition, yPosition);
-                                        gameStatus = listener.getGameStatus();
                                     }
                                 }
                             }
@@ -638,6 +707,8 @@ public class ConsoleView implements View {
                     } catch (NumberFormatException e) {
                         showMessage("ОШИБКА: неправильный формат координат: " + e);
                     }
+                } else {
+                    warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;
                 }
             } else {
                 warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;

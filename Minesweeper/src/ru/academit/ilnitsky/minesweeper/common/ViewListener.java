@@ -12,9 +12,13 @@ public interface ViewListener {
 
     void stopGame();
 
+    void setQuery(int xPosition, int yPosition);
+
     void setFlag(int xPosition, int yPosition);
 
     void setOpen(int xPosition, int yPosition);
+
+    void setOpenAllAround(int xPosition, int yPosition);
 
     int getNumActions();
 
