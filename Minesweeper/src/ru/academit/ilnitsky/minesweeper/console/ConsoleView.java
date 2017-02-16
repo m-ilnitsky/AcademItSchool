@@ -151,7 +151,13 @@ public class ConsoleView implements View {
 
         System.out.print("   ");
         for (int i = 1; i <= xSize; i++) {
-            if (i > 8) {
+            if (i > 8 && i < 12 && xSize > 8 && xSize < 12) {
+                if (i == 10) {
+                    System.out.print("+");
+                } else {
+                    System.out.print("-");
+                }
+            } else if (i > 8) {
                 if ((i - 8) % 4 == 0) {
                     System.out.print("---+");
 
@@ -176,7 +182,9 @@ public class ConsoleView implements View {
 
         System.out.print("   ");
         for (int i = 1; i <= xSize; i++) {
-            if (i > 8) {
+            if (i == 10 && xSize > 9 && xSize < 12) {
+                System.out.print(" 10");
+            } else if (i > 8) {
                 if ((i - 8) % 4 == 0) {
                     System.out.print("  " + i);
                 }
@@ -195,7 +203,9 @@ public class ConsoleView implements View {
 
         System.out.print("   +");
         for (int i = 2; i <= xSize; i++) {
-            if (i > 10) {
+            if (i == 11 && xSize == 11) {
+                System.out.print("~-");
+            } else if (i > 10) {
                 if ((i - 8) % 2 == 0) {
                     System.out.print("~-~+");
 
@@ -423,6 +433,10 @@ public class ConsoleView implements View {
                     break;
                 case 9:
                     showAbout();
+
+                    break;
+                default:
+                    showMessage("Чтоб выбрать пункт меню, введите номер соответствующего пункта!");
             }
 
             if (choice >= 1 && choice <= 3) {
