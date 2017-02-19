@@ -4,6 +4,8 @@ import ru.academit.ilnitsky.minesweeper.common.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Конслольное представление View для игры "Сапёр"
@@ -36,21 +38,19 @@ public class ConsoleView implements View {
 
     private final int topLength;
 
-    private final GameSize[] standardGameSizes = {
-            new GameSize(9, 9, 10),
-            new GameSize(16, 16, 40),
-            new GameSize(30, 16, 99)
-    };
+    private final Pattern patternPoint = Pattern.compile("^([?&fF]?)(\\d+)[.,](\\d+)$");
+    private final Pattern patternXY = Pattern.compile("^([?&fF]?)[xX](\\d+)[yY](\\d+)$");
+    private final Pattern patternYX = Pattern.compile("^([?&fF]?)[yY](\\d+)[xX](\\d+)$");
 
-    private final String[] standardGameNames = {
-            "Новичок (малый размер 9х9 ячеек, 10 мин)",
-            "Любитель (средний размер 16х16 ячеек, 40 мин)",
-            "Профессионал (большой размер 16х30 ячеек, 99 мин)"
-    };
+    private final GameSize[] standardGameSizes;
+    private final String[] standardGameNames;
 
-    public ConsoleView(int topLength) {
+    public ConsoleView(int topLength, GameSize[] standardGameSizes, String[] standardGameNames) {
         gameStatus = GameStatus.NONE;
         continued = true;
+
+        this.standardGameSizes = standardGameSizes;
+        this.standardGameNames = standardGameNames;
 
         this.topLength = topLength;
     }
@@ -365,23 +365,51 @@ public class ConsoleView implements View {
         scanner.nextLine();
     }
 
+    private static void printLine(String s, int number) {
+        for (int i = 0; i < number; i++) {
+            System.out.print(s);
+
+        }
+        System.out.println();
+    }
+
+    private static void printLine(String begin, String s, String end, int length) {
+
+        int number = (length - begin.length() - end.length()) / s.length();
+
+        System.out.print(begin);
+        for (int i = 0; i < number; i++) {
+            System.out.print(s);
+
+        }
+        System.out.println(end);
+    }
+
     private void showStartMenu() {
         clear();
 
+        int lineLength = 59;
+
         System.out.println("*********************** ИГРА <САПЁР> **********************");
         System.out.println("*                       ГЛАВНОЕ МЕНЮ                      *");
-        System.out.println("************** * * * * * * * * * * * * * * * **************");
+        printLine("*", lineLength);
         System.out.println("* СЛОЖНОСТЬ ИГРЫ:                                         *");
-        System.out.println("* 1: Новичок (малый размер 9х9 ячеек, 10 мин)             *");
-        System.out.println("* 2: Любитель (средний размер 16х16 ячеек, 40 мин)        *");
-        System.out.println("* 3: Профессионал (большой размер 16х30 ячеек, 99 мин)    *");
+
+        for (int i = 0; i < Math.min(3, standardGameNames.length); i++) {
+            printLine("* " + (i + 1) + ": " + standardGameNames[i],
+                    " ", "*", lineLength);
+        }
+
         System.out.println("* 4: Произвольный размер                                  *");
-        System.out.println("************** * * * * * * * * * * * * * * * **************");
+        printLine("*", lineLength);
         System.out.println("* ТОП ЛУЧШИХ РЕЗУЛЬТАТОВ:                                 *");
-        System.out.println("* 5: Новичёк (малый размер 9х9 ячеек, 10 мин)             *");
-        System.out.println("* 6: Любитель (средний размер 16х16 ячеек, 40 мин)        *");
-        System.out.println("* 7: Профессионал (большой размер 16х30 ячеек, 99 мин)    *");
-        System.out.println("************** * * * * * * * * * * * * * * * **************");
+
+        for (int i = 0; i < Math.min(3, standardGameNames.length); i++) {
+            printLine("* " + (i + 5) + ": " + standardGameNames[i],
+                    " ", "*", lineLength);
+        }
+
+        printLine("*", lineLength);
         System.out.println("* 9: О ПРОГРАММЕ                                          *");
         System.out.println("* 0: ВЫХОД                                                *");
         System.out.println("*************** Введите номер вашего выбора ***************");
@@ -397,22 +425,12 @@ public class ConsoleView implements View {
 
                     break;
                 case 1:
-                    xSize = 9;
-                    ySize = 9;
-                    numMines = 10;
-
-                    break;
                 case 2:
-                    xSize = 16;
-                    ySize = 16;
-                    numMines = 40;
-                    System.out.println("2");
-
-                    break;
                 case 3:
-                    xSize = 30;
-                    ySize = 16;
-                    numMines = 99;
+                    int index = choice - 1;
+                    xSize = standardGameSizes[index].getXSize();
+                    ySize = standardGameSizes[index].getYSize();
+                    numMines = standardGameSizes[index].getNumMines();
 
                     break;
                 case 4:
@@ -420,15 +438,9 @@ public class ConsoleView implements View {
 
                     break;
                 case 5:
-                    showTopScores(new GameSize(9, 9, 10));
-
-                    break;
                 case 6:
-                    showTopScores(new GameSize(16, 16, 40));
-
-                    break;
                 case 7:
-                    showTopScores(new GameSize(30, 16, 99));
+                    showTopScores(standardGameSizes[choice - 5]);
 
                     break;
                 case 9:
@@ -542,20 +554,6 @@ public class ConsoleView implements View {
 
         String line = scanner.nextLine().trim().toLowerCase();
 
-        boolean isFlag = false;
-        boolean isQuery = false;
-        boolean isAllAround = false;
-
-        boolean isX = false;
-        boolean isY = false;
-        boolean isComma = false;
-
-        String x = "";
-        String y = "";
-
-        int xPosition;
-        int yPosition;
-
         if (line.equals("stop")) {
             for (ViewListener listener : listeners) {
                 listener.stopGame();
@@ -577,152 +575,133 @@ public class ConsoleView implements View {
         } else if (line.equals("narrow")) {
             isWideBoard = false;
         } else if (!line.isEmpty()) {
-            int iX = 0;
-            int iY = 0;
-            int iComma = 0;
 
-            if (line.substring(0, 1).equals("f")) {
-                isFlag = true;
-            } else if (line.substring(0, 1).equals("?")) {
-                isQuery = true;
-            } else if (line.substring(0, 1).equals("&")) {
-                isAllAround = true;
+            Matcher matcherPoint = patternPoint.matcher(line);
+            Matcher matcherXY = patternXY.matcher(line);
+            Matcher matcherYX = patternYX.matcher(line);
+
+            Matcher matcher;
+
+            String x;
+            String y;
+
+            if (matcherPoint.matches()) {
+                matcher = matcherPoint;
+                x = matcher.group(2);
+                y = matcher.group(3);
+            } else if (matcherXY.matches()) {
+                matcher = matcherXY;
+                x = matcher.group(2);
+                y = matcher.group(3);
+            } else if (matcherYX.matches()) {
+                matcher = matcherYX;
+                x = matcher.group(3);
+                y = matcher.group(2);
+            } else {
+                warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;
+                return;
             }
 
-            if (line.contains("x")) {
-                iX = line.indexOf("x");
-                isX = true;
-            }
+            boolean isFlag = false;
+            boolean isQuery = false;
+            boolean isAllAround = false;
 
-            if (line.contains("y")) {
-                iY = line.indexOf("y");
-                isY = true;
-            }
-
-            if (line.contains(",")) {
-                iComma = line.indexOf(",");
-                isComma = true;
-            } else if (line.contains(".")) {
-                iComma = line.indexOf(".");
-                isComma = true;
-            }
-
-            if ((isX && isY) || isComma) {
-
-                if (isX && isY) {
-                    iX++;
-                    while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
-                        x += line.substring(iX, iX + 1);
-                        iX++;
-                    }
-
-                    iY++;
-                    while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
-                        y += line.substring(iY, iY + 1);
-                        iY++;
-                    }
-                } else {
-
-                    if (isFlag || isQuery || isAllAround) {
-                        iX = 1;
-                    } else {
-                        iX = 0;
-                    }
-
-                    while (iX < line.length() && Character.isDigit(line.substring(iX, iX + 1).toCharArray()[0])) {
-                        x += line.substring(iX, iX + 1);
-                        iX++;
-                    }
-
-                    iY = iComma + 1;
-
-                    while (iY < line.length() && Character.isDigit(line.substring(iY, iY + 1).toCharArray()[0])) {
-                        y += line.substring(iY, iY + 1);
-                        iY++;
-                    }
+            String flag = matcher.group(1);
+            if (!flag.isEmpty()) {
+                switch (flag) {
+                    case "f":
+                        isFlag = true;
+                        break;
+                    case "?":
+                        isQuery = true;
+                        break;
+                    case "&":
+                        isAllAround = true;
+                        break;
+                    default:
+                        warning = "ВНИМАНИЕ: использован неизвестный флаг команды: " + flag;
+                        return;
                 }
+            }
 
-                if (!x.isEmpty() && !y.isEmpty()) {
-                    try {
-                        xPosition = Integer.parseInt(x);
-                        yPosition = Integer.parseInt(y);
+            if (!x.isEmpty() && !y.isEmpty()) {
+                try {
+                    int xPosition = Integer.parseInt(x);
+                    int yPosition = Integer.parseInt(y);
 
-                        boolean isError = false;
-                        String errorString = "";
+                    boolean isError = false;
+                    String errorString = "";
 
-                        if (xPosition < 1) {
-                            errorString += " x < 1 ";
-                            isError = true;
-                        } else if (xPosition > xSize) {
-                            errorString += " x > xSize ";
-                            isError = true;
-                        }
-                        if (yPosition < 1) {
-                            errorString += " y < 1 ";
-                            isError = true;
-                        } else if (yPosition > xSize) {
-                            errorString += " y > ySize ";
-                            isError = true;
-                        }
+                    if (xPosition < 1) {
+                        errorString += " x < 1 ";
+                        isError = true;
+                    } else if (xPosition > xSize) {
+                        errorString += " x > xSize ";
+                        isError = true;
+                    }
+                    if (yPosition < 1) {
+                        errorString += " y < 1 ";
+                        isError = true;
+                    } else if (yPosition > xSize) {
+                        errorString += " y > ySize ";
+                        isError = true;
+                    }
 
-                        if (isError) {
-                            showMessage("ОШИБКА: координаты выходят за пределы игрового поля (" + errorString + ")!");
-                        } else {
-                            xPosition--;
-                            yPosition--;
+                    if (isError) {
+                        showMessage("ОШИБКА: координаты выходят за пределы игрового поля (" + errorString + ")!");
+                    } else {
+                        xPosition--;
+                        yPosition--;
 
-                            CellState cellState = gameBoard.getCell(xPosition, yPosition);
+                        CellState cellState = gameBoard.getCell(xPosition, yPosition);
 
-                            if (isFlag || isQuery) {
-                                if (cellState != CellState.CLOSE && cellState != CellState.FLAG && cellState != CellState.QUERY) {
-                                    showMessage("ОШИБКА: нельзя поставить флаг в уже открытую ячейку!");
-                                } else {
-                                    if (isFlag) {
-                                        for (ViewListener listener : listeners) {
-                                            listener.setFlag(xPosition, yPosition);
-                                            gameStatus = listener.getGameStatus();
-                                        }
-                                    } else {
-                                        for (ViewListener listener : listeners) {
-                                            listener.setQuery(xPosition, yPosition);
-                                            gameStatus = listener.getGameStatus();
-                                        }
-                                    }
-                                    lastCommands.add(line);
-                                }
-                            } else if (isAllAround) {
-                                if (cellState == CellState.CLOSE || cellState == CellState.FLAG || cellState == CellState.QUERY) {
-                                    showMessage("ОШИБКА: нельзя открыть окружение неоткрытой ячейки!");
-                                } else if (cellState == CellState.FREE) {
-                                    showMessage("ОШИБКА: нельзя открыть окружение ячейки не граничащей с минами!");
-                                } else {
-                                    for (ViewListener listener : listeners) {
-                                        listener.setOpenAllAround(xPosition, yPosition);
-                                        gameStatus = listener.getGameStatus();
-                                    }
-                                    lastCommands.add(line);
-                                }
+                        if (isFlag || isQuery) {
+                            if (cellState != CellState.CLOSE && cellState != CellState.FLAG && cellState != CellState.QUERY) {
+                                showMessage("ОШИБКА: нельзя поставить флаг в уже открытую ячейку!");
                             } else {
-                                if (cellState == CellState.CLOSE || cellState == CellState.QUERY) {
+                                if (isFlag) {
                                     for (ViewListener listener : listeners) {
-                                        listener.setOpen(xPosition, yPosition);
+                                        listener.setFlag(xPosition, yPosition);
                                         gameStatus = listener.getGameStatus();
                                     }
-                                    lastCommands.add(line);
                                 } else {
-                                    if (cellState == CellState.FLAG) {
-                                        showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
-                                    } else {
-                                        showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
+                                    for (ViewListener listener : listeners) {
+                                        listener.setQuery(xPosition, yPosition);
+                                        gameStatus = listener.getGameStatus();
                                     }
+                                }
+                                lastCommands.add(line);
+                            }
+                        } else if (isAllAround) {
+                            if (cellState == CellState.CLOSE || cellState == CellState.FLAG || cellState == CellState.QUERY) {
+                                showMessage("ОШИБКА: нельзя открыть окружение неоткрытой ячейки!");
+                            } else if (cellState == CellState.FREE) {
+                                showMessage("ОШИБКА: нельзя открыть окружение ячейки не граничащей с минами!");
+                            } else {
+                                for (ViewListener listener : listeners) {
+                                    listener.setOpenAllAround(xPosition, yPosition);
+                                    gameStatus = listener.getGameStatus();
+                                }
+                                lastCommands.add(line);
+                            }
+                        } else {
+                            if (cellState == CellState.CLOSE || cellState == CellState.QUERY) {
+                                for (ViewListener listener : listeners) {
+                                    listener.setOpen(xPosition, yPosition);
+                                    gameStatus = listener.getGameStatus();
+                                }
+                                lastCommands.add(line);
+                            } else {
+                                if (cellState == CellState.FLAG) {
+                                    showMessage("ОШИБКА: нельзя сходить в ячейку занятую флагом!");
+                                } else {
+                                    showMessage("ОШИБКА: нельзя сходить в уже открытую ячейку!");
                                 }
                             }
                         }
-                    } catch (NumberFormatException e) {
-                        showMessage("ОШИБКА: неправильный формат координат: " + e);
                     }
-                } else {
-                    warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;
+                } catch (NumberFormatException e) {
+                    showMessage("ОШИБКА: неправильный формат координат: " + e);
                 }
             } else {
                 warning = "ВНИМАНИЕ: введена неизвестная команда: " + line;

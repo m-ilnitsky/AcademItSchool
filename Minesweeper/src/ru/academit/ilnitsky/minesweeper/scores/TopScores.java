@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Лучшие результаты игры "Сапёр"
@@ -65,8 +67,6 @@ public class TopScores implements TopScoresInterface {
         } catch (IOException e) {
             System.out.println("Ошибка открытия файла с результатами игры! (" + e + ")");
         }
-
-        System.out.println("Constructor currentLength=" + currentLength);
     }
 
     private void readFromFile() throws IOException {
@@ -74,71 +74,33 @@ public class TopScores implements TopScoresInterface {
                 Scanner fileScanner = new Scanner(new FileInputStream(fileName), code)
         ) {
             GameInfo[] oldGames = new GameInfo[maxLength];
-            int count = -1;
+            int count = 0;
+
+            Pattern pattern = Pattern.compile("^T(\\d+)\\s+A(\\d+)\\s+@([a-zA-Z0-9_-]+)$");
 
             while (fileScanner.hasNextLine()) {
-                count++;
                 if (count == maxLength) {
-                    count--;
                     break;
                 }
 
-                int time;
-                int numActions;
-                String userName;
-
                 String line = fileScanner.nextLine().trim();
-                int index = 0;
+                Matcher matcher = pattern.matcher(line);
 
-                if (index < line.length() && line.substring(index, index + 1).equals("T")) {
-                    StringBuilder sb = new StringBuilder();
-                    index++;
-                    while (index < line.length() && Character.isDigit(line.substring(index, index + 1).toCharArray()[0])) {
-                        sb.append(line.substring(index, index + 1));
-                        index++;
-                    }
-                    time = Integer.parseInt(sb.toString());
-                } else {
-                    return;
+                if (!matcher.matches()) {
+                    break;
                 }
 
-                while (index < line.length() && !line.substring(index, index + 1).equals("A")) {
-                    index++;
-                }
-
-                if (index < line.length() && line.substring(index, index + 1).equals("A")) {
-                    StringBuilder sb = new StringBuilder();
-                    index++;
-                    while (index < line.length() && Character.isDigit(line.substring(index, index + 1).toCharArray()[0])) {
-                        sb.append(line.substring(index, index + 1));
-                        index++;
-                    }
-                    numActions = Integer.parseInt(sb.toString());
-                } else {
-                    return;
-                }
-
-                while (index < line.length() && !line.substring(index, index + 1).equals("@")) {
-                    index++;
-                }
-
-                if (index < line.length() && line.substring(index, index + 1).equals("@")) {
-                    StringBuilder sb = new StringBuilder();
-                    index++;
-                    while (index < line.length() && !line.substring(index, index + 1).equals("\n")) {
-                        sb.append(line.substring(index, index + 1));
-                        index++;
-                    }
-                    userName = sb.toString();
-                } else {
-                    return;
-                }
+                int time = Integer.parseInt(matcher.group(1));
+                int numActions = Integer.parseInt(matcher.group(2));
+                String userName = matcher.group(3);
 
                 oldGames[count] = new GameInfo(xSize, ySize, numMines, numActions, time, userName);
+
+                count++;
             }
 
             games = oldGames;
-            currentLength = count + 1;
+            currentLength = count;
             System.out.println("readFromFile currentLength=" + currentLength);
         }
     }
@@ -197,8 +159,6 @@ public class TopScores implements TopScoresInterface {
                     break;
                 }
             }
-
-            System.out.println("addResult currentLength=" + currentLength);
         }
 
         try {
