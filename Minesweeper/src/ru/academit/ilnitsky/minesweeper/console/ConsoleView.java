@@ -389,13 +389,14 @@ public class ConsoleView implements View {
         clear();
 
         int lineLength = 59;
+        int numLines = Math.min(3, standardGameNames.length);
 
         System.out.println("*********************** ИГРА <САПЁР> **********************");
         System.out.println("*                       ГЛАВНОЕ МЕНЮ                      *");
         printLine("*", lineLength);
         System.out.println("* СЛОЖНОСТЬ ИГРЫ:                                         *");
 
-        for (int i = 0; i < Math.min(3, standardGameNames.length); i++) {
+        for (int i = 0; i < numLines; i++) {
             printLine("* " + (i + 1) + ": " + standardGameNames[i],
                     " ", "*", lineLength);
         }
@@ -404,7 +405,7 @@ public class ConsoleView implements View {
         printLine("*", lineLength);
         System.out.println("* ТОП ЛУЧШИХ РЕЗУЛЬТАТОВ:                                 *");
 
-        for (int i = 0; i < Math.min(3, standardGameNames.length); i++) {
+        for (int i = 0; i < numLines; i++) {
             printLine("* " + (i + 5) + ": " + standardGameNames[i],
                     " ", "*", lineLength);
         }
