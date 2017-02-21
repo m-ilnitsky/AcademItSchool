@@ -1,6 +1,8 @@
-package ru.academit.ilnitsky.minesweeper.console;
+package ru.academit.ilnitsky.minesweeper;
 
 import ru.academit.ilnitsky.minesweeper.common.GameSize;
+import ru.academit.ilnitsky.minesweeper.common.View;
+import ru.academit.ilnitsky.minesweeper.console.ConsoleView;
 import ru.academit.ilnitsky.minesweeper.controller.Controller;
 import ru.academit.ilnitsky.minesweeper.core.MinesweeperCore;
 
@@ -24,11 +26,11 @@ public class Console {
         };
 
         MinesweeperCore minesweeperCore = new MinesweeperCore();
-        ConsoleView consoleView = new ConsoleView(30, standardGameSizes, standardGameNames);
+        View view = new ConsoleView(30, standardGameSizes, standardGameNames);
 
-        Controller controller = new Controller(minesweeperCore, consoleView);
+        Controller controller = new Controller(minesweeperCore, view);
 
-        consoleView.addViewListener(controller);
-        consoleView.startApplication();
+        view.addViewListener(controller);
+        view.startApplication();
     }
 }

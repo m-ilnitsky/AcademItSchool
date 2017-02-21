@@ -60,7 +60,7 @@ public class FrameView implements View {
 
     private void initFrame() {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(580, 440);
+        frame.setSize(600, 440);
         frame.setMinimumSize(frame.getSize());
 
         // заставляет фрейм располагаться по центру экрана при запуске
