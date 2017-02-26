@@ -156,7 +156,7 @@ public class FrameView implements ViewAutoCloseable {
             menuSize[i] = new JRadioButtonMenuItem(standardGameNames[i]);
             buttonGroup.add(menuSize[i]);
         }
-        JMenuItem menuCustom = new JMenuItem("Произвольные параметры");
+        JRadioButtonMenuItem menuCustom = new JRadioButtonMenuItem("Произвольные параметры");
         buttonGroup.add(menuCustom);
 
         menuSize[0].doClick();
@@ -168,52 +168,114 @@ public class FrameView implements ViewAutoCloseable {
                 ySize = standardGameSizes[index].getYSize();
                 numMines = standardGameSizes[index].getNumMines();
 
-                for (ViewListener listener : listeners) {
-                    gameBoard = listener.startGame(xSize, ySize, numMines);
-                    gameStatus = listener.getGameStatus();
-                }
-
-                lastCommands.clear();
-                numActions = 0;
-                numFlags = 0;
-
-                updateTopPanel();
-                initGameBoard();
-                setFrameSize();
-
-                gameBoardPanel.updateUI();
-                frame.repaint();
+                setNewGame();
             });
         }
 
         menuNew.addActionListener(e -> {
-            for (ViewListener listener : listeners) {
-                gameBoard = listener.startGame(xSize, ySize, numMines);
-                gameStatus = listener.getGameStatus();
-            }
+            setNewGame();
+        });
 
-            lastCommands.clear();
-            numActions = 0;
-            numFlags = 0;
+        menuCustom.addActionListener(e -> {
+            JDialog dialog = new JDialog();
 
-            updateTopPanel();
-            initGameBoard();
-            setFrameSize();
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            dialog.setTitle("Выбор произвольных параметров игры");
+            dialog.setModal(true);
+            dialog.setSize(640, 160);
+            dialog.setMinimumSize(dialog.getSize());
 
-            gameBoardPanel.updateUI();
-            frame.repaint();
+            JPanel panel = new JPanel();
+
+            JLabel labelXSize = new JLabel("Введите число ячеек по оси X (от 5 до 64):");
+            JLabel labelYSize = new JLabel("Введите число ячеек по оси Y (от 5 до 64):");
+            JLabel labelNumMines = new JLabel("Введите число мин (максимум 30% от числа ячеек):");
+
+            JTextField inputXSize = new JTextField();
+            JTextField inputYSize = new JTextField();
+            JTextField inputNumMines = new JTextField();
+
+            JButton buttonCancel = new JButton("Отмена");
+            JButton buttonOk = new JButton("Применить");
+
+            buttonCancel.addActionListener(actionEvent -> {
+                dialog.setVisible(false);
+
+                int index = indexOfGameSize();
+                if (index == -1) {
+                    buttonGroup.setSelected(menuCustom.getModel(), true);
+                } else {
+                    buttonGroup.setSelected(menuSize[index].getModel(), true);
+                }
+            });
+
+            buttonOk.addActionListener(actionEvent -> {
+                try {
+                    int newXSize = Integer.parseInt(inputXSize.getText());
+                    int newYSize = Integer.parseInt(inputYSize.getText());
+                    int newNumMines = Integer.parseInt(inputNumMines.getText());
+
+                    int maxNumMines = (int) (newXSize * newYSize * 0.3);
+
+                    if (newXSize < 5 || newYSize < 5) {
+                        showErrorMessage(dialog, "Размер должен быть больше 4");
+                    } else if (newXSize > 64 || newYSize > 64) {
+                        showErrorMessage(dialog, "Размер должен быть меньше 65");
+                    } else if (newNumMines < 1) {
+                        showErrorMessage(dialog, "Число бомб должно быть больше 0");
+                    } else if (newNumMines >= maxNumMines) {
+                        showErrorMessage(dialog, "Число бомб должно быть меньше 30% от числа ячеек, т.е. меньше " + maxNumMines + " штук");
+                    } else {
+                        xSize = newXSize;
+                        ySize = newYSize;
+                        numMines = newNumMines;
+
+                        setNewGame();
+
+                        dialog.setVisible(false);
+                    }
+                } catch (NumberFormatException ex) {
+                    showErrorMessage(dialog, "Вводить нужно целые положительные числа");
+                }
+            });
+
+            panel.setLayout(new GridLayout(4, 2));
+            panel.add(labelXSize);
+            panel.add(inputXSize);
+            panel.add(labelYSize);
+            panel.add(inputYSize);
+            panel.add(labelNumMines);
+            panel.add(inputNumMines);
+            panel.add(buttonCancel);
+            panel.add(buttonOk);
+
+            dialog.add(panel);
+
+            dialog.setVisible(true);
+            dialog.setLocationRelativeTo(frame);
         });
 
         menuStop.addActionListener(e -> {
-            for (ViewListener listener : listeners) {
-                listener.stopGame();
-                gameStatus = listener.getGameStatus();
+            if (gameStatus.isGame()) {
+                for (ViewListener listener : listeners) {
+                    listener.stopGame();
+                    gameStatus = listener.getGameStatus();
+                    showMessageEndWithStop();
+                }
             }
         });
 
         menuExit.addActionListener(e -> {
             try {
-                close();
+                int result = JOptionPane.showConfirmDialog(frame,
+                        "Закрыть программу?",
+                        "Подтверждение завершения",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+
+                if (result == 0) {
+                    close();
+                }
             } catch (Exception exception) {
                 exception.getStackTrace();
             }
@@ -237,11 +299,49 @@ public class FrameView implements ViewAutoCloseable {
 
         for (int i = 0; i < standardGameNames.length; i++) {
             menuSize[i] = new JMenuItem(standardGameNames[i]);
-            menuScores.add(menuSize[i]);
+
+            Integer index = i;
 
             menuSize[i].addActionListener(e -> {
+                GameInfo[] gameArray = null;
+                String gameName = null;
 
+                for (ViewListener listener : listeners) {
+                    gameArray = listener.getTopScores(standardGameSizes[index]);
+                    gameName = standardGameNames[index];
+                }
+
+                if (gameArray != null && gameName != null) {
+
+                    int length = 0;
+                    for (int ii = gameArray.length - 1; ii >= 0; ii--) {
+                        if (gameArray[ii] != null) {
+                            length = ii + 1;
+                            break;
+                        }
+                    }
+
+                    String[] strings;
+
+                    if (length > 0) {
+                        strings = new String[length];
+
+                        for (int ii = 0; ii < length; ii++) {
+                            strings[ii] = String.format(" %3d   Время: %4d сек   Действий: %3d   Игрок: %s%n",
+                                    ii + 1, gameArray[ii].getTime(), gameArray[ii].getNumActions(), gameArray[ii].getUserName());
+                        }
+                    } else {
+                        strings = new String[1];
+                        strings[0] = "Извините для данных параметров игры ещё нет сохранённых результатов побед!";
+                    }
+
+                    String title = "Топ " + gameArray.length + " для игры: " + gameName;
+
+                    JOptionPane.showMessageDialog(frame, strings, title, JOptionPane.INFORMATION_MESSAGE);
+                }
             });
+
+            menuScores.add(menuSize[i]);
         }
 
         return menuScores;
@@ -250,9 +350,18 @@ public class FrameView implements ViewAutoCloseable {
     private JMenu createMenuAbout() {
         JMenu menuAbout = new JMenu("О программе");
 
-        menuAbout.addActionListener(e -> {
+        JMenuItem menuAbout2 = new JMenuItem("О программе");
 
+        menuAbout2.addActionListener(e -> {
+            JOptionPane.showMessageDialog(frame,
+                    new String[]{"Игра САПЁР с графическим интерфейсом",
+                            "Графический интерфейс на основе Swing",
+                            "М.Ильницкий, Новосибирск, 2017"},
+                    "О программе",
+                    JOptionPane.INFORMATION_MESSAGE);
         });
+
+        menuAbout.add(menuAbout2);
 
         return menuAbout;
     }
@@ -373,27 +482,29 @@ public class FrameView implements ViewAutoCloseable {
                     public void mouseClicked(MouseEvent e) {
                         CellState cellState = gameBoard.getCell(xValue, yValue);
 
-                        if (gameStatus.isContinued() && e.getButton() == MouseEvent.BUTTON3) {
-                            if (cellState == CellState.CLOSE
-                                    || cellState == CellState.QUERY
-                                    || cellState == CellState.FLAG) {
-                                for (ViewListener listener : listeners) {
-                                    listener.setFlag(xValue, yValue);
+                        if (gameStatus.isContinued()) {
+                            if (e.getButton() == MouseEvent.BUTTON3) {
+                                if (cellState == CellState.CLOSE
+                                        || cellState == CellState.QUERY
+                                        || cellState == CellState.FLAG) {
+                                    for (ViewListener listener : listeners) {
+                                        listener.setFlag(xValue, yValue);
+                                    }
+                                    lastCommands.add("Flag(" + (xValue + 1) + "," + (yValue + 1) + ")");
+                                    numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                    updateGameBoard();
                                 }
-                                lastCommands.add("Flag(" + (xValue + 1) + "," + (yValue + 1) + ")");
-                                numFlags = gameBoard.getNumCells(CellState.FLAG);
-                                updateGameBoard();
-                            }
-                        } else if (gameStatus.isGame() && e.getButton() == MouseEvent.BUTTON2) {
-                            if (cellState.isNumber()) {
-                                for (ViewListener listener : listeners) {
-                                    listener.setOpenAllAround(xValue, yValue);
-                                    gameStatus = listener.getGameStatus();
-                                    numActions = listener.getNumActions();
+                            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                                if (cellState.isNumber()) {
+                                    for (ViewListener listener : listeners) {
+                                        listener.setOpenAllAround(xValue, yValue);
+                                        gameStatus = listener.getGameStatus();
+                                        numActions = listener.getNumActions();
+                                    }
+                                    lastCommands.add("AllAround(" + (xValue + 1) + "," + (yValue + 1) + ")");
+                                    numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                    updateGameBoard();
                                 }
-                                lastCommands.add("AllAround(" + (xValue + 1) + "," + (yValue + 1) + ")");
-                                numFlags = gameBoard.getNumCells(CellState.FLAG);
-                                updateGameBoard();
                             }
                         }
                     }
@@ -482,11 +593,84 @@ public class FrameView implements ViewAutoCloseable {
         updateTopPanel();
 
         gameBoardPanel.updateUI();
+
+        checkGameStatus();
     }
 
     private void updateTopPanel() {
         flagLabel.setText(flagStr + numFlags + " / " + numMines);
         actionLabel.setText(actionStr + numActions);
         commandLabel.setText(commandStr + lastCommands.toString());
+    }
+
+    private void checkGameStatus() {
+        if (gameStatus == GameStatus.ENDED_WITH_STOP) {
+            showMessageEndWithStop();
+        } else if (gameStatus == GameStatus.ENDED_WITH_LOSS) {
+            showMessageEndWithLoss();
+        } else if (gameStatus == GameStatus.ENDED_WITH_WIN) {
+            showMessageEndWithWin();
+        }
+    }
+
+    private void showMessageEndWithStop() {
+        JOptionPane.showMessageDialog(frame,
+                "Игра прервана пользователем!",
+                "Игра окончена",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showMessageEndWithLoss() {
+        JOptionPane.showMessageDialog(frame,
+                "Вы проиграли!",
+                "Игра окончена",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showMessageEndWithWin() {
+        JOptionPane.showMessageDialog(frame,
+                "Поздравляем! Вы победили!",
+                "Игра окончена",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showErrorMessage(Window fromFrame, String message) {
+        JOptionPane.showMessageDialog(fromFrame,
+                message,
+                "Ошибка",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private int indexOfGameSize() {
+        int index = -1;
+
+        for (int i = 0; i < standardGameSizes.length; i++) {
+            if ((xSize == standardGameSizes[i].getXSize())
+                    && (ySize == standardGameSizes[i].getYSize())
+                    && (numMines == standardGameSizes[i].getNumMines())) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    private void setNewGame() {
+        for (ViewListener listener : listeners) {
+            gameBoard = listener.startGame(xSize, ySize, numMines);
+            gameStatus = listener.getGameStatus();
+        }
+
+        lastCommands.clear();
+        numActions = 0;
+        numFlags = 0;
+
+        updateTopPanel();
+        initGameBoard();
+        setFrameSize();
+
+        gameBoardPanel.updateUI();
+        frame.repaint();
     }
 }
