@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +52,9 @@ public class FrameView implements ViewAutoCloseable {
     private final JLabel flagLabel = new JLabel(flagStr);
     private final JLabel actionLabel = new JLabel(actionStr);
     private final JLabel commandLabel = new JLabel(commandStr);
+
+    private Instant startTime;
+    private Timer timer = new Timer(100, l -> updateTime());
 
     private JButton[][] cells;
 
@@ -469,6 +473,9 @@ public class FrameView implements ViewAutoCloseable {
                             if (gameStatus == GameStatus.STARTED) {
                                 Thread.sleep(5000);
                             }
+                            if (numActions == 1) {
+                                startTimer();
+                            }
                             lastCommands.add("Open(" + (xValue + 1) + "," + (yValue + 1) + ")");
                             numFlags = gameBoard.getNumCells(CellState.FLAG);
                             updateGameBoard();
@@ -604,12 +611,36 @@ public class FrameView implements ViewAutoCloseable {
         commandLabel.setText(commandStr + lastCommands.toString());
     }
 
+    private void updateTime() {
+        if (gameStatus.isGame()) {
+            long time = Instant.now().getEpochSecond() - startTime.getEpochSecond();
+
+            int min = (int) (time / 60);
+            int sec = (int) (time % 60);
+
+            if (min > 0) {
+                timeLabel.setText(timeStr + min + " мин " + sec + " сек");
+            } else {
+                timeLabel.setText(timeStr + sec + " сек");
+            }
+        }
+    }
+
+    private void startTimer() {
+        for (ViewListener listener : listeners) {
+            startTime = listener.getStartTime();
+        }
+        timer.start();
+        updateTime();
+    }
+
     private void checkGameStatus() {
         if (gameStatus == GameStatus.ENDED_WITH_STOP) {
             showMessageEndWithStop();
         } else if (gameStatus == GameStatus.ENDED_WITH_LOSS) {
             showMessageEndWithLoss();
         } else if (gameStatus == GameStatus.ENDED_WITH_WIN) {
+            timer.stop();
             showMessageEndWithWin();
             showSaveDialog();
         }
@@ -752,6 +783,9 @@ public class FrameView implements ViewAutoCloseable {
     }
 
     private void setNewGame() {
+        timer.stop();
+        timeLabel.setText(timeStr);
+
         for (ViewListener listener : listeners) {
             gameBoard = listener.startGame(xSize, ySize, numMines);
             gameStatus = listener.getGameStatus();
