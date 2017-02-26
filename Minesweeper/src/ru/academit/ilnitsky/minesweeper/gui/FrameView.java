@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * View с графическим интерфейсом пользователя (GUI) для игры "Сапёр"
@@ -37,6 +39,8 @@ public class FrameView implements ViewAutoCloseable {
     private final JMenuBar menuBar = new JMenuBar();
     private final JPanel topPanel = new JPanel();
     private final JPanel gameBoardPanel = new JPanel();
+
+    private JMenuItem[] menuScoresSize = new JMenuItem[0];
 
     private static final String timeStr = " Время: ";
     private static final String flagStr = " Установлено флагов: ";
@@ -172,12 +176,10 @@ public class FrameView implements ViewAutoCloseable {
             });
         }
 
-        menuNew.addActionListener(e -> {
-            setNewGame();
-        });
+        menuNew.addActionListener(e -> setNewGame());
 
         menuCustom.addActionListener(e -> {
-            JDialog dialog = new JDialog();
+            JDialog dialog = new JDialog(frame);
 
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             dialog.setTitle("Выбор произвольных параметров игры");
@@ -250,9 +252,8 @@ public class FrameView implements ViewAutoCloseable {
             panel.add(buttonOk);
 
             dialog.add(panel);
-
+            dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            dialog.setLocationRelativeTo(frame);
         });
 
         menuStop.addActionListener(e -> {
@@ -295,14 +296,14 @@ public class FrameView implements ViewAutoCloseable {
     private JMenu createMenuScores() {
         JMenu menuScores = new JMenu("Рекорды");
 
-        JMenuItem menuSize[] = new JMenuItem[standardGameNames.length];
+        menuScoresSize = new JMenuItem[standardGameNames.length];
 
         for (int i = 0; i < standardGameNames.length; i++) {
-            menuSize[i] = new JMenuItem(standardGameNames[i]);
+            menuScoresSize[i] = new JMenuItem(standardGameNames[i]);
 
             Integer index = i;
 
-            menuSize[i].addActionListener(e -> {
+            menuScoresSize[i].addActionListener(e -> {
                 GameInfo[] gameArray = null;
                 String gameName = null;
 
@@ -341,7 +342,7 @@ public class FrameView implements ViewAutoCloseable {
                 }
             });
 
-            menuScores.add(menuSize[i]);
+            menuScores.add(menuScoresSize[i]);
         }
 
         return menuScores;
@@ -352,14 +353,14 @@ public class FrameView implements ViewAutoCloseable {
 
         JMenuItem menuAbout2 = new JMenuItem("О программе");
 
-        menuAbout2.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame,
-                    new String[]{"Игра САПЁР с графическим интерфейсом",
-                            "Графический интерфейс на основе Swing",
-                            "М.Ильницкий, Новосибирск, 2017"},
-                    "О программе",
-                    JOptionPane.INFORMATION_MESSAGE);
-        });
+        menuAbout2.addActionListener(e ->
+                JOptionPane.showMessageDialog(frame,
+                        new String[]{"Игра САПЁР с графическим интерфейсом",
+                                "Графический интерфейс на основе Swing",
+                                "М.Ильницкий, Новосибирск, 2017"},
+                        "О программе",
+                        JOptionPane.INFORMATION_MESSAGE)
+        );
 
         menuAbout.add(menuAbout2);
 
@@ -610,6 +611,7 @@ public class FrameView implements ViewAutoCloseable {
             showMessageEndWithLoss();
         } else if (gameStatus == GameStatus.ENDED_WITH_WIN) {
             showMessageEndWithWin();
+            showSaveDialog();
         }
     }
 
@@ -639,6 +641,99 @@ public class FrameView implements ViewAutoCloseable {
                 message,
                 "Ошибка",
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showSaveDialog() {
+
+        final int index = indexOfGameSize();
+
+        GameInfo gameInfo = null;
+
+        for (ViewListener listener : listeners) {
+            gameInfo = listener.getWinGameInfo();
+        }
+
+        if (index == -1 || gameInfo == null) {
+            return;
+        }
+
+        JDialog dialog = new JDialog(frame);
+
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setTitle("Сохранение результата игры");
+        dialog.setModal(true);
+        dialog.setSize(320, 240);
+        dialog.setMinimumSize(dialog.getSize());
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(6, 2));
+
+        panel.add(new JLabel("Размер доски X*Y :"));
+        panel.add(new JLabel(xSize + "*" + ySize));
+
+        panel.add(new JLabel("Число мин :"));
+        panel.add(new JLabel(String.valueOf(numMines)));
+
+        panel.add(new JLabel("Число действий :"));
+        panel.add(new JLabel(String.valueOf(gameInfo.getNumActions())));
+
+        panel.add(new JLabel("Время игры :"));
+        panel.add(new JLabel(String.valueOf(gameInfo.getTime()) + " сек"));
+
+        JTextField inputName = new JTextField();
+        JButton buttonCancel = new JButton("Отмена");
+        JButton buttonOk = new JButton("Применить");
+
+        panel.add(new JLabel("Введите имя :"));
+        panel.add(inputName);
+
+        panel.add(buttonCancel);
+        panel.add(buttonOk);
+
+        Pattern pattern = Pattern.compile("[a-zA-Z0-9_-]+");
+
+        buttonCancel.addActionListener(e -> dialog.setVisible(false));
+
+        buttonOk.addActionListener(e -> {
+
+            String userName = inputName.getText();
+
+            Matcher matcher = pattern.matcher(userName);
+
+            GameInfo gameInformation = null;
+
+            for (ViewListener listener : listeners) {
+                gameInformation = listener.getWinGameInfo();
+            }
+
+            if (gameInformation == null) {
+                System.out.println("gameInformation == null");
+                return;
+            }
+
+            if (userName.isEmpty() || userName.equals(" ")) {
+                gameInformation.setUserName("anonymous");
+            } else {
+                if (matcher.matches()) {
+                    gameInformation.setUserName(userName);
+                } else {
+                    showErrorMessage(dialog, "Имя может состоять только из букв, чисел, знаков трие и подчёркивания!");
+                    return;
+                }
+            }
+
+            for (ViewListener listener : listeners) {
+                listener.saveWinGameInfo(gameInformation);
+            }
+
+            dialog.setVisible(false);
+
+            menuScoresSize[index].doClick();
+        });
+
+        dialog.add(panel);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
     private int indexOfGameSize() {
