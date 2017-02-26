@@ -101,7 +101,6 @@ public class TopScores implements TopScoresInterface {
 
             games = oldGames;
             currentLength = count;
-            System.out.println("readFromFile currentLength=" + currentLength);
         }
     }
 

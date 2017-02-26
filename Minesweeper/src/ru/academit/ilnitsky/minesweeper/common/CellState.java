@@ -23,6 +23,10 @@ public enum CellState {
         return value;
     }
 
+    public boolean isNumber() {
+        return (value >= 1 && value <= 8);
+    }
+
     public static CellState state(int value) {
         switch (value) {
             case -7:
