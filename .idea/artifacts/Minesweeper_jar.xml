@@ -1,21 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Minesweeper:jar">
+  <artifact type="jar" build-on-make="true" name="Minesweeper:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Minesweeper_jar</output-path>
     <root id="archive" name="Minesweeper.jar">
       <element id="module-output" name="Minesweeper" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/1.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/2.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/3.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/4.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/5.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/6.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/7.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/8.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/close.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/detonation.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/flag.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/mine.png" />
-      <element id="file-copy" path="$PROJECT_DIR$/Minesweeper/src/ru/academit/ilnitsky/minesweeper/resources/query.png" />
     </root>
   </artifact>
 </component>

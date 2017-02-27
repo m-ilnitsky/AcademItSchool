@@ -59,7 +59,7 @@ public class FrameView implements ViewAutoCloseable {
     private JButton[][] cells;
 
     private static final int iconSize = 32;
-
+    /*
     private static final String path = ".\\Minesweeper\\src\\ru\\academit\\ilnitsky\\minesweeper\\resources\\";
     private static final ImageIcon iconClose = new ImageIcon(path + "close.png");
     private static final ImageIcon iconQuery = new ImageIcon(path + "query.png");
@@ -74,6 +74,21 @@ public class FrameView implements ViewAutoCloseable {
     private static final ImageIcon icon8 = new ImageIcon(path + "8.png");
     private static final ImageIcon iconMine = new ImageIcon(path + "mine.png");
     private static final ImageIcon iconDetonation = new ImageIcon(path + "detonation.png");
+    */
+    private static final String path = "/ru/academit/ilnitsky/minesweeper/resources/";
+    private final ImageIcon iconClose = new ImageIcon(getClass().getResource(path + "close.png"));
+    private final ImageIcon iconQuery = new ImageIcon(getClass().getResource(path + "query.png"));
+    private final ImageIcon iconFlag = new ImageIcon(getClass().getResource(path + "flag.png"));
+    private final ImageIcon icon1 = new ImageIcon(getClass().getResource(path + "1.png"));
+    private final ImageIcon icon2 = new ImageIcon(getClass().getResource(path + "2.png"));
+    private final ImageIcon icon3 = new ImageIcon(getClass().getResource(path + "3.png"));
+    private final ImageIcon icon4 = new ImageIcon(getClass().getResource(path + "4.png"));
+    private final ImageIcon icon5 = new ImageIcon(getClass().getResource(path + "5.png"));
+    private final ImageIcon icon6 = new ImageIcon(getClass().getResource(path + "6.png"));
+    private final ImageIcon icon7 = new ImageIcon(getClass().getResource(path + "7.png"));
+    private final ImageIcon icon8 = new ImageIcon(getClass().getResource(path + "8.png"));
+    private final ImageIcon iconMine = new ImageIcon(getClass().getResource(path + "mine.png"));
+    private final ImageIcon iconDetonation = new ImageIcon(getClass().getResource(path + "detonation.png"));
 
     public FrameView(int topLength, GameSize[] standardGameSizes, String[] standardGameNames) {
 
@@ -417,8 +432,8 @@ public class FrameView implements ViewAutoCloseable {
     private void setFrameSize() {
         final int minStartWidth = 560;
 
-        int width = xSize * (iconSize + 2);
-        int height = ySize * (iconSize + 2) + (int) topPanel.getSize().getHeight();
+        int width = xSize * (iconSize + 1);
+        int height = ySize * (iconSize + 1) + (int) topPanel.getSize().getHeight();
 
         if (width < minStartWidth) {
             width = minStartWidth;
@@ -428,7 +443,7 @@ public class FrameView implements ViewAutoCloseable {
             }
         }
 
-        frame.setMinimumSize(new Dimension(xSize * (iconSize + 2), ySize * (iconSize + 2) + 48));
+        frame.setMinimumSize(new Dimension(xSize * (iconSize + 1), ySize * (iconSize + 1) + 48));
 
         frame.setSize(width, height);
 
@@ -449,7 +464,6 @@ public class FrameView implements ViewAutoCloseable {
             for (int j = 0; j < ySize; j++) {
                 cells[i][j] = new JButton();
                 cells[i][j].setSize(iconSize, iconSize);
-                cells[i][j].setMaximumSize(cells[i][j].getSize());
                 cells[i][j].setMinimumSize(cells[i][j].getSize());
                 cells[i][j].setIconTextGap(0);
                 cells[i][j].setText("");
