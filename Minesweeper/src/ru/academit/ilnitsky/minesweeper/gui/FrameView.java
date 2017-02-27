@@ -4,8 +4,8 @@ import ru.academit.ilnitsky.minesweeper.common.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -30,8 +30,6 @@ public class FrameView implements ViewAutoCloseable {
     private int numFlags;
     private int numActions;
 
-    private LastCommands lastCommands = new LastCommands(5);
-
     private final int topLength;
 
     private final GameSize[] standardGameSizes;
@@ -43,38 +41,24 @@ public class FrameView implements ViewAutoCloseable {
 
     private JMenuItem[] menuScoresSize = new JMenuItem[0];
 
-    private static final String timeStr = " Время: ";
-    private static final String flagStr = " Установлено флагов: ";
-    private static final String actionStr = " Выполнено действий: ";
-    private static final String commandStr = " Последние команды: ";
+    private static final String timeStr = "Время: ";
+    private static final String flagStr = "Флагов: ";
+    private static final String actionStr = "Действий: ";
 
     private final JLabel timeLabel = new JLabel(timeStr);
     private final JLabel flagLabel = new JLabel(flagStr);
     private final JLabel actionLabel = new JLabel(actionStr);
-    private final JLabel commandLabel = new JLabel(commandStr);
 
     private Instant startTime;
     private Timer timer = new Timer(100, l -> updateTime());
 
+    private long lastLeftClick;
+    private long lastRightClick;
+
     private JButton[][] cells;
 
     private static final int iconSize = 32;
-    /*
-    private static final String path = ".\\Minesweeper\\src\\ru\\academit\\ilnitsky\\minesweeper\\resources\\";
-    private static final ImageIcon iconClose = new ImageIcon(path + "close.png");
-    private static final ImageIcon iconQuery = new ImageIcon(path + "query.png");
-    private static final ImageIcon iconFlag = new ImageIcon(path + "flag.png");
-    private static final ImageIcon icon1 = new ImageIcon(path + "1.png");
-    private static final ImageIcon icon2 = new ImageIcon(path + "2.png");
-    private static final ImageIcon icon3 = new ImageIcon(path + "3.png");
-    private static final ImageIcon icon4 = new ImageIcon(path + "4.png");
-    private static final ImageIcon icon5 = new ImageIcon(path + "5.png");
-    private static final ImageIcon icon6 = new ImageIcon(path + "6.png");
-    private static final ImageIcon icon7 = new ImageIcon(path + "7.png");
-    private static final ImageIcon icon8 = new ImageIcon(path + "8.png");
-    private static final ImageIcon iconMine = new ImageIcon(path + "mine.png");
-    private static final ImageIcon iconDetonation = new ImageIcon(path + "detonation.png");
-    */
+
     private static final String path = "/ru/academit/ilnitsky/minesweeper/resources/";
     private final ImageIcon iconClose = new ImageIcon(getClass().getResource(path + "close.png"));
     private final ImageIcon iconQuery = new ImageIcon(getClass().getResource(path + "query.png"));
@@ -386,6 +370,7 @@ public class FrameView implements ViewAutoCloseable {
         return menuAbout;
     }
 
+    /*
     private void initTopPanel() {
         topPanel.setLayout(new GridBagLayout());
 
@@ -406,12 +391,21 @@ public class FrameView implements ViewAutoCloseable {
         constraints.gridx = 2;      // вторая ячейка таблицы по горизонтали
         topPanel.add(flagLabel, constraints);
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weightx = 0.0;
-        constraints.gridwidth = 3;    // размер элемента в три ячейки
-        constraints.gridx = 0;    // нулевая ячейка по горизонтали
-        constraints.gridy = 1;    // первая ячейка по вертикали
-        topPanel.add(commandLabel, constraints);
+        topPanel.setVisible(true);
+    }
+    */
+    private void initTopPanel() {
+        topPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 16, 8));
+
+        Font groupFont = new Font("TimesRoman", Font.BOLD, 14);
+
+        timeLabel.setFont(groupFont);
+        flagLabel.setFont(groupFont);
+        actionLabel.setFont(groupFont);
+
+        topPanel.add(timeLabel);
+        topPanel.add(flagLabel);
+        topPanel.add(actionLabel);
 
         topPanel.setVisible(true);
     }
@@ -430,7 +424,7 @@ public class FrameView implements ViewAutoCloseable {
     }
 
     private void setFrameSize() {
-        final int minStartWidth = 560;
+        final int minStartWidth = 400;
 
         int width = xSize * (iconSize + 1);
         int height = ySize * (iconSize + 1) + (int) topPanel.getSize().getHeight();
@@ -439,11 +433,11 @@ public class FrameView implements ViewAutoCloseable {
             width = minStartWidth;
 
             if (ySize * minStartWidth / xSize < 640) {
-                height = (int) (ySize * minStartWidth / xSize + topPanel.getSize().getHeight());
+                height = ySize * minStartWidth / xSize + 64;
             }
         }
 
-        frame.setMinimumSize(new Dimension(xSize * (iconSize + 1), ySize * (iconSize + 1) + 48));
+        frame.setMinimumSize(new Dimension(xSize * (iconSize + 1), ySize * (iconSize + 1) + 64));
 
         frame.setSize(width, height);
 
@@ -452,6 +446,8 @@ public class FrameView implements ViewAutoCloseable {
     }
 
     private void initGameBoard() {
+        lastLeftClick = lastRightClick = System.currentTimeMillis();
+
         gameBoardPanel.removeAll();
 
         gameBoardPanel.setLayout(new GridLayout(ySize, xSize));
@@ -469,80 +465,69 @@ public class FrameView implements ViewAutoCloseable {
                 cells[i][j].setText("");
                 cells[i][j].setHorizontalTextPosition(SwingConstants.LEFT);
                 cells[i][j].setVerticalTextPosition(SwingConstants.TOP);
+                cells[i][j].setIcon(iconClose);
                 cells[i][j].setVisible(true);
 
                 final Integer xValue = i;
                 final Integer yValue = j;
 
-                cells[i][j].addActionListener((e) -> {
-                    CellState cellState = gameBoard.getCell(xValue, yValue);
-
-                    if (gameStatus.isGame() && cellState == CellState.CLOSE || cellState == CellState.QUERY) {
-                        try {
-                            for (ViewListener listener : listeners) {
-                                listener.setOpen(xValue, yValue);
-                                gameStatus = listener.getGameStatus();
-                                numActions = listener.getNumActions();
-                            }
-                            if (numActions == 1) {
-                                startTimer();
-                                Thread.sleep(2000);
-                            }
-                            saveCommand("Open", xValue, yValue);
-                            numFlags = gameBoard.getNumCells(CellState.FLAG);
-                            updateGameBoard();
-                        } catch (InterruptedException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                });
-
-                cells[i][j].addMouseListener(new MouseListener() {
+                cells[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         CellState cellState = gameBoard.getCell(xValue, yValue);
 
-                        if (gameStatus.isContinued()) {
-                            if (e.getButton() == MouseEvent.BUTTON3) {
-                                if (cellState == CellState.CLOSE
-                                        || cellState == CellState.QUERY
-                                        || cellState == CellState.FLAG) {
-                                    for (ViewListener listener : listeners) {
-                                        listener.setFlag(xValue, yValue);
-                                    }
-                                    saveCommand("Flag", xValue, yValue);
-                                    numFlags = gameBoard.getNumCells(CellState.FLAG);
-                                    updateGameBoard();
+                        long now = System.currentTimeMillis();
+
+                        if (e.getButton() == MouseEvent.BUTTON2
+                                || (e.getButton() == MouseEvent.BUTTON1 && (now - lastRightClick < 50))
+                                || (e.getButton() == MouseEvent.BUTTON3 && (now - lastLeftClick < 50))) {
+
+                            if (gameStatus.isContinued() && cellState.isNumber()) {
+
+                                for (ViewListener listener : listeners) {
+                                    listener.setOpenAllAround(xValue, yValue);
+                                    gameStatus = listener.getGameStatus();
+                                    numActions = listener.getNumActions();
                                 }
-                            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                                if (cellState.isNumber()) {
-                                    for (ViewListener listener : listeners) {
-                                        listener.setOpenAllAround(xValue, yValue);
-                                        gameStatus = listener.getGameStatus();
-                                        numActions = listener.getNumActions();
-                                    }
-                                    saveCommand("AllAround", xValue, yValue);
-                                    numFlags = gameBoard.getNumCells(CellState.FLAG);
-                                    updateGameBoard();
+                                numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                updateGameBoard();
+                            }
+
+                        } else if (e.getButton() == MouseEvent.BUTTON1) {
+
+                            lastLeftClick = System.currentTimeMillis();
+
+                            if (gameStatus.isGame()
+                                    && (cellState == CellState.CLOSE || cellState == CellState.QUERY)) {
+
+                                for (ViewListener listener : listeners) {
+                                    listener.setOpen(xValue, yValue);
+                                    gameStatus = listener.getGameStatus();
+                                    numActions = listener.getNumActions();
                                 }
+                                if (numActions == 1) {
+                                    startTimer();
+                                }
+                                numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                updateGameBoard();
+                            }
+
+                        } else if (e.getButton() == MouseEvent.BUTTON3) {
+
+                            lastRightClick = System.currentTimeMillis();
+
+                            if (gameStatus.isContinued()
+                                    && (cellState == CellState.CLOSE
+                                    || cellState == CellState.QUERY
+                                    || cellState == CellState.FLAG)) {
+
+                                for (ViewListener listener : listeners) {
+                                    listener.setFlag(xValue, yValue);
+                                }
+                                numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                updateGameBoard();
                             }
                         }
-                    }
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
                     }
                 });
             }
@@ -555,10 +540,6 @@ public class FrameView implements ViewAutoCloseable {
         }
 
         gameBoardPanel.setVisible(true);
-    }
-
-    private void saveCommand(String command, int x, int y) {
-        lastCommands.add(command + "(" + (x + 1) + "," + (y + 1) + ")");
     }
 
     private void updateGameBoard() {
@@ -624,7 +605,6 @@ public class FrameView implements ViewAutoCloseable {
     private void updateTopPanel() {
         flagLabel.setText(flagStr + numFlags + " / " + numMines);
         actionLabel.setText(actionStr + numActions);
-        commandLabel.setText(commandStr + lastCommands.toString());
     }
 
     private void updateTime() {
@@ -807,7 +787,6 @@ public class FrameView implements ViewAutoCloseable {
             gameStatus = listener.getGameStatus();
         }
 
-        lastCommands.clear();
         numActions = 0;
         numFlags = 0;
 
