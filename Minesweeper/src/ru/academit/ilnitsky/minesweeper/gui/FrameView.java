@@ -476,7 +476,7 @@ public class FrameView implements ViewAutoCloseable {
                             if (numActions == 1) {
                                 startTimer();
                             }
-                            lastCommands.add("Open(" + (xValue + 1) + "," + (yValue + 1) + ")");
+                            saveCommand("Open", xValue, yValue);
                             numFlags = gameBoard.getNumCells(CellState.FLAG);
                             updateGameBoard();
                         } catch (InterruptedException exception) {
@@ -498,7 +498,7 @@ public class FrameView implements ViewAutoCloseable {
                                     for (ViewListener listener : listeners) {
                                         listener.setFlag(xValue, yValue);
                                     }
-                                    lastCommands.add("Flag(" + (xValue + 1) + "," + (yValue + 1) + ")");
+                                    saveCommand("Flag", xValue, yValue);
                                     numFlags = gameBoard.getNumCells(CellState.FLAG);
                                     updateGameBoard();
                                 }
@@ -509,7 +509,7 @@ public class FrameView implements ViewAutoCloseable {
                                         gameStatus = listener.getGameStatus();
                                         numActions = listener.getNumActions();
                                     }
-                                    lastCommands.add("AllAround(" + (xValue + 1) + "," + (yValue + 1) + ")");
+                                    saveCommand("AllAround", xValue, yValue);
                                     numFlags = gameBoard.getNumCells(CellState.FLAG);
                                     updateGameBoard();
                                 }
@@ -543,6 +543,10 @@ public class FrameView implements ViewAutoCloseable {
         }
 
         gameBoardPanel.setVisible(true);
+    }
+
+    private void saveCommand(String command, int x, int y) {
+        lastCommands.add(command + "(" + (x + 1) + "," + (y + 1) + ")");
     }
 
     private void updateGameBoard() {
