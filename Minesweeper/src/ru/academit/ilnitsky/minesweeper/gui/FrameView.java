@@ -484,11 +484,9 @@ public class FrameView implements ViewAutoCloseable {
                                 gameStatus = listener.getGameStatus();
                                 numActions = listener.getNumActions();
                             }
-                            if (gameStatus == GameStatus.STARTED) {
-                                Thread.sleep(5000);
-                            }
                             if (numActions == 1) {
                                 startTimer();
+                                Thread.sleep(2000);
                             }
                             saveCommand("Open", xValue, yValue);
                             numFlags = gameBoard.getNumCells(CellState.FLAG);
