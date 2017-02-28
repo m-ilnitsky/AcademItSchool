@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -139,6 +141,24 @@ public class FrameView implements ViewAutoCloseable {
         });
     }
 
+    private void exitDialog() {
+        try {
+            Object options[] = {"Да", "Нет"};
+            int result = JOptionPane.showOptionDialog(frame,
+                    "Завершить программу?",
+                    "Подтверждение завершения",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            if (result == 0) {
+                close();
+                System.exit(0);
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
+    }
+
     private void initMenuBar() {
         JMenu menuFile = createMenuFile();
         JMenu menuScores = createMenuScores();
@@ -264,26 +284,12 @@ public class FrameView implements ViewAutoCloseable {
                 for (ViewListener listener : listeners) {
                     listener.stopGame();
                     gameStatus = listener.getGameStatus();
-                    showMessageEndWithStop();
+                    updateGameBoard();
                 }
             }
         });
 
-        menuExit.addActionListener(e -> {
-            try {
-                int result = JOptionPane.showConfirmDialog(frame,
-                        "Закрыть программу?",
-                        "Подтверждение завершения",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-
-                if (result == 0) {
-                    close();
-                }
-            } catch (Exception exception) {
-                exception.getStackTrace();
-            }
-        });
+        menuExit.addActionListener(e -> exitDialog());
 
         menuFile.add(menuNew);
         for (JRadioButtonMenuItem menu : menuSize) {
@@ -416,7 +422,14 @@ public class FrameView implements ViewAutoCloseable {
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(gameBoardPanel, BorderLayout.CENTER);
 
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitDialog();
+            }
+        });
 
         setFrameSize();
 
