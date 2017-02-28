@@ -379,30 +379,6 @@ public class FrameView implements ViewAutoCloseable {
         return menuAbout;
     }
 
-    /*
-    private void initTopPanel() {
-        topPanel.setLayout(new GridBagLayout());
-
-        GridBagConstraints constraints = new GridBagConstraints();
-
-        constraints.weightx = 0.5;
-        constraints.gridy = 0;    // нулевая ячейка по вертикали
-
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;      // нулевая ячейка таблицы по горизонтали
-        topPanel.add(timeLabel, constraints);
-
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;      // первая ячейка таблицы по горизонтали
-        topPanel.add(actionLabel, constraints);
-
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 2;      // вторая ячейка таблицы по горизонтали
-        topPanel.add(flagLabel, constraints);
-
-        topPanel.setVisible(true);
-    }
-    */
     private void initTopPanel() {
         topPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 16, 8));
 
@@ -493,22 +469,28 @@ public class FrameView implements ViewAutoCloseable {
                         CellState cellState = gameBoard.getCell(xValue, yValue);
 
                         long now = System.currentTimeMillis();
+                        long rightClick = now - lastRightClick;
+                        long leftClick = now - lastLeftClick;
 
                         if (e.getButton() == MouseEvent.BUTTON2
-                                || (e.getButton() == MouseEvent.BUTTON1 && (now - lastRightClick < 50))
-                                || (e.getButton() == MouseEvent.BUTTON3 && (now - lastLeftClick < 50))) {
+                                || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 300))
+                                || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 300))) {
 
                             if (gameStatus.isContinued() && cellState.isNumber()) {
 
-                                for (ViewListener listener : listeners) {
-                                    listener.setOpenAllAround(xValue, yValue);
-                                    gameStatus = listener.getGameStatus();
-                                    numActions = listener.getNumActions();
-                                }
-                                numFlags = gameBoard.getNumCells(CellState.FLAG);
-                                updateGameBoard();
-                            }
+                                if (e.getButton() == MouseEvent.BUTTON2
+                                        || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 30))
+                                        || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 30))) {
 
+                                    for (ViewListener listener : listeners) {
+                                        listener.setOpenAllAround(xValue, yValue);
+                                        gameStatus = listener.getGameStatus();
+                                        numActions = listener.getNumActions();
+                                    }
+                                    numFlags = gameBoard.getNumCells(CellState.FLAG);
+                                    updateGameBoard();
+                                }
+                            }
                         } else if (e.getButton() == MouseEvent.BUTTON1) {
 
                             lastLeftClick = System.currentTimeMillis();
