@@ -292,11 +292,14 @@ public class FrameView implements ViewAutoCloseable {
         menuExit.addActionListener(e -> exitDialog());
 
         menuFile.add(menuNew);
+        menuFile.addSeparator();
         for (JRadioButtonMenuItem menu : menuSize) {
             menuFile.add(menu);
         }
         menuFile.add(menuCustom);
+        menuFile.addSeparator();
         menuFile.add(menuStop);
+        menuFile.addSeparator();
         menuFile.add(menuExit);
 
         return menuFile;
