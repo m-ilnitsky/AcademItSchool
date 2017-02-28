@@ -93,6 +93,7 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
     @Override
     public void stopGame() {
         checkGameStatus();
+        showHiddenBoard();
         gameStatus = GameStatus.ENDED_WITH_STOP;
     }
 

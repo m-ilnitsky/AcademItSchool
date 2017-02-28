@@ -105,6 +105,9 @@ public class ConsoleView implements View {
 
                     break;
                 case ENDED_WITH_STOP:
+                    showBoard();
+                    showLastCommands();
+
                     showMessage("Вы выбрали завершение текущей игры!");
 
                     gameStatus = GameStatus.NONE;
