@@ -60,12 +60,16 @@ public class FrameView implements ViewAutoCloseable {
     public void removeViewListener(ViewListener listener) {
         if (this.core == listener) {
             this.core = null;
+            gameInfoPanel.removeViewListener();
+            gameBoardPanel.removeViewListener();
         }
     }
 
     @Override
     public void removeViewListener() {
         this.core = null;
+        gameInfoPanel.removeViewListener();
+        gameBoardPanel.removeViewListener();
     }
 
     @Override
