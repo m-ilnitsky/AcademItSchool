@@ -12,12 +12,10 @@ import java.time.Instant;
  */
 public class Controller implements ViewListener {
     private MinesweeperCore model;
-    private View view;
     private TopScoresInterface[] topScores;
 
     public Controller(MinesweeperCore model, View view) {
         this.model = model;
-        this.view = view;
 
         GameSize[] gameSizes = view.getStandardGameSizes();
         String[] gameNames = view.getStandardGameNames();

@@ -260,13 +260,6 @@ class GameBoardPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void showErrorMessage(Window fromFrame, String message) {
-        JOptionPane.showMessageDialog(fromFrame,
-                message,
-                "Ошибка",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
-
     private void showSaveDialog() {
 
         GameInfo gameInfo = core.getWinGameInfo();
@@ -330,7 +323,10 @@ class GameBoardPanel extends JPanel {
                 if (matcher.matches()) {
                     gameInformation.setUserName(userName);
                 } else {
-                    showErrorMessage(dialog, "Имя может состоять только из букв, чисел, знаков трие и подчёркивания!");
+                    JOptionPane.showMessageDialog(dialog,
+                            "Имя может состоять только из латинских букв, чисел, знаков трие и подчёркивания!",
+                            "Ошибка",
+                            JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
             }

@@ -367,7 +367,8 @@ public class ConsoleView implements View {
         scanner.nextLine();
     }
 
-    private static void printLine(String s, int number) {
+    private static void printLine(int number) {
+        String s = "*";
         for (int i = 0; i < number; i++) {
             System.out.print(s);
 
@@ -375,7 +376,10 @@ public class ConsoleView implements View {
         System.out.println();
     }
 
-    private static void printLine(String begin, String s, String end, int length) {
+    private static void printLine(String begin, int length) {
+
+        String s = " ";
+        String end = "*";
 
         int number = (length - begin.length() - end.length()) / s.length();
 
@@ -395,24 +399,22 @@ public class ConsoleView implements View {
 
         System.out.println("*********************** ИГРА <САПЁР> **********************");
         System.out.println("*                       ГЛАВНОЕ МЕНЮ                      *");
-        printLine("*", lineLength);
+        printLine(lineLength);
         System.out.println("* СЛОЖНОСТЬ ИГРЫ:                                         *");
 
         for (int i = 0; i < numLines; i++) {
-            printLine("* " + (i + 1) + ": " + standardGameNames[i],
-                    " ", "*", lineLength);
+            printLine("* " + (i + 1) + ": " + standardGameNames[i], lineLength);
         }
 
         System.out.println("* 4: Произвольный размер                                  *");
-        printLine("*", lineLength);
+        printLine(lineLength);
         System.out.println("* ТОП ЛУЧШИХ РЕЗУЛЬТАТОВ:                                 *");
 
         for (int i = 0; i < numLines; i++) {
-            printLine("* " + (i + 5) + ": " + standardGameNames[i],
-                    " ", "*", lineLength);
+            printLine("* " + (i + 5) + ": " + standardGameNames[i], lineLength);
         }
 
-        printLine("*", lineLength);
+        printLine(lineLength);
         System.out.println("* 9: О ПРОГРАММЕ                                          *");
         System.out.println("* 0: ВЫХОД                                                *");
         System.out.println("*************** Введите номер вашего выбора ***************");

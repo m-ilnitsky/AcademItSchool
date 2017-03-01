@@ -2,6 +2,7 @@ package ru.academit.ilnitsky.minesweeper.gui;
 
 import ru.academit.ilnitsky.minesweeper.common.*;
 
+import javax.swing.ImageIcon;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -226,11 +227,8 @@ public class FrameView implements ViewAutoCloseable {
             Integer index = i;
 
             menuScoresSize[i].addActionListener(e -> {
-                GameInfo[] gameArray = null;
-                String gameName = null;
-
-                gameArray = core.getTopScores(standardGameSizes[index]);
-                gameName = standardGameNames[index];
+                GameInfo[] gameArray = core.getTopScores(standardGameSizes[index]);
+                String gameName = standardGameNames[index];
 
                 if (gameArray != null && gameName != null) {
 
@@ -288,6 +286,9 @@ public class FrameView implements ViewAutoCloseable {
     }
 
     private void initFrame() {
+        Image image = new ImageIcon(getClass().getResource("/ru/academit/ilnitsky/minesweeper/resources/mine.png")).getImage();
+        frame.setIconImage(image);
+
         frame.setJMenuBar(menuBar);
 
         frame.add(gameInfoPanel, BorderLayout.NORTH);
