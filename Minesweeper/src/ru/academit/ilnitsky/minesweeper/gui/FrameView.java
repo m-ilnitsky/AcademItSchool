@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +17,7 @@ import java.util.regex.Pattern;
  * Created by UserLabView on 21.02.17.
  */
 public class FrameView implements ViewAutoCloseable {
-    private final ArrayList<ViewListener> listeners = new ArrayList<>();
+    private ViewListener listener;
 
     private final JFrame frame = new JFrame("Сапёр");
 
@@ -86,14 +85,14 @@ public class FrameView implements ViewAutoCloseable {
 
     @Override
     public void addViewListener(ViewListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        this.listener = listener;
     }
 
     @Override
     public void removeViewListener(ViewListener listener) {
-        listeners.remove(listener);
+        if (this.listener == listener) {
+            this.listener = null;
+        }
     }
 
     @Override
@@ -127,10 +126,8 @@ public class FrameView implements ViewAutoCloseable {
             numActions = 0;
             numFlags = 0;
 
-            for (ViewListener listener : listeners) {
-                gameBoard = listener.startGame(xSize, ySize, numMines);
-                gameStatus = listener.getGameStatus();
-            }
+            gameBoard = listener.startGame(xSize, ySize, numMines);
+            gameStatus = listener.getGameStatus();
 
             initMenuBar();
             initTopPanel();
@@ -281,11 +278,9 @@ public class FrameView implements ViewAutoCloseable {
 
         menuStop.addActionListener(e -> {
             if (gameStatus.isGame()) {
-                for (ViewListener listener : listeners) {
-                    listener.stopGame();
-                    gameStatus = listener.getGameStatus();
-                    updateGameBoard();
-                }
+                listener.stopGame();
+                gameStatus = listener.getGameStatus();
+                updateGameBoard();
             }
         });
 
@@ -319,10 +314,8 @@ public class FrameView implements ViewAutoCloseable {
                 GameInfo[] gameArray = null;
                 String gameName = null;
 
-                for (ViewListener listener : listeners) {
-                    gameArray = listener.getTopScores(standardGameSizes[index]);
-                    gameName = standardGameNames[index];
-                }
+                gameArray = listener.getTopScores(standardGameSizes[index]);
+                gameName = standardGameNames[index];
 
                 if (gameArray != null && gameName != null) {
 
@@ -473,20 +466,18 @@ public class FrameView implements ViewAutoCloseable {
                         long leftClick = now - lastLeftClick;
 
                         if (e.getButton() == MouseEvent.BUTTON2
-                                || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 300))
-                                || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 300))) {
+                                || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 200))
+                                || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 200))) {
 
                             if (gameStatus.isContinued() && cellState.isNumber()) {
 
                                 if (e.getButton() == MouseEvent.BUTTON2
-                                        || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 30))
-                                        || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 30))) {
+                                        || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 50))
+                                        || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 50))) {
 
-                                    for (ViewListener listener : listeners) {
-                                        listener.setOpenAllAround(xValue, yValue);
-                                        gameStatus = listener.getGameStatus();
-                                        numActions = listener.getNumActions();
-                                    }
+                                    listener.setOpenAllAround(xValue, yValue);
+                                    gameStatus = listener.getGameStatus();
+                                    numActions = listener.getNumActions();
                                     numFlags = gameBoard.getNumCells(CellState.FLAG);
                                     updateGameBoard();
                                 }
@@ -498,11 +489,10 @@ public class FrameView implements ViewAutoCloseable {
                             if (gameStatus.isGame()
                                     && (cellState == CellState.CLOSE || cellState == CellState.QUERY)) {
 
-                                for (ViewListener listener : listeners) {
-                                    listener.setOpen(xValue, yValue);
-                                    gameStatus = listener.getGameStatus();
-                                    numActions = listener.getNumActions();
-                                }
+                                listener.setOpen(xValue, yValue);
+                                gameStatus = listener.getGameStatus();
+                                numActions = listener.getNumActions();
+
                                 if (numActions == 1) {
                                     startTimer();
                                 }
@@ -519,9 +509,7 @@ public class FrameView implements ViewAutoCloseable {
                                     || cellState == CellState.QUERY
                                     || cellState == CellState.FLAG)) {
 
-                                for (ViewListener listener : listeners) {
-                                    listener.setFlag(xValue, yValue);
-                                }
+                                listener.setFlag(xValue, yValue);
                                 numFlags = gameBoard.getNumCells(CellState.FLAG);
                                 updateGameBoard();
                             }
@@ -621,9 +609,8 @@ public class FrameView implements ViewAutoCloseable {
     }
 
     private void startTimer() {
-        for (ViewListener listener : listeners) {
-            startTime = listener.getStartTime();
-        }
+        startTime = listener.getStartTime();
+
         timer.start();
         updateTime();
     }
@@ -672,11 +659,7 @@ public class FrameView implements ViewAutoCloseable {
 
         final int index = indexOfGameSize();
 
-        GameInfo gameInfo = null;
-
-        for (ViewListener listener : listeners) {
-            gameInfo = listener.getWinGameInfo();
-        }
+        GameInfo gameInfo = listener.getWinGameInfo();
 
         if (index == -1 || gameInfo == null) {
             return;
@@ -725,11 +708,7 @@ public class FrameView implements ViewAutoCloseable {
 
             Matcher matcher = pattern.matcher(userName);
 
-            GameInfo gameInformation = null;
-
-            for (ViewListener listener : listeners) {
-                gameInformation = listener.getWinGameInfo();
-            }
+            GameInfo gameInformation = listener.getWinGameInfo();
 
             if (gameInformation == null) {
                 System.out.println("gameInformation == null");
@@ -747,9 +726,7 @@ public class FrameView implements ViewAutoCloseable {
                 }
             }
 
-            for (ViewListener listener : listeners) {
-                listener.saveWinGameInfo(gameInformation);
-            }
+            listener.saveWinGameInfo(gameInformation);
 
             dialog.setVisible(false);
 
@@ -780,10 +757,8 @@ public class FrameView implements ViewAutoCloseable {
         timer.stop();
         timeLabel.setText(timeStr);
 
-        for (ViewListener listener : listeners) {
-            gameBoard = listener.startGame(xSize, ySize, numMines);
-            gameStatus = listener.getGameStatus();
-        }
+        gameBoard = listener.startGame(xSize, ySize, numMines);
+        gameStatus = listener.getGameStatus();
 
         numActions = 0;
         numFlags = 0;
