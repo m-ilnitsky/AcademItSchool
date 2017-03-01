@@ -2,7 +2,6 @@ package ru.academit.ilnitsky.minesweeper.gui;
 
 import ru.academit.ilnitsky.minesweeper.common.CellState;
 import ru.academit.ilnitsky.minesweeper.common.GameBoard;
-import ru.academit.ilnitsky.minesweeper.common.GameStatus;
 import ru.academit.ilnitsky.minesweeper.common.ViewListener;
 
 import javax.swing.*;
