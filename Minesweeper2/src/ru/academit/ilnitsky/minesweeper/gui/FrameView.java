@@ -50,7 +50,7 @@ public class FrameView implements ViewAutoCloseable {
 
     @Override
     public void addViewListener(ViewListener listener) {
-        this.core = listener;
+        core = listener;
 
         gameInfoPanel.addViewListener(listener);
         gameBoardPanel.addViewListener(listener);
@@ -58,8 +58,9 @@ public class FrameView implements ViewAutoCloseable {
 
     @Override
     public void removeViewListener(ViewListener listener) {
-        if (this.core == listener) {
-            this.core = null;
+        if (core == listener) {
+            core = null;
+
             gameInfoPanel.removeViewListener();
             gameBoardPanel.removeViewListener();
         }
@@ -67,7 +68,8 @@ public class FrameView implements ViewAutoCloseable {
 
     @Override
     public void removeViewListener() {
-        this.core = null;
+        core = null;
+
         gameInfoPanel.removeViewListener();
         gameBoardPanel.removeViewListener();
     }

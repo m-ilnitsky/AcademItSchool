@@ -49,7 +49,7 @@ class GameInfoPanel extends JPanel {
     }
 
     void removeViewListener() {
-        this.core = null;
+        core = null;
     }
 
     void init(GameBoard gameBoard) {
