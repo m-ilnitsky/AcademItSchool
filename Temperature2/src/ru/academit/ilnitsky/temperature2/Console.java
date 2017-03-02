@@ -2,20 +2,20 @@ package ru.academit.ilnitsky.temperature2;
 
 import ru.academit.ilnitsky.temperature2.common.UnitConverter;
 import ru.academit.ilnitsky.temperature2.common.View;
+import ru.academit.ilnitsky.temperature2.console.ConsoleView;
 import ru.academit.ilnitsky.temperature2.controller.Controller;
-import ru.academit.ilnitsky.temperature2.gui.FrameView;
-import ru.academit.ilnitsky.temperature2.model.TEW2Converter;
+import ru.academit.ilnitsky.temperature2.model.TEWConverter;
 
 /**
- * Класс приложение с интерфейсом Swing.
+ * Класс консольное приложение.
  * Создаёт модель, представление и контроллер, и запускае представление view.
- * Created by Mike on 28.01.2017.
+ * Created by UserLabView on 02.03.17.
  */
-public class Application {
+public class Console {
     public static void main(String[] args) {
-        UnitConverter model = new TEW2Converter();
+        UnitConverter model = new TEWConverter();
 
-        try (View view = new FrameView(model)) {
+        try (View view = new ConsoleView(model)) {
             Controller controller = new Controller(model, view);
             view.addViewListener(controller);
             view.startApplication();

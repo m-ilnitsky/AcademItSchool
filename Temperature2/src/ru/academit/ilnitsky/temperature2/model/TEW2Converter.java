@@ -5,10 +5,12 @@ import ru.academit.ilnitsky.temperature2.common.UnitGroup;
 
 /**
  * Класс модели конвертера температуры в тепловую энергию, частоту и длину волны излучения
+ * Частота и длина волны излучения рассчитываются как для заданной энергии фотона,
+ * так и для заданной температуры тела (в максимуме интенсивности излучения).
  * Created by Mike on 28.01.2017.
  */
-public class TEFWConverter extends TemperatureConverter {
-    public TEFWConverter() {
+public class TEW2Converter extends TemperatureConverter {
+    public TEW2Converter() {
         super(new ConvertUnit[]{
                         new ConvertTemperatureK(),
                         new ConvertTemperatureC(),
