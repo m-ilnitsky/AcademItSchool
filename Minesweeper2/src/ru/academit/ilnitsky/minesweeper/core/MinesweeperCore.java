@@ -153,6 +153,21 @@ public class MinesweeperCore implements MinesweeperCoreInterface {
         return gameStatus;
     }
 
+    @Override
+    public int getMinSize() {
+        return MIN_SIZE;
+    }
+
+    @Override
+    public int getMaxSize() {
+        return MAX_SIZE;
+    }
+
+    @Override
+    public double getNumMinesCoefficient() {
+        return MINE_COEFFICIENT;
+    }
+
     private void checkPosition(int xPosition, int yPosition) {
         if (xPosition < 0) {
             throw new IllegalArgumentException("xPosition < 0");

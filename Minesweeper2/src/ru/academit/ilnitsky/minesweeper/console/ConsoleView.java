@@ -44,6 +44,11 @@ public class ConsoleView implements View {
     private final GameSize[] standardGameSizes;
     private final String[] standardGameNames;
 
+    private int minSize;
+    private int maxSize;
+    private double numMinesCoefficient;
+    private int numMinesPercent;
+
     public ConsoleView(int topLength, GameSize[] standardGameSizes, String[] standardGameNames) {
         gameStatus = GameStatus.NONE;
         continued = true;
@@ -57,6 +62,12 @@ public class ConsoleView implements View {
     @Override
     public void addViewListener(ViewListener listener) {
         core = listener;
+
+        minSize = core.getMinSize();
+        maxSize = core.getMaxSize();
+        numMinesCoefficient = core.getNumMinesCoefficient();
+
+        numMinesPercent = (int) (numMinesCoefficient * 100);
     }
 
     @Override
@@ -495,12 +506,12 @@ public class ConsoleView implements View {
         int choice;
         int numMines;
 
-        choice = readGameParameter("Введите число ячеек поля игры по оси X (целое число от 5 до 64): ");
+        choice = readGameParameter("Введите число ячеек поля игры по оси X (целое число от " + minSize + " до " + maxSize + "): ");
         if (choice < 1) {
             return;
         } else {
-            if (choice < 5 || choice > 64) {
-                showMessage("ОШИБКА: Число ячеек должно быть от 5 до 64 !");
+            if (choice < minSize || choice > maxSize) {
+                showMessage("ОШИБКА: Число ячеек должно быть от " + minSize + " до " + maxSize + " !");
                 showGameSizeMenu();
                 return;
             } else {
@@ -508,12 +519,12 @@ public class ConsoleView implements View {
             }
         }
 
-        choice = readGameParameter("Введите число ячеек поля игры по оси Y (целое число от 5 до 64): ");
+        choice = readGameParameter("Введите число ячеек поля игры по оси Y (целое число от " + minSize + " до " + maxSize + "): ");
         if (choice < 1) {
             return;
         } else {
-            if (choice < 5 || choice > 64) {
-                showMessage("ОШИБКА: Число ячеек должно быть от 5 до 64 !");
+            if (choice < minSize || choice > maxSize) {
+                showMessage("ОШИБКА: Число ячеек должно быть от " + minSize + " до " + maxSize + " !");
                 showGameSizeMenu();
                 return;
             } else {
@@ -521,12 +532,14 @@ public class ConsoleView implements View {
             }
         }
 
-        choice = readGameParameter("Введите число мин на поле (целое число не более 30% от числа ячеек): ");
+        int maxNumMines = (int) (xSize * ySize * numMinesCoefficient);
+
+        choice = readGameParameter("Введите число мин на поле (целое число не более " + numMinesPercent + "% от числа ячеек, т.е. меньше " + maxNumMines + " штук): ");
         if (choice < 1) {
             return;
         } else {
-            if (choice > (int) (xSize * ySize * 0.3)) {
-                showMessage("ОШИБКА: Число мин должно быть от 1 до 30% от числа ячеек !");
+            if (choice >= maxNumMines) {
+                showMessage("ОШИБКА: Число мин должно быть от 1 до " + numMinesPercent + "% от числа ячеек, т.е. меньше " + maxNumMines + " штук!");
                 showGameSizeMenu();
                 return;
             } else {

@@ -30,6 +30,12 @@ public interface MinesweeperCoreInterface {
 
     GameBoard linkToGameBoard();
 
+    int getMinSize();
+
+    int getMaxSize();
+
+    double getNumMinesCoefficient();
+
     void setQuery(int xPosition, int yPosition);
 
     void setFlag(int xPosition, int yPosition);

@@ -41,4 +41,10 @@ public interface ViewListener {
     GameInfo[] getTopScores(GameSize gameSize);
 
     String getTopScoresName(GameSize gameSize);
+
+    int getMinSize();
+
+    int getMaxSize();
+
+    double getNumMinesCoefficient();
 }

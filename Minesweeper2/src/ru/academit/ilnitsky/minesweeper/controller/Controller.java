@@ -68,6 +68,21 @@ public class Controller implements ViewListener {
     }
 
     @Override
+    public int getMinSize() {
+        return model.getMinSize();
+    }
+
+    @Override
+    public int getMaxSize() {
+        return model.getMaxSize();
+    }
+
+    @Override
+    public double getNumMinesCoefficient() {
+        return model.getNumMinesCoefficient();
+    }
+
+    @Override
     public int getGameNumMines() {
         return model.getGameNumMines();
     }
