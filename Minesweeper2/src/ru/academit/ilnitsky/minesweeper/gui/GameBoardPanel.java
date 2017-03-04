@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +15,26 @@ import java.util.regex.Pattern;
  * Created by UserLabView on 01.03.17.
  */
 class GameBoardPanel extends JPanel {
+    private class CellData {
+        private ImageIcon icon;
+        private boolean isEnabled;
+
+        CellData(ImageIcon icon, boolean isEnabled) {
+            this.icon = icon;
+            this.isEnabled = isEnabled;
+        }
+
+        ImageIcon getIcon() {
+            return icon;
+        }
+
+        boolean isEnabled() {
+            return isEnabled;
+        }
+    }
+
+    private HashMap<CellState, CellData> cellMap;
+
     private ViewListener core;
 
     private GameBoard gameBoard;
@@ -25,31 +46,55 @@ class GameBoardPanel extends JPanel {
 
     private GameStatus gameStatus;
 
-    private long lastLeftClick;
-    private long lastRightClick;
+    private long lastLeftPressed;
+    private long lastRightPressed;
 
     private JButton[][] cells;
 
     private static final int iconSize = 32;
 
     private static final String path = "/ru/academit/ilnitsky/minesweeper/resources/";
-    private final ImageIcon iconClose = new ImageIcon(getClass().getResource(path + "close.png"));
-    private final ImageIcon iconQuery = new ImageIcon(getClass().getResource(path + "query.png"));
-    private final ImageIcon iconFlag = new ImageIcon(getClass().getResource(path + "flag.png"));
-    private final ImageIcon icon1 = new ImageIcon(getClass().getResource(path + "1.png"));
-    private final ImageIcon icon2 = new ImageIcon(getClass().getResource(path + "2.png"));
-    private final ImageIcon icon3 = new ImageIcon(getClass().getResource(path + "3.png"));
-    private final ImageIcon icon4 = new ImageIcon(getClass().getResource(path + "4.png"));
-    private final ImageIcon icon5 = new ImageIcon(getClass().getResource(path + "5.png"));
-    private final ImageIcon icon6 = new ImageIcon(getClass().getResource(path + "6.png"));
-    private final ImageIcon icon7 = new ImageIcon(getClass().getResource(path + "7.png"));
-    private final ImageIcon icon8 = new ImageIcon(getClass().getResource(path + "8.png"));
-    private final ImageIcon iconMine = new ImageIcon(getClass().getResource(path + "mine.png"));
-    private final ImageIcon iconDetonation = new ImageIcon(getClass().getResource(path + "detonation.png"));
+
+    private ImageIcon getIcon(String namePng) {
+        return new ImageIcon(getClass().getResource(path + namePng));
+    }
 
     GameBoardPanel(FrameView frameView, GameInfoPanel gameInfoPanel) {
         this.frameView = frameView;
         this.gameInfoPanel = gameInfoPanel;
+
+        ImageIcon iconClose = getIcon("close.png");
+        ImageIcon iconQuery = getIcon("query.png");
+        ImageIcon iconFlag = getIcon("flag.png");
+        ImageIcon icon1 = getIcon("1.png");
+        ImageIcon icon2 = getIcon("2.png");
+        ImageIcon icon3 = getIcon("3.png");
+        ImageIcon icon4 = getIcon("4.png");
+        ImageIcon icon5 = getIcon("5.png");
+        ImageIcon icon6 = getIcon("6.png");
+        ImageIcon icon7 = getIcon("7.png");
+        ImageIcon icon8 = getIcon("8.png");
+        ImageIcon iconMine = getIcon("mine.png");
+        ImageIcon iconDetonation = getIcon("detonation.png");
+
+        cellMap = new HashMap<>(16);
+
+        cellMap.put(CellState.CLOSE, new CellData(iconClose, true));
+        cellMap.put(CellState.FLAG, new CellData(iconFlag, true));
+        cellMap.put(CellState.QUERY, new CellData(iconQuery, true));
+
+        cellMap.put(CellState.MINE, new CellData(iconMine, false));
+        cellMap.put(CellState.DETONATION, new CellData(iconDetonation, false));
+        cellMap.put(CellState.FREE, new CellData(iconClose, false));
+
+        cellMap.put(CellState.N1, new CellData(icon1, false));
+        cellMap.put(CellState.N2, new CellData(icon2, false));
+        cellMap.put(CellState.N3, new CellData(icon3, false));
+        cellMap.put(CellState.N4, new CellData(icon4, false));
+        cellMap.put(CellState.N5, new CellData(icon5, false));
+        cellMap.put(CellState.N6, new CellData(icon6, false));
+        cellMap.put(CellState.N7, new CellData(icon7, false));
+        cellMap.put(CellState.N8, new CellData(icon8, false));
     }
 
     void addViewListener(ViewListener listener) {
@@ -68,13 +113,15 @@ class GameBoardPanel extends JPanel {
 
         gameStatus = core.getGameStatus();
 
-        lastLeftClick = lastRightClick = System.currentTimeMillis();
+        lastLeftPressed = lastRightPressed = System.currentTimeMillis();
 
         removeAll();
 
         setLayout(new GridLayout(ySize, xSize));
 
         cells = new JButton[xSize][ySize];
+
+        ImageIcon iconClose = cellMap.get(CellState.CLOSE).getIcon();
 
         for (int i = 0; i < xSize; i++) {
             cells[i] = new JButton[ySize];
@@ -94,25 +141,26 @@ class GameBoardPanel extends JPanel {
                 final Integer yValue = j;
 
                 cells[i][j].addMouseListener(new MouseAdapter() {
+
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mousePressed(MouseEvent e) {
                         CellState cellState = gameBoard.getCell(xValue, yValue);
 
                         long now = System.currentTimeMillis();
-                        long rightClick = now - lastRightClick;
-                        long leftClick = now - lastLeftClick;
+                        long rightPressed = now - lastRightPressed;
+                        long leftPressed = now - lastLeftPressed;
 
                         gameStatus = core.getGameStatus();
 
                         if (e.getButton() == MouseEvent.BUTTON2
-                                || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 200))
-                                || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 200))) {
+                                || (e.getButton() == MouseEvent.BUTTON1 && (rightPressed < 200))
+                                || (e.getButton() == MouseEvent.BUTTON3 && (leftPressed < 200))) {
 
                             if (gameStatus.isContinued() && cellState.isNumber()) {
 
                                 if (e.getButton() == MouseEvent.BUTTON2
-                                        || (e.getButton() == MouseEvent.BUTTON1 && (rightClick < 50))
-                                        || (e.getButton() == MouseEvent.BUTTON3 && (leftClick < 50))) {
+                                        || (e.getButton() == MouseEvent.BUTTON1 && (rightPressed < 50))
+                                        || (e.getButton() == MouseEvent.BUTTON3 && (leftPressed < 50))) {
 
                                     core.setOpenAllAround(xValue, yValue);
                                     gameStatus = core.getGameStatus();
@@ -121,7 +169,7 @@ class GameBoardPanel extends JPanel {
                             }
                         } else if (e.getButton() == MouseEvent.BUTTON1) {
 
-                            lastLeftClick = System.currentTimeMillis();
+                            lastLeftPressed = System.currentTimeMillis();
 
                             if (gameStatus.isGame()
                                     && (cellState == CellState.CLOSE || cellState == CellState.QUERY)) {
@@ -138,7 +186,7 @@ class GameBoardPanel extends JPanel {
 
                         } else if (e.getButton() == MouseEvent.BUTTON3) {
 
-                            lastRightClick = System.currentTimeMillis();
+                            lastRightPressed = System.currentTimeMillis();
 
                             if (gameStatus.isContinued()
                                     && (cellState == CellState.CLOSE
@@ -167,51 +215,14 @@ class GameBoardPanel extends JPanel {
 
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
+                CellData cellData = cellMap.get(gameBoard.getCell(i, j));
 
-                CellState cellState = gameBoard.getCell(i, j);
+                cells[i][j].setEnabled(cellData.isEnabled());
 
-                if (cellState == CellState.CLOSE) {
-                    cells[i][j].setIcon(iconClose);
-                    cells[i][j].setEnabled(true);
-                } else if (cellState == CellState.FLAG) {
-                    cells[i][j].setIcon(iconFlag);
-                    cells[i][j].setEnabled(true);
-                } else if (cellState == CellState.QUERY) {
-                    cells[i][j].setIcon(iconQuery);
-                    cells[i][j].setEnabled(true);
-                } else if (cellState == CellState.FREE) {
-                    cells[i][j].setDisabledIcon(iconClose);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N1) {
-                    cells[i][j].setDisabledIcon(icon1);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N2) {
-                    cells[i][j].setDisabledIcon(icon2);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N3) {
-                    cells[i][j].setDisabledIcon(icon3);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N4) {
-                    cells[i][j].setDisabledIcon(icon4);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N5) {
-                    cells[i][j].setDisabledIcon(icon5);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N6) {
-                    cells[i][j].setDisabledIcon(icon6);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N7) {
-                    cells[i][j].setDisabledIcon(icon7);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.N8) {
-                    cells[i][j].setDisabledIcon(icon8);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.MINE) {
-                    cells[i][j].setDisabledIcon(iconMine);
-                    cells[i][j].setEnabled(false);
-                } else if (cellState == CellState.DETONATION) {
-                    cells[i][j].setDisabledIcon(iconDetonation);
-                    cells[i][j].setEnabled(false);
+                if (cellData.isEnabled()) {
+                    cells[i][j].setIcon(cellData.getIcon());
+                } else {
+                    cells[i][j].setDisabledIcon(cellData.getIcon());
                 }
             }
         }

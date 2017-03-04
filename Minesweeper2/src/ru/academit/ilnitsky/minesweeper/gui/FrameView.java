@@ -5,6 +5,8 @@ import ru.academit.ilnitsky.minesweeper.common.*;
 import javax.swing.ImageIcon;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -31,7 +33,7 @@ public class FrameView implements ViewAutoCloseable {
     private final JMenuBar menuBar = new JMenuBar();
     private JMenuItem[] menuScoresSize = new JMenuItem[0];
 
-    private CustomSize customSize;
+    private CustomSizeDialog customSizeDialog;
 
     private GameInfoPanel gameInfoPanel;
     private GameBoardPanel gameBoardPanel;
@@ -43,7 +45,7 @@ public class FrameView implements ViewAutoCloseable {
 
         this.topLength = topLength;
 
-        customSize = new CustomSize(frame);
+        customSizeDialog = new CustomSizeDialog(frame);
 
         gameInfoPanel = new GameInfoPanel();
         gameBoardPanel = new GameBoardPanel(this, gameInfoPanel);
@@ -122,7 +124,7 @@ public class FrameView implements ViewAutoCloseable {
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-            if (result == 0) {
+            if (result == JOptionPane.OK_OPTION) {
                 close();
                 System.exit(0);
             }
@@ -146,16 +148,24 @@ public class FrameView implements ViewAutoCloseable {
 
         JMenuItem menuNew = new JMenuItem("Начать заново");
         JMenuItem menuStop = new JMenuItem("Завершить");
-        JMenuItem menuExit = new JMenuItem("Закрыть");
+        JMenuItem menuExit = new JMenuItem("Выход");
+
+        menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+        menuStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+        menuExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
 
         JRadioButtonMenuItem menuSize[] = new JRadioButtonMenuItem[standardGameNames.length];
         ButtonGroup buttonGroup = new ButtonGroup();
 
         for (int i = 0; i < standardGameNames.length; i++) {
             menuSize[i] = new JRadioButtonMenuItem(standardGameNames[i]);
+            if (i < 9) {
+                menuSize[i].setAccelerator(KeyStroke.getKeyStroke(Integer.toString(i + 1)));
+            }
             buttonGroup.add(menuSize[i]);
         }
         JRadioButtonMenuItem menuCustom = new JRadioButtonMenuItem("Произвольные параметры");
+        menuCustom.setAccelerator(KeyStroke.getKeyStroke("0"));
         buttonGroup.add(menuCustom);
 
         menuSize[0].doClick();
@@ -174,12 +184,14 @@ public class FrameView implements ViewAutoCloseable {
         menuNew.addActionListener(e -> setNewGame());
 
         menuCustom.addActionListener(e -> {
-            boolean isNewGameSize = customSize.showDialog(new GameSize(xSize, ySize, numMines));
+            boolean isNewGameSize = customSizeDialog.showDialog(new GameSize(xSize, ySize, numMines));
 
             if (isNewGameSize) {
-                xSize = customSize.getGameSize().getXSize();
-                ySize = customSize.getGameSize().getYSize();
-                numMines = customSize.getGameSize().getNumMines();
+                GameSize newGameSize = customSizeDialog.getGameSize();
+
+                xSize = newGameSize.getXSize();
+                ySize = newGameSize.getYSize();
+                numMines = newGameSize.getNumMines();
 
                 setNewGame();
             }
@@ -270,6 +282,7 @@ public class FrameView implements ViewAutoCloseable {
         JMenu menuAbout = new JMenu("О программе");
 
         JMenuItem menuAbout2 = new JMenuItem("О программе");
+        menuAbout2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 
         menuAbout2.addActionListener(e ->
                 JOptionPane.showMessageDialog(frame,

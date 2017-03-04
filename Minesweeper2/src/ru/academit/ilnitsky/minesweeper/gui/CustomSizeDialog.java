@@ -4,17 +4,18 @@ import ru.academit.ilnitsky.minesweeper.common.GameSize;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Диалог выбора произвольных параметров для Swing-версии игры "Сапёр"
  * Created by UserLabView on 01.03.17.
  */
-class CustomSize {
-    private Frame frame;
+class CustomSizeDialog {
+    private JFrame frame;
     private boolean isNewGameSize;
     private GameSize gameSize;
 
-    CustomSize(Frame frame) {
+    CustomSizeDialog(JFrame frame) {
         this.frame = frame;
     }
 
@@ -42,6 +43,9 @@ class CustomSize {
 
         JButton buttonCancel = new JButton("Отмена");
         JButton buttonOk = new JButton("Применить");
+
+        buttonCancel.setMnemonic(KeyEvent.VK_C);
+        buttonOk.setMnemonic(KeyEvent.VK_ENTER);
 
         buttonCancel.addActionListener(actionEvent -> {
             isNewGameSize = false;
