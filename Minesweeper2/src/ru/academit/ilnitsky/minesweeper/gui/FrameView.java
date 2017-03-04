@@ -45,8 +45,6 @@ public class FrameView implements ViewAutoCloseable {
 
         this.topLength = topLength;
 
-        customSizeDialog = new CustomSizeDialog(frame);
-
         gameInfoPanel = new GameInfoPanel();
         gameBoardPanel = new GameBoardPanel(this, gameInfoPanel);
     }
@@ -57,6 +55,8 @@ public class FrameView implements ViewAutoCloseable {
 
         gameInfoPanel.addViewListener(listener);
         gameBoardPanel.addViewListener(listener);
+
+        customSizeDialog = new CustomSizeDialog(frame, core);
     }
 
     @Override
