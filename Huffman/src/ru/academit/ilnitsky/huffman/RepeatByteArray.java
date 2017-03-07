@@ -1,6 +1,8 @@
 package ru.academit.ilnitsky.huffman;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by UserLabView on 06.03.17.
@@ -118,8 +120,89 @@ public class RepeatByteArray {
     public void removeSubThresholdLength(byte symbol, int thresholdRate) {
         int symbolIndex = symbol + shift;
 
-        if (symbols[symbolIndex]!=null){
+        if (symbols[symbolIndex] != null) {
+            RepeatByteSymbol[] aboveArray = new RepeatByteSymbol[symbols[symbolIndex].length];
+            RepeatByteSymbol[] subArray = new RepeatByteSymbol[symbols[symbolIndex].length];
 
+            int indexLength1 = -1;
+            int aboveCount = 0;
+            int subCount = 0;
+
+            for (int i = 0; i < symbols[symbolIndex].length; i++) {
+                int length = symbols[symbolIndex][i].getLength();
+
+                if (length == 1) {
+                    indexLength1 = aboveCount;
+                    aboveArray[aboveCount] = symbols[symbolIndex][i];
+                    aboveCount++;
+                } else if (symbols[symbolIndex][i].getLength() * symbols[symbolIndex][i].getRate() > thresholdRate) {
+                    aboveArray[aboveCount] = symbols[symbolIndex][i];
+                    aboveCount++;
+                } else {
+                    subArray[subCount] = symbols[symbolIndex][i];
+                    subCount++;
+                }
+            }
+
+            if (subCount > 0) {
+                int sum = 0;
+
+                for (RepeatByteSymbol s : subArray) {
+                    sum += s.getLength() * s.getRate();
+                }
+
+                if (indexLength1 == -1) {
+                    aboveArray[aboveCount] = new RepeatByteSymbol(symbol, 1, sum);
+                    aboveCount++;
+                } else {
+                    aboveArray[indexLength1].add(sum);
+                }
+            }
+
+            RepeatByteSymbol[] newArray = new RepeatByteSymbol[aboveCount];
+            System.arraycopy(aboveArray, 0, newArray, 0, aboveCount);
+
+            symbols[symbolIndex] = newArray;
+        }
+    }
+
+    public void removeSubThresholdLength() {
+        int thresholdRate = calcThresholdRate();
+
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                removeSubThresholdLength((byte) (i - shift), thresholdRate);
+            }
+        }
+    }
+
+    public void sort(byte symbol, Comparator<RepeatByteSymbol> comparator) {
+        int symbolIndex = symbol + shift;
+
+        if (symbols[symbolIndex] != null && symbols[symbolIndex].length > 1) {
+            Arrays.sort(symbols[symbolIndex], comparator);
+        }
+    }
+
+    public void sort(Comparator<RepeatByteSymbol> comparator) {
+        int thresholdRate = calcThresholdRate();
+
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                sort((byte) (i - shift), comparator);
+            }
+        }
+    }
+
+    public void printAll() {
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                for (RepeatByteSymbol s : symbols[i]) {
+                    if (s != null) {
+                        System.out.println("'" + (char) (i + shift) + "'  L=" + s.getLength() + "  Rate=" + s.getRate());
+                    }
+                }
+            }
         }
     }
 }

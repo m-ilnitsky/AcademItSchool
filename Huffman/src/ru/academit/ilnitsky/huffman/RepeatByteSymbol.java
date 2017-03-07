@@ -8,15 +8,20 @@ public class RepeatByteSymbol {
     private int length;
     private int rate;
 
-    public RepeatByteSymbol(byte symbol, int length) {
-        checkLength(length);
-        this.symbol = symbol;
-        this.length = length;
-        rate = 1;
+    public void setRate(int rate) {
+        this.rate = rate;
     }
 
-    public void add() {
-        rate++;
+    public RepeatByteSymbol(byte symbol, int length) {
+        this(symbol, length, 1);
+    }
+
+    public RepeatByteSymbol(byte symbol, int length, int rate) {
+        checkLength(length);
+        this.symbol = symbol;
+
+        this.length = length;
+        this.rate = rate;
     }
 
     public void add(byte symbol, int length) {
@@ -24,6 +29,14 @@ public class RepeatByteSymbol {
         if ((this.symbol == symbol) && (this.length == length)) {
             rate++;
         }
+    }
+
+    public void add() {
+        rate++;
+    }
+
+    public void add(int number) {
+        rate += number;
     }
 
     public byte getSymbol() {
