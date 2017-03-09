@@ -89,6 +89,18 @@ public class RepeatByteArray {
         return sum;
     }
 
+    public int getRate() {
+        int sum = 0;
+
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                sum += getRate((byte) (i - shift));
+            }
+        }
+
+        return sum;
+    }
+
     public RepeatByteSymbol[] getRepeatSymbol(byte symbol) {
         return symbols[symbol + shift];
     }
@@ -114,13 +126,14 @@ public class RepeatByteArray {
 
         Arrays.sort(rates);
 
-        return (rates[rates.length] + rates[rates.length / 2]) / 2;
+        //return (rates[rates.length - 1] + rates[rates.length / 2]) / 2;
+        return rates[rates.length / 8 * 7];
     }
 
     public void removeSubThresholdLength(byte symbol, int thresholdRate) {
         int symbolIndex = symbol + shift;
 
-        if (symbols[symbolIndex] != null) {
+        if (symbols[symbolIndex] != null && symbols[symbolIndex].length > 1) {
             RepeatByteSymbol[] aboveArray = new RepeatByteSymbol[symbols[symbolIndex].length];
             RepeatByteSymbol[] subArray = new RepeatByteSymbol[symbols[symbolIndex].length];
 
@@ -129,18 +142,20 @@ public class RepeatByteArray {
             int subCount = 0;
 
             for (int i = 0; i < symbols[symbolIndex].length; i++) {
-                int length = symbols[symbolIndex][i].getLength();
+                if (symbols[symbolIndex][i] != null) {
+                    int length = symbols[symbolIndex][i].getLength();
 
-                if (length == 1) {
-                    indexLength1 = aboveCount;
-                    aboveArray[aboveCount] = symbols[symbolIndex][i];
-                    aboveCount++;
-                } else if (symbols[symbolIndex][i].getLength() * symbols[symbolIndex][i].getRate() > thresholdRate) {
-                    aboveArray[aboveCount] = symbols[symbolIndex][i];
-                    aboveCount++;
-                } else {
-                    subArray[subCount] = symbols[symbolIndex][i];
-                    subCount++;
+                    if (length == 1) {
+                        indexLength1 = aboveCount;
+                        aboveArray[aboveCount] = symbols[symbolIndex][i];
+                        aboveCount++;
+                    } else if (symbols[symbolIndex][i].getLength() * symbols[symbolIndex][i].getRate() > thresholdRate) {
+                        aboveArray[aboveCount] = symbols[symbolIndex][i];
+                        aboveCount++;
+                    } else {
+                        subArray[subCount] = symbols[symbolIndex][i];
+                        subCount++;
+                    }
                 }
             }
 
@@ -148,7 +163,9 @@ public class RepeatByteArray {
                 int sum = 0;
 
                 for (RepeatByteSymbol s : subArray) {
-                    sum += s.getLength() * s.getRate();
+                    if (s != null) {
+                        sum += s.getLength() * s.getRate();
+                    }
                 }
 
                 if (indexLength1 == -1) {
@@ -176,7 +193,35 @@ public class RepeatByteArray {
         }
     }
 
-    public void sort(byte symbol, Comparator<RepeatByteSymbol> comparator) {
+    public void trim(byte symbol) {
+        int symbolIndex = symbol + shift;
+
+        if (symbols[symbolIndex] != null) {
+            int count = 0;
+            for (int i = 0; i < symbols[symbolIndex].length; i++) {
+                if (symbols[symbolIndex][i] != null) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            RepeatByteSymbol[] newArray = new RepeatByteSymbol[count];
+            System.arraycopy(symbols[symbolIndex], 0, newArray, 0, count);
+
+            symbols[symbolIndex] = newArray;
+        }
+    }
+
+    public void trim() {
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                trim((byte) (i - shift));
+            }
+        }
+    }
+
+    public void sort(byte symbol, Comparator<RepeatSymbol> comparator) {
         int symbolIndex = symbol + shift;
 
         if (symbols[symbolIndex] != null && symbols[symbolIndex].length > 1) {
@@ -184,9 +229,7 @@ public class RepeatByteArray {
         }
     }
 
-    public void sort(Comparator<RepeatByteSymbol> comparator) {
-        int thresholdRate = calcThresholdRate();
-
+    public void sort(Comparator<RepeatSymbol> comparator) {
         for (int i = 0; i < symbols.length; i++) {
             if (symbols[i] != null) {
                 sort((byte) (i - shift), comparator);
@@ -199,7 +242,7 @@ public class RepeatByteArray {
             if (symbols[i] != null) {
                 for (RepeatByteSymbol s : symbols[i]) {
                     if (s != null) {
-                        System.out.println("'" + (char) (i + shift) + "'  L=" + s.getLength() + "  Rate=" + s.getRate());
+                        System.out.println("'" + (char) (i + shift) + "'=" + i + " L=" + s.getLength() + "  Rate=" + s.getRate());
                     }
                 }
             }

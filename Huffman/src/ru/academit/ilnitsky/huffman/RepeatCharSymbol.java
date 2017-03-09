@@ -3,20 +3,21 @@ package ru.academit.ilnitsky.huffman;
 /**
  * Created by UserLabView on 06.03.17.
  */
-public class RepeatCharSymbol {
+public class RepeatCharSymbol implements RepeatSymbol {
     private char symbol;
     private int length;
     private int rate;
 
     public RepeatCharSymbol(char symbol, int length) {
-        checkLength(length);
-        this.symbol = symbol;
-        this.length = length;
-        rate = 1;
+        this(symbol, length, 1);
     }
 
-    public void add() {
-        rate++;
+    public RepeatCharSymbol(char symbol, int length, int rate) {
+        checkLength(length);
+        this.symbol = symbol;
+
+        this.length = length;
+        this.rate = rate;
     }
 
     public void add(char symbol, int length) {
@@ -24,6 +25,18 @@ public class RepeatCharSymbol {
         if ((this.symbol == symbol) && (this.length == length)) {
             rate++;
         }
+    }
+
+    public void add() {
+        rate++;
+    }
+
+    public void add(int number) {
+        rate += number;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
     }
 
     public char getSymbol() {

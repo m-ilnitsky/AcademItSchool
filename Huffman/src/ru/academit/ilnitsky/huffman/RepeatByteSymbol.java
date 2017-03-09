@@ -3,14 +3,10 @@ package ru.academit.ilnitsky.huffman;
 /**
  * Created by UserLabView on 06.03.17.
  */
-public class RepeatByteSymbol {
+public class RepeatByteSymbol implements RepeatSymbol {
     private byte symbol;
     private int length;
     private int rate;
-
-    public void setRate(int rate) {
-        this.rate = rate;
-    }
 
     public RepeatByteSymbol(byte symbol, int length) {
         this(symbol, length, 1);
@@ -37,6 +33,10 @@ public class RepeatByteSymbol {
 
     public void add(int number) {
         rate += number;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
     }
 
     public byte getSymbol() {
