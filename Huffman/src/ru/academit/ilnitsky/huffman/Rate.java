@@ -73,22 +73,22 @@ public class Rate {
         System.out.println("*** Byte ***");
         byteSymbols.trim();
         byteSymbols.sort(new SortedByLength());
-        System.out.println("*** Symbols = " + byteSymbols.getRate());
+        System.out.println("*** Symbols = " + byteSymbols.getNumInputBytes());
         System.out.println("*** Symbols in Alphabet = " + byteSymbols.getNumSymbolsInAlphabet());
         System.out.println("*** Symbols in File = " + byteSymbols.getNumSymbolsInFile());
         byteSymbols.printAll();
-        byteSymbols.printStatistic();
+        //byteSymbols.printStatistic();
 
         System.out.println();
-        System.out.println("*** Threshold = " + byteSymbols.calcThresholdRate());
+        System.out.println("*** Threshold = " + byteSymbols.calcThreshold());
         byteSymbols.removeSubThresholdLength();
         byteSymbols.sort(new SortedByLength());
-        System.out.println("*** Symbols = " + byteSymbols.getRate());
+        System.out.println("*** Symbols = " + byteSymbols.getNumInputBytes());
         System.out.println("*** Symbols in Alphabet = " + byteSymbols.getNumSymbolsInAlphabet());
         System.out.println("*** Symbols in File = " + byteSymbols.getNumSymbolsInFile());
-        System.out.println("*** Threshold = " + byteSymbols.calcThresholdRate());
+        System.out.println("*** Threshold = " + byteSymbols.calcThreshold());
         byteSymbols.printAll();
-        byteSymbols.printStatistic();
+        //byteSymbols.printStatistic();
 
         /*
         System.out.println();
@@ -101,13 +101,13 @@ public class Rate {
         //charSymbols.printAll();
 
         System.out.println();
-        System.out.println("*** Threshold = " + charSymbols.calcThresholdRate());
+        System.out.println("*** Threshold = " + charSymbols.calcThreshold());
         charSymbols.removeSubThresholdLength();
         charSymbols.sort(new SortedByLength());
         System.out.println("*** Symbols = " + charSymbols.getRate());
         System.out.println("*** Symbols in Alphabet = " + charSymbols.getNumSymbolsInAlphabet());
         System.out.println("*** Symbols in File = " + charSymbols.getNumSymbolsInFile());
-        System.out.println("*** Threshold = " + charSymbols.calcThresholdRate());
+        System.out.println("*** Threshold = " + charSymbols.calcThreshold());
         //charSymbols.printAll();
         */
     }
@@ -116,7 +116,7 @@ public class Rate {
         Rate rate1 = new Rate();
         Rate rate2 = new Rate();
 
-        String file1 = "LICENSE.txt";
+        String file1 = "text.fb2";
         //String file1 = "Matrix.java";
 
         try {
