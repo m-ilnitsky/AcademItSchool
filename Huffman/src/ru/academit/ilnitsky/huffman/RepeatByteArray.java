@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.huffman;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * Created by UserLabView on 06.03.17.
@@ -101,33 +102,83 @@ public class RepeatByteArray {
         return sum;
     }
 
+    public int getNumSymbolsInFile() {
+        int sum = 0;
+
+        for (RepeatByteSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (RepeatByteSymbol s : ss) {
+                    if (s != null) {
+                        sum += s.getRate();
+                    }
+                }
+            }
+        }
+
+        return sum;
+    }
+
+    public int getNumSymbolsInAlphabet() {
+        int count = 0;
+
+        for (RepeatByteSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (RepeatByteSymbol s : ss) {
+                    if (s != null) {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
     public RepeatByteSymbol[] getRepeatSymbol(byte symbol) {
         return symbols[symbol + shift];
     }
 
     public int calcThresholdRate() {
-        int[] rates = new int[symbols.length];
+        int count = 0;
+
+        for (RepeatByteSymbol[] ss : symbols) {
+            if (ss != null) {
+                count++;
+            }
+        }
+
+        int[] rates = new int[count];
 
         int sum;
+        count = 0;
 
-        for (int i = 0; i < symbols.length; i++) {
-            if (symbols[i] != null) {
+        for (RepeatByteSymbol[] ss : symbols) {
+            if (ss != null) {
                 sum = 0;
-                for (RepeatByteSymbol s : symbols[i]) {
+                for (RepeatByteSymbol s : ss) {
                     if (s == null) {
                         break;
                     } else {
                         sum += s.getRate() * s.getLength();
                     }
                 }
-                rates[i] = sum;
+                rates[count] = sum;
+                count++;
             }
         }
 
         Arrays.sort(rates);
 
+        /*
+        if (rates.length > 10) {
+            return (rates[rates.length - 4] + rates[rates.length / 4 * 3]) / 2;
+        } else {
+            return (rates[rates.length - 1] + rates[rates.length / 4 * 3]) / 2;
+        }
+        */
+
         //return (rates[rates.length - 1] + rates[rates.length / 2]) / 2;
-        return rates[rates.length / 8 * 7];
+        return rates[rates.length / 2];
     }
 
     public void removeSubThresholdLength(byte symbol, int thresholdRate) {
@@ -245,6 +296,36 @@ public class RepeatByteArray {
                         System.out.println("'" + (char) (i + shift) + "'=" + i + " L=" + s.getLength() + "  Rate=" + s.getRate());
                     }
                 }
+            }
+        }
+    }
+
+    public void printStatistic() {
+        HashMap<Integer, Integer> numSymbolsForRate = new HashMap<>(256);
+
+        int maxRate = 0;
+
+        for (RepeatByteSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (RepeatByteSymbol s : ss) {
+                    if (s != null) {
+                        int rate = s.getRate();
+                        if (numSymbolsForRate.containsKey(rate)) {
+                            numSymbolsForRate.put(rate, numSymbolsForRate.get(rate) + 1);
+                        } else {
+                            numSymbolsForRate.put(rate, 1);
+                        }
+                        if (rate > maxRate) {
+                            maxRate = rate;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = maxRate; i > 0; i--) {
+            if (numSymbolsForRate.containsKey(i)) {
+                System.out.println("Rate = " + i + " NumSymbols = " + numSymbolsForRate.get(i));
             }
         }
     }

@@ -94,33 +94,81 @@ public class RepeatCharArray {
         return sum;
     }
 
+    public int getNumSymbolsInFile() {
+        int sum = 0;
+
+        for (RepeatCharSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (RepeatCharSymbol s : ss) {
+                    if (s != null) {
+                        sum += s.getRate();
+                    }
+                }
+            }
+        }
+
+        return sum;
+    }
+
+    public int getNumSymbolsInAlphabet() {
+        int count = 0;
+
+        for (RepeatCharSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (RepeatCharSymbol s : ss) {
+                    if (s != null) {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
     public RepeatCharSymbol[] getRepeatSymbol(char symbol) {
         return symbols[symbol];
     }
 
     public int calcThresholdRate() {
-        int[] rates = new int[symbols.length];
+        int count = 0;
+
+        for (RepeatCharSymbol[] ss : symbols) {
+            if (ss != null) {
+                count++;
+            }
+        }
+
+        int[] rates = new int[count];
 
         int sum;
+        count = 0;
 
-        for (int i = 0; i < symbols.length; i++) {
-            if (symbols[i] != null) {
+        for (RepeatCharSymbol[] ss : symbols) {
+            if (ss != null) {
                 sum = 0;
-                for (RepeatCharSymbol s : symbols[i]) {
+                for (RepeatCharSymbol s : ss) {
                     if (s == null) {
                         break;
                     } else {
                         sum += s.getRate() * s.getLength();
                     }
                 }
-                rates[i] = sum;
+                rates[count] = sum;
+                count++;
             }
         }
 
         Arrays.sort(rates);
 
+        if (rates.length > 10) {
+            return (rates[rates.length - 4] + rates[rates.length / 4 * 3]) / 2;
+        } else {
+            return (rates[rates.length - 1] + rates[rates.length / 4 * 3]) / 2;
+        }
+
         //return (rates[rates.length - 1] + rates[rates.length / 2]) / 2;
-        return rates[rates.length / 8 * 7];
+        //return rates[rates.length / 8 * 7];
     }
 
     public void removeSubThresholdLength(char symbol, int thresholdRate) {

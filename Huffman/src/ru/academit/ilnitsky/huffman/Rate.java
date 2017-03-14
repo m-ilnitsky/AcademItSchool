@@ -18,7 +18,29 @@ public class Rate {
 
     private void readFromFile(String fileName) throws IOException {
         try (
-                Scanner fileScanner = new Scanner(new FileInputStream(fileName), "ASCII")
+                FileInputStream file = new FileInputStream(fileName);
+        ) {
+            byte[] bytes = new byte[file.available()];
+            file.read(bytes, 0, file.available());
+
+            int count = 1;
+            byte old = bytes[0];
+            for (int i = 1; i < bytes.length; i++) {
+                if (bytes[i] != bytes[i - 1]) {
+                    byteSymbols.add(old, count);
+                    old = bytes[i];
+                    count = 1;
+                } else {
+                    count++;
+                }
+            }
+            if (count > 1) {
+                byteSymbols.add(old, count);
+            }
+        }
+
+        try (
+                Scanner fileScanner = new Scanner(new FileInputStream(fileName))
         ) {
             while (fileScanner.hasNext()) {
 
@@ -26,14 +48,12 @@ public class Rate {
                 char[] chars = line.toCharArray();
 
                 if (chars.length == 1) {
-                    byteSymbols.add((byte) (chars[0] - 128), 1);
                     charSymbols.add(chars[0], 1);
                 } else {
                     int count = 1;
                     char oldChar = chars[0];
                     for (int i = 1; i < chars.length; i++) {
                         if (chars[i] != chars[i - 1]) {
-                            byteSymbols.add((byte) (oldChar - 128), count);
                             charSymbols.add(oldChar, count);
                             oldChar = chars[i];
                             count = 1;
@@ -42,7 +62,6 @@ public class Rate {
                         }
                     }
                     if (count > 1) {
-                        byteSymbols.add((byte) (oldChar - 128), count);
                         charSymbols.add(oldChar, count);
                     }
                 }
@@ -51,36 +70,46 @@ public class Rate {
     }
 
     public void showSymbolRate() {
-        System.out.println("*** ByteStep1 ***");
+        System.out.println("*** Byte ***");
         byteSymbols.trim();
         byteSymbols.sort(new SortedByLength());
         System.out.println("*** Symbols = " + byteSymbols.getRate());
-        System.out.println("*** Threshold = " + byteSymbols.calcThresholdRate());
+        System.out.println("*** Symbols in Alphabet = " + byteSymbols.getNumSymbolsInAlphabet());
+        System.out.println("*** Symbols in File = " + byteSymbols.getNumSymbolsInFile());
         byteSymbols.printAll();
+        byteSymbols.printStatistic();
 
         System.out.println();
-        System.out.println("*** ByteStep2 ***");
+        System.out.println("*** Threshold = " + byteSymbols.calcThresholdRate());
         byteSymbols.removeSubThresholdLength();
         byteSymbols.sort(new SortedByLength());
         System.out.println("*** Symbols = " + byteSymbols.getRate());
+        System.out.println("*** Symbols in Alphabet = " + byteSymbols.getNumSymbolsInAlphabet());
+        System.out.println("*** Symbols in File = " + byteSymbols.getNumSymbolsInFile());
         System.out.println("*** Threshold = " + byteSymbols.calcThresholdRate());
         byteSymbols.printAll();
+        byteSymbols.printStatistic();
 
+        /*
         System.out.println();
-        System.out.println("*** CharStep1 ***");
+        System.out.println("*** Char ***");
         charSymbols.trim();
         charSymbols.sort(new SortedByLength());
         System.out.println("*** Symbols = " + charSymbols.getRate());
-        System.out.println("*** Threshold = " + charSymbols.calcThresholdRate());
-        charSymbols.printAll();
+        System.out.println("*** Symbols in Alphabet = " + charSymbols.getNumSymbolsInAlphabet());
+        System.out.println("*** Symbols in File = " + charSymbols.getNumSymbolsInFile());
+        //charSymbols.printAll();
 
         System.out.println();
-        System.out.println("*** CharStep2 ***");
+        System.out.println("*** Threshold = " + charSymbols.calcThresholdRate());
         charSymbols.removeSubThresholdLength();
         charSymbols.sort(new SortedByLength());
         System.out.println("*** Symbols = " + charSymbols.getRate());
+        System.out.println("*** Symbols in Alphabet = " + charSymbols.getNumSymbolsInAlphabet());
+        System.out.println("*** Symbols in File = " + charSymbols.getNumSymbolsInFile());
         System.out.println("*** Threshold = " + charSymbols.calcThresholdRate());
-        charSymbols.printAll();
+        //charSymbols.printAll();
+        */
     }
 
     public static void main(String[] args) {
