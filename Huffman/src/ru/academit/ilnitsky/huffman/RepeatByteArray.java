@@ -319,7 +319,7 @@ public class RepeatByteArray {
             if (symbols[i] != null) {
                 for (RepeatByteSymbol s : symbols[i]) {
                     if (s != null) {
-                        System.out.println("'" + (char) (i + shift) + "'=" + i + " L=" + s.getLength() + "  Rate=" + s.getRate());
+                        System.out.println("'" + (char) (i - shift) + "'=" + i + " L=" + s.getLength() + "  Rate=" + s.getRate());
                     }
                 }
             }
