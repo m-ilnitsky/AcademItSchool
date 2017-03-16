@@ -25,9 +25,8 @@ public class NumByteSymbol {
         StringBuilder sb = new StringBuilder();
 
         for (byte b : symbol) {
-            sb.append("[").append((char) (b - shift)).append("]");
+            sb.append("[").append((char) b ).append("]");
         }
-
         return sb.toString();
     }
 
@@ -36,6 +35,7 @@ public class NumByteSymbol {
         final int prime = 37;
         int result = 127;
 
+        result += symbol.length;
         for (byte b : symbol) {
             result = prime * result;
             result += b;

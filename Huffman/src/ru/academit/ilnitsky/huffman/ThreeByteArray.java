@@ -71,6 +71,25 @@ public class ThreeByteArray {
         return count;
     }
 
+    public NumByteSymbol[] getNumByteSymbols() {
+        int size = getNumSymbolsInAlphabet();
+        NumByteSymbol[] result = new NumByteSymbol[size];
+
+        int count = 0;
+        for (int i = 0; i < byteSize; i++) {
+            for (int j = 0; j < byteSize; j++) {
+                for (int k = 0; k < byteSize; k++) {
+                    if (mask[i][j][k] && symbols[i][j][k] > 1) {
+                        result[count] = new NumByteSymbol(new byte[]{(byte) (i - shift), (byte) (j - shift), (byte) (k - shift)});
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     public void printAll() {
         for (int i = 0; i < byteSize; i++) {
             for (int j = 0; j < byteSize; j++) {

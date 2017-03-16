@@ -15,6 +15,9 @@ public class Rate {
     DoubleByteArray doubleByteSymbols2;
     DoubleByteArray doubleByteSymbols;
     ThreeByteArray threeByteSymbols;
+    NumByteArray fourByteSymbols;
+    NumByteArray fiveByteSymbols;
+    NumByteArray sixByteSymbols;
 
     public Rate() {
         byteSymbols = new RepeatByteArray();
@@ -73,6 +76,26 @@ public class Rate {
             for (int i = 2; i < bytes.length; i++) {
                 threeByteSymbols.add(bytes[i - 2], bytes[i - 1], bytes[i]);
             }
+
+            fourByteSymbols = new NumByteArray(3, threeByteSymbols.getNumByteSymbols());
+
+            for (int i = 3; i < bytes.length; i++) {
+                fourByteSymbols.add(new byte[]{bytes[i - 3], bytes[i - 2], bytes[i - 1]}, bytes[i]);
+            }
+
+            int threshold = byteSymbols.calcThreshold();
+
+            fiveByteSymbols = new NumByteArray(4, fourByteSymbols.getNumByteSymbols(threshold));
+
+            for (int i = 4; i < bytes.length; i++) {
+                fiveByteSymbols.add(new byte[]{bytes[i - 4], bytes[i - 3], bytes[i - 2], bytes[i - 1]}, bytes[i]);
+            }
+
+            sixByteSymbols = new NumByteArray(5, fiveByteSymbols.getNumByteSymbols(threshold));
+
+            for (int i = 5; i < bytes.length; i++) {
+                sixByteSymbols.add(new byte[]{bytes[i - 5], bytes[i - 4], bytes[i - 3], bytes[i - 2], bytes[i - 1]}, bytes[i]);
+            }
         }
 
         try (
@@ -126,11 +149,13 @@ public class Rate {
         byteSymbols.printAll();
         //byteSymbols.printStatistic();
 
+        int threshold = byteSymbols.calcThreshold();
+
         System.out.println();
         System.out.println("*** DoubleByte1 ***");
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols1.getNumSymbolsInAlphabet());
         //doubleByteSymbols1.printAll();
-        doubleByteSymbols1.maskSubThreshold(byteSymbols.calcThreshold());
+        doubleByteSymbols1.maskSubThreshold(threshold);
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols1.getNumSymbolsInAlphabet());
         doubleByteSymbols1.printAll();
 
@@ -138,7 +163,7 @@ public class Rate {
         System.out.println("*** DoubleByte2 ***");
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols2.getNumSymbolsInAlphabet());
         //doubleByteSymbols2.printAll();
-        doubleByteSymbols2.maskSubThreshold(byteSymbols.calcThreshold());
+        doubleByteSymbols2.maskSubThreshold(threshold);
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols2.getNumSymbolsInAlphabet());
         doubleByteSymbols2.printAll();
 
@@ -146,7 +171,7 @@ public class Rate {
         System.out.println("*** NumByteSymbol ***");
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols.getNumSymbolsInAlphabet());
         //doubleByteSymbols.printAll();
-        doubleByteSymbols.maskSubThreshold(byteSymbols.calcThreshold());
+        doubleByteSymbols.maskSubThreshold(threshold);
         System.out.println("*** Symbols in Alphabet = " + doubleByteSymbols.getNumSymbolsInAlphabet());
         doubleByteSymbols.printAll();
 
@@ -154,9 +179,30 @@ public class Rate {
         System.out.println("*** ThreeByte ***");
         System.out.println("*** Symbols in Alphabet = " + threeByteSymbols.getNumSymbolsInAlphabet());
         //threeByteSymbols.printAll();
-        threeByteSymbols.maskSubThreshold(byteSymbols.calcThreshold());
+        threeByteSymbols.maskSubThreshold(threshold);
         System.out.println("*** Symbols in Alphabet = " + threeByteSymbols.getNumSymbolsInAlphabet());
         threeByteSymbols.printAll();
+
+        System.out.println();
+        System.out.println("*** FourByte ***");
+        System.out.println("*** Symbols in Alphabet = " + fourByteSymbols.getNumSymbolsInAlphabet(1));
+        //fourByteSymbols.print(1);
+        System.out.println("*** Symbols in Alphabet = " + fourByteSymbols.getNumSymbolsInAlphabet(threshold));
+        fourByteSymbols.print(threshold);
+
+        System.out.println();
+        System.out.println("*** FiveByte ***");
+        System.out.println("*** Symbols in Alphabet = " + fiveByteSymbols.getNumSymbolsInAlphabet(1));
+        //fiveByteSymbols.print(1);
+        System.out.println("*** Symbols in Alphabet = " + fiveByteSymbols.getNumSymbolsInAlphabet(threshold));
+        fiveByteSymbols.print(threshold);
+
+        System.out.println();
+        System.out.println("*** SixByte ***");
+        System.out.println("*** Symbols in Alphabet = " + sixByteSymbols.getNumSymbolsInAlphabet(1));
+        //sixByteSymbols.print(1);
+        System.out.println("*** Symbols in Alphabet = " + sixByteSymbols.getNumSymbolsInAlphabet(threshold));
+        sixByteSymbols.print(threshold);
 
         /*
         System.out.println();
