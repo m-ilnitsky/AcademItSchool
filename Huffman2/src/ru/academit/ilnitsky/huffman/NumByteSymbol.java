@@ -4,9 +4,9 @@ package ru.academit.ilnitsky.huffman;
  * Created by UserLabView on 15.03.17.
  */
 public class NumByteSymbol {
-    private final int shift = 128;
+    protected final int shift = 128;
 
-    private byte[] symbol;
+    protected byte[] symbol;
 
     public NumByteSymbol(byte[] symbol) {
         this.symbol = symbol;

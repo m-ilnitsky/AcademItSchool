@@ -13,6 +13,8 @@ public class Rate {
     private int minNum = 2;
     private int maxNum = -1;
 
+    private AlphabetBuilder alphabetBuilder;
+
     public Rate(int maxLength) {
         byteSymbols = new RepeatByteArray();
         numByteArrays = new NumByteArray[maxLength];
@@ -111,7 +113,7 @@ public class Rate {
                 }
             }
 
-            for(int i=minNum;i<=maxNum;i++){
+            for (int i = minNum; i <= maxNum; i++) {
                 numByteArrays[i].deleteRepeatBytes();
 
                 //////////////////////////
@@ -120,6 +122,21 @@ public class Rate {
                 numByteArrays[i].print(threshold);
                 //////////////////////////
             }
+
+            System.out.println();
+            System.out.println("AlphabetBuilder:");
+            System.out.println();
+
+            alphabetBuilder = new AlphabetBuilder(maxNum + 1, threshold);
+            alphabetBuilder.addSymbols(1, byteSymbols.getAlphabetSymbols(true,threshold));
+            for (int i = minNum; i <= maxNum; i++) {
+                alphabetBuilder.addSymbols(i, numByteArrays[i]);
+            }
+            alphabetBuilder.setDepth();
+            alphabetBuilder.sortByDepthAndRate();
+            alphabetBuilder.setRates();
+            alphabetBuilder.print();
+
         }
     }
 

@@ -350,6 +350,44 @@ public class RepeatByteArray {
         return result;
     }
 
+    public AlphabetSymbol[] getAlphabetSymbols(boolean onlySingleBytes, int threshold) {
+        int size;
+        if (onlySingleBytes) {
+            size = getNumberSingleBytesInAlphabet();
+        } else {
+            size = getNumberSymbolsInAlphabet();
+        }
+
+        AlphabetSymbol[] result = new AlphabetSymbol[size];
+
+        int count = 0;
+        for (int i = 0; i < symbols.length; i++) {
+            if (symbols[i] != null) {
+                for (RepeatByteSymbol s : symbols[i]) {
+                    if (s != null) {
+                        if (onlySingleBytes) {
+                            if (s.getLength() == 1) {
+                                result[count] = new AlphabetSymbol(new byte[]{(byte) (i - shift)}, s.getRate());
+                                count++;
+                                break;
+                            }
+                        } else {
+                            byte[] bytes = new byte[s.getLength()];
+                            byte repeated = (byte) (i - shift);
+                            for (int k = 0; k < bytes.length; k++) {
+                                bytes[i] = repeated;
+                            }
+                            result[count] = new AlphabetSymbol(bytes, s.getRate());
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     public void print() {
         for (int i = 0; i < symbols.length; i++) {
             if (symbols[i] != null) {

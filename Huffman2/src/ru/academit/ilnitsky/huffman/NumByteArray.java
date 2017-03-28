@@ -81,6 +81,28 @@ public class NumByteArray {
         return result;
     }
 
+    public AlphabetSymbol[] getAlphabetSymbols(int threshold) {
+        int size = getNumberSymbolsInAlphabet(threshold);
+        AlphabetSymbol[] result = new AlphabetSymbol[size];
+
+        int count = 0;
+        for (int i = 0; i < rates.length; i++) {
+            for (int j = 0; j < byteSize; j++) {
+                if (rates[i][j] >= threshold) {
+                    byte[] oldArray = numByteSymbols[i].getSymbol();
+                    byte[] newArray = new byte[numBytes + 1];
+                    System.arraycopy(oldArray, 0, newArray, 0, numBytes);
+                    newArray[numBytes] = (byte) (j - shift);
+
+                    result[count] = new AlphabetSymbol(newArray,rates[i][j]);
+                    count++;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public void deleteRepeatBytes() {
         for (int i = 0; i < rates.length; i++) {
             for (int j = 0; j < byteSize; j++) {
