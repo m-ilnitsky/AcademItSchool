@@ -145,11 +145,21 @@ public class Rate {
             System.out.println();
 
             finalSymbols = alphabetBuilder.getAlphabet();
-            Arrays.sort(finalSymbols);
 
             for (FinalSymbol s : finalSymbols) {
                 System.out.println(s);
             }
+
+            System.out.println();
+            System.out.println();
+
+            Arrays.sort(finalSymbols);
+            for (FinalSymbol s : finalSymbols) {
+                System.out.println(s);
+            }
+
+            System.out.println();
+            System.out.println("*** Num Symbols:  "+finalSymbols.length);
         }
     }
 
