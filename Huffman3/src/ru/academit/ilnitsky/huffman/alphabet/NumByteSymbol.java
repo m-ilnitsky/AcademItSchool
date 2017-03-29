@@ -1,11 +1,10 @@
 package ru.academit.ilnitsky.huffman.alphabet;
 
 /**
+ * Символ произвольной длины без указания частоты
  * Created by UserLabView on 15.03.17.
  */
 public class NumByteSymbol implements SymbolInterface {
-    protected final int shift = 128;
-
     protected byte[] symbol;
 
     public NumByteSymbol(byte[] symbol) {

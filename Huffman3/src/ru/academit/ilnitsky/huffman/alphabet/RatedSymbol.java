@@ -1,19 +1,16 @@
 package ru.academit.ilnitsky.huffman.alphabet;
 
 /**
+ * Символ произвольной длины с указанием частоты встречаемости (точнее количества таких символов в тексте)
+ * и глубины вхождения символа в символы большей длины
  * Created by Mike on 27.03.2017.
  */
-public class AlphabetBuilderSymbol extends NumByteSymbol implements RatedSymbolInterface, Comparable<AlphabetBuilderSymbol> {
+public class RatedSymbol extends NumByteSymbol implements RatedSymbolInterface, Comparable<RatedSymbol> {
     protected int depth;
     protected int rate;
 
-    public AlphabetBuilderSymbol(byte[] symbol, int rate) {
+    public RatedSymbol(byte[] symbol, int rate) {
         super(symbol);
-        this.rate = rate;
-    }
-
-    public AlphabetBuilderSymbol(NumByteSymbol numByteSymbol, int rate) {
-        super(numByteSymbol.symbol);
         this.rate = rate;
     }
 
@@ -35,15 +32,15 @@ public class AlphabetBuilderSymbol extends NumByteSymbol implements RatedSymbolI
         this.rate = rate;
     }
 
-    public int indexOfContained(AlphabetBuilderSymbol alphabetBuilderSymbol) {
-        if (symbol.length < alphabetBuilderSymbol.symbol.length) {
+    public int indexOfContained(RatedSymbol ratedSymbol) {
+        if (symbol.length < ratedSymbol.symbol.length) {
             return -1;
         } else {
-            int diff = symbol.length - alphabetBuilderSymbol.symbol.length;
+            int diff = symbol.length - ratedSymbol.symbol.length;
             for (int i = 0; i <= diff; i++) {
                 boolean key = true;
-                for (int j = 0; j < alphabetBuilderSymbol.symbol.length; j++) {
-                    if (alphabetBuilderSymbol.symbol[j] != symbol[i + j]) {
+                for (int j = 0; j < ratedSymbol.symbol.length; j++) {
+                    if (ratedSymbol.symbol[j] != symbol[i + j]) {
                         key = false;
                         break;
                     }
@@ -89,7 +86,7 @@ public class AlphabetBuilderSymbol extends NumByteSymbol implements RatedSymbolI
         } else if (this == object) {
             return true;
         } else if (this.getClass() == object.getClass()) {
-            AlphabetBuilderSymbol other = (AlphabetBuilderSymbol) object;
+            RatedSymbol other = (RatedSymbol) object;
 
             if (this.symbol.length != other.symbol.length) {
                 return false;
@@ -110,8 +107,12 @@ public class AlphabetBuilderSymbol extends NumByteSymbol implements RatedSymbolI
     }
 
     @Override
-    public int compareTo(AlphabetBuilderSymbol symbol) {
-        if (rate > symbol.rate) {
+    public int compareTo(RatedSymbol symbol) {
+        if (depth > symbol.depth) {
+            return 1;
+        } else if (depth < symbol.depth) {
+            return -1;
+        } else if (rate > symbol.rate) {
             return 1;
         } else if (rate < symbol.rate) {
             return -1;

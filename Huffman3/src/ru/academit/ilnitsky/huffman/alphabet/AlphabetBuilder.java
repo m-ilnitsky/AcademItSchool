@@ -1,201 +1,160 @@
 package ru.academit.ilnitsky.huffman.alphabet;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by Mike on 27.03.2017.
+ * Создатель словаря (алфавита) для заданного файла
+ * Created by UserLabView on 29.03.17.
  */
 public class AlphabetBuilder {
-    protected AlphabetBuilderSymbol[][] symbols;
-    protected int threshold;
+    private final String fileName;
+    private byte[] fileBytes;
+    private SingleByteAccumulator singleByteSymbols;
+    private NumByteAccumulator[] numByteSymbols;
+    private AlphabetSymbol[] alphabetSymbols;
+    private int minNum = 2;
+    private int maxNum = -1;
+    private int threshold = 1;
 
-    public AlphabetBuilder(int maxLength, int threshold) {
-        symbols = new AlphabetBuilderSymbol[maxLength][];
+    public AlphabetBuilder(int maxLength, String fileName) throws IOException {
+        this.fileName = fileName;
+        singleByteSymbols = new SingleByteAccumulator();
+        numByteSymbols = new NumByteAccumulator[maxLength];
+
+        try (
+                FileInputStream file = new FileInputStream(fileName)
+        ) {
+            fileBytes = new byte[file.available()];
+            file.read(fileBytes, 0, file.available());
+        }
+    }
+
+    public byte[] getFileBytes() {
+        return fileBytes;
+    }
+
+    public void collectSingleBytes() {
+        for (byte b : fileBytes) {
+            singleByteSymbols.add(b);
+        }
+    }
+
+    public void calcThreshold() {
+        threshold = singleByteSymbols.calcThreshold();
+    }
+
+    public int getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
 
-    public void addSymbols(int length, AlphabetBuilderSymbol[] alphabetBuilderSymbols) {
-        if (alphabetBuilderSymbols.length > 0) {
-            symbols[length] = alphabetBuilderSymbols;
-        }
-    }
+    public void collectManyBytes() {
+        for (int i = 2; i < numByteSymbols.length; i++) {
 
-    public void addSymbols(int length, NumByteAccumulator numByteAccumulator) {
-        int size = numByteAccumulator.getNumberSymbolsInAlphabet(threshold);
-
-        if (size > 0) {
-            symbols[length] = numByteAccumulator.getAlphabetBuilderSymbols(threshold);
-
-            if (symbols[length].length != size) {
-                throw new IllegalArgumentException("symbols[" + length + "].length(" + symbols[length].length + ") != size(" + size + ")");
+            if (i == 2) {
+                numByteSymbols[2] = new NumByteAccumulator(1, singleByteSymbols.getNumByteSymbols(threshold));
+                for (int j = 1; j < fileBytes.length; j++) {
+                    numByteSymbols[2].add(new byte[]{fileBytes[j - 1]}, fileBytes[j]);
+                }
+            } else {
+                int lastSize = i - 1;
+                numByteSymbols[i] = new NumByteAccumulator(lastSize, numByteSymbols[lastSize].getNumByteSymbols(threshold));
+                for (int j = lastSize; j < fileBytes.length; j++) {
+                    byte[] lastBytes = new byte[lastSize];
+                    for (int k = lastSize; k > 0; k--) {
+                        lastBytes[lastSize - k] = fileBytes[j - k];
+                    }
+                    numByteSymbols[i].add(lastBytes, fileBytes[j]);
+                }
             }
-        }
-    }
 
-    public void sortByDepthAndRate() {
-        SortedByDepthAndRate comparator = new SortedByDepthAndRate();
-        for (AlphabetBuilderSymbol[] ss : symbols) {
-            if (ss != null) {
-                Arrays.sort(ss, comparator);
+            if (numByteSymbols[i].getNumberSymbolsInAlphabet(threshold) == 0) {
+                maxNum = i - 1;
+                break;
             }
-        }
-    }
 
-    public void sortByRate() {
-        for (AlphabetBuilderSymbol[] ss : symbols) {
-            if (ss != null) {
-                Arrays.sort(ss);
+            if (i == numByteSymbols.length - 1) {
+                maxNum = i;
             }
         }
     }
 
-    public void setDepth() {
-        for (int i = symbols.length - 1; i >= 2; i--) {
-            if (symbols[i] != null && symbols[i - 1] != null) {
-                for (int j = 0; j < symbols[i].length; j++) {
-                    for (int k = 0; k < symbols[i - 1].length; k++) {
-                        if (symbols[i][j].indexOfContained(symbols[i - 1][k]) > -1) {
-                            symbols[i - 1][k].setDepth(symbols[i][j].getDepth() + 1);
-                        }
-                    }
-                }
-            }
+    public void createAlphabet() {
+        RatedSymbolSelector ratedSymbolSelector;
+
+        ratedSymbolSelector = new RatedSymbolSelector(maxNum + 1, threshold);
+        ratedSymbolSelector.addSymbols(1, singleByteSymbols.getRatedSymbols());
+        for (int i = minNum; i <= maxNum; i++) {
+            ratedSymbolSelector.addSymbols(i, numByteSymbols[i]);
         }
+        ratedSymbolSelector.setDepth();
+        ratedSymbolSelector.sortByDepthAndRate();
+        ratedSymbolSelector.setRates();
+
+        alphabetSymbols = ratedSymbolSelector.getAlphabet();
+
+        Arrays.sort(alphabetSymbols);
     }
 
-    public void setRates() {
-        for (int i = 3; i < symbols.length; i++) {
-            if (symbols[i] != null && symbols[i - 1] != null) {
-                for (int j = symbols[i].length - 1; j >= 0; j--) {
-                    for (int k = symbols[i - 1].length - 1; k >= 0; k--) {
-
-                        if (symbols[i - 1][k].getDepth() == 0) {
-                            break;
-                        }
-
-                        if (symbols[i][j].indexOfContained(symbols[i - 1][k]) > -1) {
-                            if (symbols[i][j].getRate() <= symbols[i - 1][k].getRate()) {
-                                //System.out.println("v2  i=" + i + " j=" + j + " k=" + k);
-                                //System.out.println(symbols[i][j]);
-                                //System.out.println(symbols[i - 1][k]);
-                                symbols[i - 1][k].setRate(symbols[i - 1][k].getRate() - symbols[i][j].getRate());
-                                //System.out.println(symbols[i][j]);
-                                //System.out.println(symbols[i - 1][k]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for (int i = 2; i < symbols.length; i++) {
-            if (symbols[i] != null) {
-                int threshold2 = threshold / i;
-                for (int j = symbols[i].length - 1; j >= 0; j--) {
-                    if (symbols[i][j].getRate() < threshold2) {
-                        symbols[i][j].setRate(0);
-                    }
-                }
-            }
-        }
-
-        sortByRate();
-
-        int shift = 128;
-        AlphabetBuilderSymbol[] cash = new AlphabetBuilderSymbol[256];
-        for (int i = 0; i < symbols[1].length; i++) {
-            cash[symbols[1][i].getSymbol()[0] + shift] = symbols[1][i];
-        }
-
-        for (int i = symbols.length - 1; i >= 2; i--) {
-            if (symbols[i] != null) {
-                for (int j = symbols[i].length - 1; j >= 0; j--) {
-                    byte[] bytes = symbols[i][j].getSymbol();
-                    int rate = symbols[i][j].getRate();
-
-                    boolean key = false;
-                    for (int k = 0; k < bytes.length; k++) {
-                        int index = bytes[k] + shift;
-                        if (cash[index] != null) {
-                            if (cash[index].getRate() < rate) {
-                                key = true;
-                                rate = cash[index].getRate();
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Unknown symbol: [" + (char) bytes[k] + "]=" + bytes[k]);
-                        }
-                    }
-
-                    if (key) {
-                        symbols[i][j].setRate(rate);
-                    }
-
-                    if (rate > threshold / i) {
-                        for (int k = 0; k < bytes.length; k++) {
-                            int index = bytes[k] + shift;
-                            cash[index].setRate(cash[index].getRate() - rate);
-                        }
-                    } else {
-                        symbols[i][j].setRate(0);
-                    }
-                }
-            }
-
-        }
-
-        sortByRate();
+    public AlphabetSymbol[] getByteAlphabet() {
+        return singleByteSymbols.getAlphabetSymbols();
     }
 
-    public int numSymbols() {
-        int count = 0;
-
-        for (AlphabetBuilderSymbol[] ss : symbols) {
-            if (ss != null) {
-                for (AlphabetBuilderSymbol s : ss) {
-                    if (s != null && s.rate > 0) {
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return count;
+    public AlphabetSymbol[] getSyllableAlphabet() {
+        return alphabetSymbols;
     }
 
-    public FinalSymbol[] getAlphabet() {
-        FinalSymbol[] finalSymbol = new FinalSymbol[numSymbols()];
-        int count = 0;
-
-        for (AlphabetBuilderSymbol[] ss : symbols) {
-            if (ss != null) {
-                for (AlphabetBuilderSymbol s : ss) {
-                    if (s != null && s.rate > 0) {
-                        finalSymbol[count] = new FinalSymbol(s);
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return finalSymbol;
+    public int getFileSizeWithBytes() {
+        return fileBytes.length;
     }
 
-    public void print() {
-        for (int i = 0; i < symbols.length; i++) {
-            if (symbols[i] != null) {
-                int count = 0;
-                for (int j = 0; j < symbols[i].length; j++) {
-                    if (symbols[i][j] != null && symbols[i][j].getRate() > 0) {
-                        count++;
-                    }
-                }
-                System.out.println(i + "-byte Symbols: " + count);
-                for (int j = 0; j < symbols[i].length; j++) {
-                    if (symbols[i][j] != null && symbols[i][j].getRate() > 0) {
-                        System.out.println(symbols[i][j]);
-                    }
-                }
-            }
+    public int getFileSizeWithAlphabet() {
+        int sumRate = 0;
+        for (AlphabetSymbol s : alphabetSymbols) {
+            sumRate += s.getRate();
         }
+        return sumRate;
+    }
+
+    public void printByteAlphabet() {
+        int numSymbols = singleByteSymbols.getNumberSymbolsInAlphabet();
+
+        System.out.println("****************************");
+        System.out.println("*** Single Byte Alphabet ***");
+        System.out.println("*** File Name = '" + fileName + "'");
+        System.out.println("*** Bytes in File = " + fileBytes.length);
+        System.out.println("*** Number Symbols = " + numSymbols);
+        System.out.println();
+
+        singleByteSymbols.print();
+
+        System.out.println();
+        System.out.println("*** Number Symbols = " + numSymbols);
+        System.out.println("******");
+    }
+
+    public void printSyllableAlphabet() {
+        System.out.println("*************************");
+        System.out.println("*** Syllable Alphabet ***");
+        System.out.println("*** File Name = '" + fileName + "'");
+        System.out.println("*** Number Symbols = " + alphabetSymbols.length);
+        System.out.println("*** Initial File Size [bytes] = " + getFileSizeWithBytes());
+        System.out.println("*** Simple Coded File Size [bytes] = " + getFileSizeWithAlphabet());
+        System.out.println();
+
+        for (AlphabetSymbol s : alphabetSymbols) {
+            System.out.println(s);
+        }
+
+        System.out.println();
+        System.out.println("*** Number Symbols = " + alphabetSymbols.length);
+        System.out.println("*** Initial File Size [bytes] = " + getFileSizeWithBytes());
+        System.out.println("*** Simple Coded File Size [bytes] = " + getFileSizeWithAlphabet());
+        System.out.println("******");
     }
 }

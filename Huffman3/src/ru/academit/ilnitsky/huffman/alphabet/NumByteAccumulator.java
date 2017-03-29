@@ -3,9 +3,11 @@ package ru.academit.ilnitsky.huffman.alphabet;
 import java.util.HashMap;
 
 /**
+ * Накопитель символов произвольной длины
+ * Подсчитывает частоту встречаемости каждого сивола (последовательности байт) в заданном наборе байт
  * Created by UserLabView on 16.03.17.
  */
-public class NumByteAccumulator {
+class NumByteAccumulator {
     private HashMap<NumByteSymbol, Integer> hashMap;
     private NumByteSymbol[] numByteSymbols;
     private int[][] rates;
@@ -14,7 +16,7 @@ public class NumByteAccumulator {
     private final int shift = 128;
     private final int byteSize = 256;
 
-    public NumByteAccumulator(int numBytes, NumByteSymbol[] numByteSymbols) {
+    NumByteAccumulator(int numBytes, NumByteSymbol[] numByteSymbols) {
         this.numBytes = numBytes;
         this.numByteSymbols = numByteSymbols;
 
@@ -32,7 +34,7 @@ public class NumByteAccumulator {
         }
     }
 
-    public void add(byte[] bytes, byte newByte) {
+    void add(byte[] bytes, byte newByte) {
         if (numBytes != bytes.length) {
             throw new IllegalArgumentException("numBytes(" + numBytes + ") != bytes.length(" + bytes.length + ")");
         }
@@ -45,12 +47,12 @@ public class NumByteAccumulator {
         }
     }
 
-    public int getNumberSymbolsInAlphabet(int threshold) {
+    int getNumberSymbolsInAlphabet(int threshold) {
         int count = 0;
 
-        for (int i = 0; i < rates.length; i++) {
-            for (int j = 0; j < byteSize; j++) {
-                if (rates[i][j] >= threshold) {
+        for (int[] rr : rates) {
+            for (int r : rr) {
+                if (r >= threshold) {
                     count++;
                 }
             }
@@ -59,7 +61,7 @@ public class NumByteAccumulator {
         return count;
     }
 
-    public NumByteSymbol[] getNumByteSymbols(int threshold) {
+    NumByteSymbol[] getNumByteSymbols(int threshold) {
         int size = getNumberSymbolsInAlphabet(threshold);
         NumByteSymbol[] result = new NumByteSymbol[size];
 
@@ -81,9 +83,9 @@ public class NumByteAccumulator {
         return result;
     }
 
-    public AlphabetBuilderSymbol[] getAlphabetBuilderSymbols(int threshold) {
+    RatedSymbol[] getRatedSymbols(int threshold) {
         int size = getNumberSymbolsInAlphabet(threshold);
-        AlphabetBuilderSymbol[] result = new AlphabetBuilderSymbol[size];
+        RatedSymbol[] result = new RatedSymbol[size];
 
         int count = 0;
         for (int i = 0; i < rates.length; i++) {
@@ -94,7 +96,7 @@ public class NumByteAccumulator {
                     System.arraycopy(oldArray, 0, newArray, 0, numBytes);
                     newArray[numBytes] = (byte) (j - shift);
 
-                    result[count] = new AlphabetBuilderSymbol(newArray, rates[i][j]);
+                    result[count] = new RatedSymbol(newArray, rates[i][j]);
                     count++;
                 }
             }
@@ -103,19 +105,7 @@ public class NumByteAccumulator {
         return result;
     }
 
-    public void deleteRepeatBytes() {
-        for (int i = 0; i < rates.length; i++) {
-            for (int j = 0; j < byteSize; j++) {
-                if (numByteSymbols[i].getLength() == 1 || numByteSymbols[i].isRepeatByte()) {
-                    if (numByteSymbols[i].getSymbol()[0] == (byte) (j - shift)) {
-                        rates[i][j] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    public void print(int threshold) {
+    void print(int threshold) {
         for (int i = 0; i < rates.length; i++) {
             for (int j = 0; j < byteSize; j++) {
                 if (rates[i][j] >= threshold) {

@@ -3,28 +3,33 @@ package ru.academit.ilnitsky.huffman.alphabet;
 import java.util.Arrays;
 
 /**
+ * Накопитель однобайтовых символов
+ * Подсчитывает частоту встречаемости каждого байта в заданном наборе байт
  * Created by UserLabView on 29.03.17.
  */
-public class SingleByteAccumulator {
+class SingleByteAccumulator {
     private int[] rates;
 
     private final int shift = 128;
-    private final int byteSize = 256;
 
-    public SingleByteAccumulator() {
-        rates = new int[byteSize];
+    SingleByteAccumulator() {
+        rates = new int[256];
     }
 
-    public void add(byte newByte) {
+    void add(byte newByte) {
         int index = newByte + shift;
         rates[index]++;
     }
 
-    public int getNumberSymbolsInAlphabet(int threshold) {
+    int getNumberSymbolsInAlphabet() {
+        return getNumberSymbolsInAlphabet(1);
+    }
+
+    int getNumberSymbolsInAlphabet(int threshold) {
         int count = 0;
 
-        for (int i = 0; i < rates.length; i++) {
-            if (rates[i] >= threshold) {
+        for (int r : rates) {
+            if (r >= threshold) {
                 count++;
             }
         }
@@ -32,7 +37,11 @@ public class SingleByteAccumulator {
         return count;
     }
 
-    public NumByteSymbol[] getNumByteSymbols(int threshold) {
+    NumByteSymbol[] getNumByteSymbols() {
+        return getNumByteSymbols(1);
+    }
+
+    NumByteSymbol[] getNumByteSymbols(int threshold) {
         int size = getNumberSymbolsInAlphabet(threshold);
         NumByteSymbol[] result = new NumByteSymbol[size];
 
@@ -48,15 +57,19 @@ public class SingleByteAccumulator {
         return result;
     }
 
-    public AlphabetBuilderSymbol[] getAlphabetBuilderSymbols(int threshold) {
+    RatedSymbol[] getRatedSymbols() {
+        return getRatedSymbols(1);
+    }
+
+    RatedSymbol[] getRatedSymbols(int threshold) {
         int size = getNumberSymbolsInAlphabet(threshold);
-        AlphabetBuilderSymbol[] result = new AlphabetBuilderSymbol[size];
+        RatedSymbol[] result = new RatedSymbol[size];
 
         int count = 0;
         for (int i = 0; i < rates.length; i++) {
             if (rates[i] >= threshold) {
                 byte[] newArray = new byte[]{(byte) (i - shift)};
-                result[count] = new AlphabetBuilderSymbol(newArray, rates[i]);
+                result[count] = new RatedSymbol(newArray, rates[i]);
                 count++;
             }
         }
@@ -64,7 +77,23 @@ public class SingleByteAccumulator {
         return result;
     }
 
-    public int calcThreshold() {
+    AlphabetSymbol[] getAlphabetSymbols() {
+        int size = getNumberSymbolsInAlphabet();
+        AlphabetSymbol[] result = new AlphabetSymbol[size];
+
+        int count = 0;
+        for (int i = 0; i < rates.length; i++) {
+            if (rates[i] > 0) {
+                byte[] newArray = new byte[]{(byte) (i - shift)};
+                result[count] = new AlphabetSymbol(newArray, rates[i]);
+                count++;
+            }
+        }
+
+        return result;
+    }
+
+    int calcThreshold() {
         int sum = 0;
         int count = 0;
         for (int r : rates) {
@@ -88,16 +117,20 @@ public class SingleByteAccumulator {
 
         int center = (array[array.length - 1] + array[0]) / 2;
 
-        System.out.println("average=" + average);
-        System.out.println("median=" + median);
-        System.out.println("center=" + center);
+        int min = Math.min(Math.min(average, median), center);
+        min = (min + array[0]) / 2;
 
-        return Math.max(Math.min(Math.min(average, median), center), 1);
+        //System.out.println("average=" + average);
+        //System.out.println("median=" + median);
+        //System.out.println("center=" + center);
+        //System.out.println("min=" + min);
+
+        return Math.max(min, 2);
     }
 
-    public void print(int threshold) {
+    void print() {
         for (int i = 0; i < rates.length; i++) {
-            if (rates[i] >= threshold) {
+            if (rates[i] > 0) {
                 System.out.println("[" + (char) (i - shift) + "] Rate = " + rates[i]);
             }
         }

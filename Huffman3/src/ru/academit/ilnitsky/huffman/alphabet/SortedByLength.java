@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.huffman.alphabet;
 import java.util.Comparator;
 
 /**
+ * Сортировка символов по длине
  * Created by UserLabView on 07.03.17.
  */
 public class SortedByLength implements Comparator<SymbolInterface> {

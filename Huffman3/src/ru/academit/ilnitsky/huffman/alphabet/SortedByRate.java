@@ -3,6 +3,7 @@ package ru.academit.ilnitsky.huffman.alphabet;
 import java.util.Comparator;
 
 /**
+ * Сортировка символов по частоте встречаемости
  * Created by UserLabView on 07.03.17.
  */
 public class SortedByRate implements Comparator<RatedSymbolInterface> {

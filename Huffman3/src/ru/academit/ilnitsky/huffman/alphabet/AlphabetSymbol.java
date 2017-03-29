@@ -1,24 +1,25 @@
 package ru.academit.ilnitsky.huffman.alphabet;
 
 /**
+ * Символ произвольной длины с указанием частоты встречаемости (точнее количества таких символов в тексте)
  * Created by UserLabView on 29.03.17.
  */
-public class FinalSymbol extends NumByteSymbol implements Comparable<FinalSymbol> {
+public class AlphabetSymbol extends NumByteSymbol implements Comparable<AlphabetSymbol> {
     private int rate;
 
-    public FinalSymbol(byte[] symbol, int rate) {
+    public AlphabetSymbol(byte[] symbol, int rate) {
         super(symbol);
         this.rate = rate;
     }
 
-    public FinalSymbol(NumByteSymbol numByteSymbol, int rate) {
+    public AlphabetSymbol(NumByteSymbol numByteSymbol, int rate) {
         super(numByteSymbol.symbol);
         this.rate = rate;
     }
 
-    public FinalSymbol(AlphabetBuilderSymbol alphabetBuilderSymbol) {
-        super(alphabetBuilderSymbol.symbol);
-        this.rate = alphabetBuilderSymbol.rate;
+    public AlphabetSymbol(RatedSymbol ratedSymbol) {
+        super(ratedSymbol.symbol);
+        this.rate = ratedSymbol.rate;
     }
 
     public int getRate() {
@@ -62,7 +63,7 @@ public class FinalSymbol extends NumByteSymbol implements Comparable<FinalSymbol
         } else if (this == object) {
             return true;
         } else if (this.getClass() == object.getClass()) {
-            FinalSymbol other = (FinalSymbol) object;
+            AlphabetSymbol other = (AlphabetSymbol) object;
 
             if (this.symbol.length != other.symbol.length) {
                 return false;
@@ -81,7 +82,7 @@ public class FinalSymbol extends NumByteSymbol implements Comparable<FinalSymbol
     }
 
     @Override
-    public int compareTo(FinalSymbol symbol) {
+    public int compareTo(AlphabetSymbol symbol) {
         if (rate > symbol.rate) {
             return 1;
         } else if (rate < symbol.rate) {
