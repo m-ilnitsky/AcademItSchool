@@ -2,6 +2,7 @@ package ru.academit.ilnitsky.huffman;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by UserLabView on 06.03.17.
@@ -14,6 +15,8 @@ public class Rate {
     private int maxNum = -1;
 
     private AlphabetBuilder alphabetBuilder;
+
+    private FinalSymbol[] finalSymbols;
 
     public Rate(int maxLength) {
         byteSymbols = new RepeatByteArray();
@@ -128,7 +131,7 @@ public class Rate {
             System.out.println();
 
             alphabetBuilder = new AlphabetBuilder(maxNum + 1, threshold);
-            alphabetBuilder.addSymbols(1, byteSymbols.getAlphabetSymbols(true,threshold));
+            alphabetBuilder.addSymbols(1, byteSymbols.getAlphabetSymbols(true, threshold));
             for (int i = minNum; i <= maxNum; i++) {
                 alphabetBuilder.addSymbols(i, numByteArrays[i]);
             }
@@ -137,6 +140,16 @@ public class Rate {
             alphabetBuilder.setRates();
             alphabetBuilder.print();
 
+            System.out.println();
+            System.out.println("finalSymbols:");
+            System.out.println();
+
+            finalSymbols = alphabetBuilder.getAlphabet();
+            Arrays.sort(finalSymbols);
+
+            for (FinalSymbol s : finalSymbols) {
+                System.out.println(s);
+            }
         }
     }
 

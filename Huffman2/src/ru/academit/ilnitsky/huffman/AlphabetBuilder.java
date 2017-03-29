@@ -128,7 +128,7 @@ public class AlphabetBuilder {
                         int index = bytes[k] + shift;
                         cash[index].setRate(cash[index].getRate() - rate);
                     }
-                }else {
+                } else {
                     symbols[i][j].setRate(0);
                 }
             }
@@ -137,73 +137,39 @@ public class AlphabetBuilder {
         sortByRate();
     }
 
-    /*public void setRates() {
-        System.out.println("start");
-        for (int i = symbols.length-1; i >= 2; i--) {
-            for (int j = symbols[i].length - 1; j >= 0; j--) {
-                for (int k = symbols[i - 1].length - 1; k >= 0; k--) {
+    public int numSymbols() {
+        int count = 0;
 
-                    if (symbols[i - 1][k].getDepth() == 0) {
-                        //break;
-                    }
-
-                    int index = symbols[i][j].indexOfContained(symbols[i - 1][k]);
-
-                    if (index > -1) {
-                        if (symbols[i][j].getRate() > symbols[i - 1][k].getRate()) {
-                            System.out.println("v1_0 i=" + i + " j=" + j + " k=" + k
-                                    +"  [i][j]="+symbols[i][j].getRate()+"  [i-1][k]="+symbols[i - 1][k].getRate());
-                            System.out.println(symbols[i][j]);
-                            System.out.println(symbols[i - 1][k]);
-                            symbols[i][j].setRate(0);
-                            break;
-                        } else {
-                            if (index == 0 || index == 1) {
-                                byte[] bytes = symbols[i][j].getSymbol();
-                                byte lastByte;
-                                if (index == 0) {
-                                    lastByte = bytes[bytes.length - 1];
-                                } else {
-                                    lastByte = bytes[0];
-                                }
-
-                                for (int n = symbols[1].length - 1; n >= 0; n--) {
-                                    if (symbols[1][n].getDepth() == 0) {
-                                        //break;
-                                    }
-
-                                    if (lastByte == symbols[1][n].getSymbol()[0]) {
-                                        if (symbols[i][j].getRate() > symbols[1][n].getRate()) {
-                                            System.out.println("v2_0 i=" + i + " j=" + j + " n=" + n
-                                                    +"  [i][j]="+symbols[i][j].getRate()+"  [1][n]="+symbols[1][n].getRate());
-                                            System.out.println(symbols[i][j]);
-                                            System.out.println(symbols[1][n]);
-                                            symbols[i][j].setRate(0);
-                                        } else {
-                                            System.out.println("v3   i=" + i + " j=" + j + " k=" + k);
-                                            System.out.println(symbols[i][j]);
-                                            System.out.println(symbols[i - 1][k]);
-                                            System.out.println(symbols[1][n]);
-                                            symbols[1][n].setRate(symbols[1][n].getRate() - symbols[i][j].getRate());
-                                            symbols[i - 1][k].setRate(symbols[i - 1][k].getRate() - symbols[i][j].getRate());
-                                            System.out.println(symbols[i][j]);
-                                            System.out.println(symbols[i - 1][k]);
-                                            System.out.println(symbols[1][n]);
-                                        }
-                                        break;
-                                    }
-                                }
-                            } else {
-                                throw new IllegalArgumentException("index=" + index);
-                            }
-                        }
+        for (AlphabetSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (AlphabetSymbol s : ss) {
+                    if (s != null && s.rate > 0) {
+                        count++;
                     }
                 }
             }
         }
-        System.out.println("stop");
+
+        return count;
     }
-    */
+
+    public FinalSymbol[] getAlphabet() {
+        FinalSymbol[] finalSymbol = new FinalSymbol[numSymbols()];
+        int count = 0;
+
+        for (AlphabetSymbol[] ss : symbols) {
+            if (ss != null) {
+                for (AlphabetSymbol s : ss) {
+                    if (s != null && s.rate > 0) {
+                        finalSymbol[count] = new FinalSymbol(s);
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return finalSymbol;
+    }
 
     public void print() {
         for (int i = 0; i < symbols.length; i++) {

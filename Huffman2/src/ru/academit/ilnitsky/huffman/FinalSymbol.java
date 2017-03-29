@@ -1,28 +1,24 @@
 package ru.academit.ilnitsky.huffman;
 
 /**
- * Created by Mike on 27.03.2017.
+ * Created by UserLabView on 29.03.17.
  */
-public class AlphabetSymbol extends NumByteSymbol implements Comparable<AlphabetSymbol> {
-    protected int depth;
-    protected int rate;
+public class FinalSymbol extends NumByteSymbol implements Comparable<FinalSymbol> {
+    private int rate;
 
-    public AlphabetSymbol(byte[] symbol, int rate) {
+    public FinalSymbol(byte[] symbol, int rate) {
         super(symbol);
         this.rate = rate;
     }
 
-    public AlphabetSymbol(NumByteSymbol numByteSymbol, int rate) {
+    public FinalSymbol(NumByteSymbol numByteSymbol, int rate) {
         super(numByteSymbol.symbol);
         this.rate = rate;
     }
 
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
+    public FinalSymbol(AlphabetSymbol alphabetSymbol) {
+        super(alphabetSymbol.symbol);
+        this.rate = alphabetSymbol.rate;
     }
 
     public int getRate() {
@@ -33,27 +29,6 @@ public class AlphabetSymbol extends NumByteSymbol implements Comparable<Alphabet
         this.rate = rate;
     }
 
-    public int indexOfContained(AlphabetSymbol alphabetSymbol) {
-        if (symbol.length < alphabetSymbol.symbol.length) {
-            return -1;
-        } else {
-            int diff = symbol.length - alphabetSymbol.symbol.length;
-            for (int i = 0; i <= diff; i++) {
-                boolean key = true;
-                for (int j = 0; j < alphabetSymbol.symbol.length; j++) {
-                    if (alphabetSymbol.symbol[j] != symbol[i + j]) {
-                        key = false;
-                        break;
-                    }
-                }
-                if (key) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -62,7 +37,7 @@ public class AlphabetSymbol extends NumByteSymbol implements Comparable<Alphabet
             sb.append("[").append((char) b).append("]");
         }
 
-        sb.append("  Depth=").append(depth).append("  Rate=").append(rate);
+        sb.append("  Rate=").append(rate);
 
         return sb.toString();
     }
@@ -72,7 +47,7 @@ public class AlphabetSymbol extends NumByteSymbol implements Comparable<Alphabet
         final int prime = 37;
         int result = 127;
 
-        result += symbol.length + depth + rate;
+        result += symbol.length + rate;
         for (byte b : symbol) {
             result = prime * result;
             result += b;
@@ -87,13 +62,11 @@ public class AlphabetSymbol extends NumByteSymbol implements Comparable<Alphabet
         } else if (this == object) {
             return true;
         } else if (this.getClass() == object.getClass()) {
-            AlphabetSymbol other = (AlphabetSymbol) object;
+            FinalSymbol other = (FinalSymbol) object;
 
             if (this.symbol.length != other.symbol.length) {
                 return false;
             } else if (this.rate != other.rate) {
-                return false;
-            } else if (this.depth != other.depth) {
                 return false;
             } else {
                 for (int i = 0; i < symbol.length; i++) {
@@ -108,7 +81,7 @@ public class AlphabetSymbol extends NumByteSymbol implements Comparable<Alphabet
     }
 
     @Override
-    public int compareTo(AlphabetSymbol symbol) {
+    public int compareTo(FinalSymbol symbol) {
         if (rate > symbol.rate) {
             return 1;
         } else if (rate < symbol.rate) {
