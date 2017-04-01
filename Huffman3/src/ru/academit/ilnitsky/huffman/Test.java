@@ -12,8 +12,8 @@ import java.util.Scanner;
 public class Test {
     public static void main(String[] args) {
         String fileName;
-        //fileName = "text.fb2";
-        fileName = "Matrix.java";
+        fileName = "text.fb2";
+        //fileName = "Matrix.java";
 
         try {
             AlphabetBuilder alphabetBuilder = new AlphabetBuilder(256, fileName);
